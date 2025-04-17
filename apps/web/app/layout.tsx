@@ -10,6 +10,22 @@ import { generateRootMetadata } from '~/lib/root-metdata';
 
 import '../styles/globals.css';
 
+import { Barlow_Condensed, Montserrat } from 'next/font/google';
+
+const barlowCondensed = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-barlow-condensed',
+  display: 'swap',
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-montserrat',
+  display: 'swap',
+});
+
 export default async function RootLayout({
   children,
 }: {
@@ -21,7 +37,7 @@ export default async function RootLayout({
 
   return (
     <html lang={language} className={className}>
-      <body>
+      <body className={`${barlowCondensed.variable} ${montserrat.variable}`}>
         <RootProviders theme={theme} lang={language}>
           {children}
         </RootProviders>

@@ -1,0 +1,879 @@
+{
+  "apiEndpoints": [
+    {
+      "name": "Admissions",
+      "method": "GET",
+      "path": "/patients/admissions",
+      "description": "List admissions within a date range",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "phi_level", "type": "string", "location": "query", "required": true, "description": "Detail Level", "availableValues": ["high", "medium", "low"] },
+        { "name": "start_date", "type": "string", "location": "query", "required": true, "description": "Start Date (Example: 2018-12-01)", "format": "$date" },
+        { "name": "end_date", "type": "string", "location": "query", "required": true, "description": "End Date (Example: 2018-12-03)", "format": "$date" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Patients per page" },
+        { "name": "insurance_detail", "type": "string", "location": "query", "description": "Show insurance detail with phi_level: high", "availableValues": ["v121"] },
+        { "name": "demographics_detail", "type": "string", "location": "query", "description": "Show demographics detail with phi_level: high", "availableValues": ["v121"] },
+        { "name": "patient_status_detail", "type": "string", "location": "query", "description": "Show patient status detail with phi_level: high", "availableValues": ["v121"] },
+        { "name": "patient_contacts_detail", "type": "boolean", "location": "query", "description": "Show patient contacts detail with phi_level: high" },
+        { "name": "location_id", "type": "integer", "location": "query", "format": "$int32", "description": "Location ID (Can be found through the Locations index route)" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "patients": [
+              {
+                "casefile_id": "string",
+                "first_name": "string",
+                "middle_name": "string",
+                "last_name": "string",
+                "dob": "string",
+                "admission_date": "string",
+                "discharge_date": "string",
+                "mr_number": "string",
+                "payment_method_category": "string",
+                "created_at": "string",
+                "last_updated_at": "string",
+                "diagnosis_codes": "string",
+                "insurance_company": "string",
+                "phone": "string",
+                "pronouns": "string",
+                "preferred_language": "string",
+                "maiden_name": "string",
+                "preferred_contact": "string",
+                "alternate_addresses": [],
+                "location_id": "integer",
+                "discharge_type": "string",
+                "discharge_type_code": "string",
+                "payment_method": "string",
+                "gender": "string",
+                "gender_identity": "string",
+                "race": "string",
+                "ethnicity": "string",
+                "address_street": "string",
+                "address_street2": "string",
+                "address_city": "string",
+                "state": "string",
+                "address_zip": "string",
+                "address_country": "string",
+                "email": "string",
+                "pre_admission_status": "string",
+                "anticipated_discharge_date": "string",
+                "date_of_death": "string",
+                "cause_of_death": "string",
+                "discharge_or_transition_id": "integer",
+                "discharge_or_transition_name": "string",
+                "first_contact_name": "string",
+                "referrer_name": "string",
+                "pre_admission_status_id": "string",
+                "preferred_name": "string",
+                "alternate_phone": "string",
+                "sobriety_date": "string",
+                "ssn": "string",
+                "first_contact_date": "string",
+                "first_contact_information": "string",
+                "first_contact_relationship": "string",
+                "first_contact_rep_on_call": "string",
+                "insurances": [],
+                "patient_statuses": [],
+                "patient_contacts": [],
+                "level_of_care": "string",
+                "next_level_of_care": "string",
+                "next_level_of_care_date": "string",
+                "program": "string",
+                "bed_name": "string",
+                "room_name": "string",
+                "building_name": "string",
+                "location_name": "string",
+                "external_apps": [],
+                "ext_id_mappings": [],
+                "record_source": "string",
+                "patient_tags": []
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Allergens",
+      "method": "GET",
+      "path": "/allergens",
+      "description": "List all allergens",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "enabled", "type": "boolean", "location": "query", "description": "Only List Enabled Allergens" },
+        { "name": "allergen_type", "type": "string", "location": "query", "description": "Only List Allergens with given allergen_type" },
+        { "name": "starts_with", "type": "string", "location": "query", "description": "Only List Allergens with name starting with given string (minimum input length should be 3)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number", "defaultValue": 1 },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Appointments per page", "defaultValue": 20 }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "allergens": [
+              {
+                "id": "string",
+                "name": "string",
+                "allergy_type": "string",
+                "record_source": "string",
+                "created_by": "string",
+                "enabled": "boolean"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Allergies",
+      "method": "GET",
+      "path": "/allergies",
+      "description": "List all allergies",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "active", "type": "boolean", "location": "query", "description": "Only List Active Allergies" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "allergies": [
+              {
+                "id": "string",
+                "patient_casefile_id": "string",
+                "allergen": "string",
+                "allergy_type": "string",
+                "reaction": "string",
+                "reaction_type": "string",
+                "onset": "string",
+                "treatment": "string",
+                "status_type": "string",
+                "source": "string",
+                "deleted": "boolean",
+                "allergen_id": "integer"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patient Allergies",
+      "method": "GET",
+      "path": "/patients/{patient_id}/allergies",
+      "description": "List allergies scoped to a patient",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "patient_master_id", "type": "string", "location": "query", "required": true, "description": "Patient Master UUID (Important: NOT ID)", "format": "$uuid" },
+        { "name": "active", "type": "boolean", "location": "query", "description": "Only List Active Allergies" },
+        { "name": "patient_id", "type": "integer", "location": "path", "required": true, "description": "Location Patient ID" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "allergies": [
+              {
+                "id": "string",
+                "patient_casefile_id": "string",
+                "allergen": "string",
+                "allergy_type": "string",
+                "reaction": "string",
+                "reaction_type": "string",
+                "onset": "string",
+                "treatment": "string",
+                "status_type": "string",
+                "source": "string",
+                "deleted": "boolean",
+                "allergen_id": "integer"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "method": "GET",
+      "path": "/scheduler/appointments",
+      "description": "List all appointments",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number", "defaultValue": 1 },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Resources per page", "defaultValue": 20 },
+        { "name": "start_date", "type": "string", "location": "query", "required": true, "description": "Start Date (Example: 2018-12-01)", "format": "$date" },
+        { "name": "end_date", "type": "string", "location": "query", "description": "End Date (Example: 2018-12-03)", "format": "$date" },
+        { "name": "patient_id", "type": "integer", "location": "query", "description": "fetches the appointments for the provided patient_id" },
+        { "name": "resource_id", "type": "string", "location": "query", "description": "fetches the appointments for the provided resource_id" },
+        { "name": "telehealth_session_only", "type": "boolean", "location": "query", "description": "fetches the appointments with telehealth_session as true" },
+        { "name": "include_group_sessions", "type": "boolean", "location": "query", "description": "extends the result set to have group session appointments as well" },
+        { "name": "include_resources", "type": "boolean", "location": "query", "description": "includes an extra key resources in each appointment block" },
+        { "name": "location_ids", "type": "array[integer]", "location": "query", "description": "fetches the appointments belonging to the provided locations" },
+        { "name": "patient_appointment_status_ids", "type": "array[integer]", "location": "query", "description": "fetches the appointments with the provided patient_appointment_status" },
+        { "name": "appointment_type_ids", "type": "array[integer]", "location": "query", "description": "fetches the appointments with the given appointment type. Is ignored in case of group session appointments" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "appointments": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Care Levels",
+      "method": "GET",
+      "path": "/care_levels",
+      "description": "List all Levels of Care",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "care_levels": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Care Teams",
+      "method": "GET",
+      "path": "/patients/care_teams",
+      "description": "List all patients' care teams",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Patients per page" },
+        { "name": "admissions", "type": "string", "location": "query", "description": "Set to \"true\" to return care teams from Patient Admissions filters. Otherwise, results are from the Patient Census filters" },
+        { "name": "start_date", "type": "string", "location": "query", "description": "Start Date (Example: 2018-12-01); required for \"admissions\" filtering", "format": "$date" },
+        { "name": "end_date", "type": "string", "location": "query", "description": "End Date (Example: 2018-12-03); required for \"admissions\" filtering", "format": "$date" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "patients": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Census",
+      "method": "GET",
+      "path": "/patients/census",
+      "description": "List all patients from a census of the database",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "phi_level", "type": "string", "location": "query", "required": true, "description": "Detail Level", "availableValues": ["high", "medium", "low"] },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Patients per page" },
+        { "name": "insurance_detail", "type": "string", "location": "query", "description": "Show insurance detail with phi_level: high", "availableValues": ["v121"] },
+        { "name": "demographics_detail", "type": "string", "location": "query", "description": "Show demographics detail with phi_level: high", "availableValues": ["v121"] },
+        { "name": "patient_status_detail", "type": "string", "location": "query", "description": "Show patient status detail with phi_level: high", "availableValues": ["v121"] },
+        { "name": "patient_contacts_detail", "type": "boolean", "location": "query", "description": "Show patient contacts detail with phi_level: high" },
+        { "name": "start_date", "type": "string", "location": "query", "description": "Starting date of the census", "format": "$date" },
+        { "name": "end_date", "type": "string", "location": "query", "description": "Ending date of the census", "format": "$date" },
+        { "name": "location_id", "type": "integer", "location": "query", "format": "$int32", "description": "Location ID (Can be found through the Locations index route)" },
+        { "name": "exclude_preadmission", "type": "boolean", "location": "query", "description": "if true returns patient records that have an MR #" },
+        { "name": "care_team_role", "type": "string", "location": "query", "description": "Care Team Role (Required if user_id is provided)", "availableValues": ["therapist", "nurse", "physician", "case_manager"] },
+        { "name": "user_id", "type": "string", "location": "query", "description": "User Id (Required if care_team_role is provided)" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "patients": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ciwa Ars",
+      "method": "GET",
+      "path": "/ciwa_ars",
+      "description": "List all CiwaArs",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "CiwaArs per page" },
+        { "name": "created_at_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "created_at_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" },
+        { "name": "interval_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "interval_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "ciwa_ars": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ciwa Bs",
+      "method": "GET",
+      "path": "/ciwa_bs",
+      "description": "List all CiwaBs",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "CiwaBs per page" },
+        { "name": "created_at_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "created_at_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" },
+        { "name": "interval_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "interval_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "ciwa_bs": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cows",
+      "method": "GET",
+      "path": "/cows",
+      "description": "List all Cows",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Cows per page" },
+        { "name": "created_at_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "created_at_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" },
+        { "name": "interval_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "interval_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "cows": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Diagnosis History",
+      "method": "GET",
+      "path": "/patients/{patient_id}/diagnosis_history",
+      "description": "List a patient's diagnosis history",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "patient_master_id", "type": "string", "location": "query", "required": true, "description": "Patient Master UUID (Important: NOT ID)", "format": "$uuid" },
+        { "name": "patient_id", "type": "integer", "location": "path", "required": true, "description": "Location Patient ID" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "patient": {
+              "casefile_id": "string",
+              "first_name": "string",
+              "middle_name": "string",
+              "last_name": "string",
+              "dob": "string",
+              "diagnosis_history": []
+            }
+          }
+        },
+        {
+          "code": 404,
+          "description": "Not Found",
+          "mediaType": "application/json",
+          "schema": {
+            "errors": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patient Evaluations",
+      "method": "GET",
+      "path": "/patient_evaluations",
+      "description": "List all Patient Evaluations",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "evaluation_id", "type": "integer", "location": "query", "description": "Lists patient evaluations scoped to the given template id" },
+        { "name": "completed_only", "type": "boolean", "location": "query", "description": "Includes only the Patient Evaluations with status completed" },
+        { "name": "current_census_only", "type": "boolean", "location": "query", "description": "Includes only the Patient Evaluations with patient in current census" },
+        { "name": "start_date", "type": "string", "location": "query", "description": "Start Date (Example: 2018-12-01) of the latest updated range", "format": "$date" },
+        { "name": "end_date", "type": "string", "location": "query", "description": "End Date (Example: 2018-12-03) of the latest updated range", "format": "$date" },
+        { "name": "include_stranded", "type": "boolean", "location": "query", "description": "Include Patient Evaluations not having Patient Id" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Patients per page" },
+        { "name": "patient_process_id", "type": "integer", "location": "query", "description": "Includes only the Patient Evaluations with given patient process id" },
+        { "name": "evaluation_content", "type": "string", "location": "query", "description": "Includes only the Patient Evaluations with given evaluation_content value", "availableValues": ["standard", "notes", "treatment_plan"] }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "patient_evaluations": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Flags",
+      "method": "GET",
+      "path": "/flags",
+      "description": "List all flags",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number", "defaultValue": 1 },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Flags per page", "defaultValue": 20 }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "flags": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Group Sessions",
+      "method": "GET",
+      "path": "/group_sessions",
+      "description": "List all group sessions",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "group_sessions per page" },
+        { "name": "location_id", "type": "integer", "location": "query", "description": "location id to filter by" },
+        { "name": "group_leader_id", "type": "integer", "location": "query", "description": "group leader id to filter by" },
+        { "name": "group_session_topic", "type": "string", "location": "query", "description": "Group session Topic (contains) to filter by" },
+        { "name": "billable", "type": "boolean", "location": "query", "description": "billable value to filter by" },
+        { "name": "session_type_id", "type": "string", "location": "query", "description": "Session Type ID to filter by" },
+        { "name": "session_start_date", "type": "string", "location": "query", "description": "Session Start Date (Example: 2018-12-01): Starting date", "format": "$date" },
+        { "name": "session_end_date", "type": "string", "location": "query", "description": "Session End Date (Example: 2018-12-23): Ending date", "format": "$date" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "group_sessions": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Insurances Latest",
+      "method": "GET",
+      "path": "/insurances/latest",
+      "description": "List insurances with updated_at within a date range",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "start_date", "type": "string", "location": "query", "required": true, "description": "Start Date (Example: 2018-12-01)", "format": "$date" },
+        { "name": "end_date", "type": "string", "location": "query", "required": true, "description": "End Date (Example: 2018-12-03)", "format": "$date" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Insurances per page" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "insurances": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Occupancy",
+      "method": "GET",
+      "path": "/patients/occupancy",
+      "description": "Occupancy",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "phi_level", "type": "string", "location": "query", "required": true, "description": "Detail Level", "availableValues": ["high", "medium", "low"] }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "beds": [],
+            "buildings": [],
+            "locations": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orthostatic Vital Signs",
+      "method": "GET",
+      "path": "/orthostatic_vital_signs",
+      "description": "List all orthostatic vital signs",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "orthostatic vital signs per page" },
+        { "name": "created_at_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "created_at_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" },
+        { "name": "interval_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "interval_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "orthostatic_vital_signs": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patient Diets",
+      "method": "GET",
+      "path": "/patient_diets",
+      "description": "List all patient diets",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "patient_diets": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payors",
+      "method": "GET",
+      "path": "/settings/payors",
+      "description": "List all payors",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number", "defaultValue": 1 },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "Payors per page", "defaultValue": 20 }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "payors": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Program History",
+      "method": "GET",
+      "path": "/patients/{patient_id}/program_history",
+      "description": "List a patient's program history",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "patient_master_id", "type": "string", "location": "query", "required": true, "description": "Patient Master UUID (Important: NOT ID)", "format": "$uuid" },
+        { "name": "patient_id", "type": "integer", "location": "path", "required": true, "description": "Location Patient ID" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "patient": {
+              "casefile_id": "string",
+              "first_name": "string",
+              "middle_name": "string",
+              "last_name": "string",
+              "dob": "string",
+              "program_history": []
+            }
+          }
+        },
+        {
+          "code": 404,
+          "description": "Not Found",
+          "mediaType": "application/json",
+          "schema": {
+            "errors": "string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Utilization Reviews Latest",
+      "method": "GET",
+      "path": "/utilization_reviews/latest",
+      "description": "List utilization reviews with updated_at within a date range",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "start_date", "type": "string", "location": "query", "required": true, "description": "Start Date (Example: 2018-12-01)", "format": "$date" },
+        { "name": "end_date", "type": "string", "location": "query", "required": true, "description": "End Date (Example: 2018-12-03)", "format": "$date" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "utilization_reviews per page" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "utilization_reviews": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "Vital Signs",
+      "method": "GET",
+      "path": "/vital_signs",
+      "description": "List all vital signs",
+      "parameters": [
+        { "name": "Accept", "type": "string", "location": "header", "required": true, "description": "Accept Header [Do not change this value]", "availableValues": ["application/vnd.kipusystems+json; version=3"] },
+        { "name": "Authorization", "type": "string", "location": "header", "required": true, "description": "APIAuth {your Access ID}:{signature}", "format": "$APIAuth {access_id}:{signature}" },
+        { "name": "Date", "type": "string", "location": "header", "required": true, "description": "RFC 822 Format (Example: Tue, 03 Sep 2019 16:05:56 GMT)", "format": "$rfc822" },
+        { "name": "app_id", "type": "string", "location": "query", "required": true, "description": "app_id (also referred to as recipient_id, provided by Kipu)" },
+        { "name": "page", "type": "integer", "location": "query", "format": "$int32", "description": "Page number" },
+        { "name": "per", "type": "integer", "location": "query", "format": "$int32", "description": "vital signs per page" },
+        { "name": "created_at_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "created_at_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" },
+        { "name": "interval_start_date", "type": "string", "location": "query", "description": "Starting date", "format": "$date" },
+        { "name": "interval_end_date", "type": "string", "location": "query", "description": "Ending date", "format": "$date" }
+      ],
+      "responses": [
+        {
+          "code": 200,
+          "description": "Success",
+          "mediaType": "application/json",
+          "schema": {
+            "pagination": {
+              "current_page": "string",
+              "total_pages": "string",
+              "records_per_page": "string",
+              "total_records": "string"
+            },
+            "vital_signs": []
+          }
+        }
+      ]
+    }
+  ]
+}

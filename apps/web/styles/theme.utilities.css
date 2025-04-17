@@ -1,5 +1,11 @@
 @utility container {
   margin-inline: auto;
+  /* Replicate px-8 */
+  padding-left: 2rem;
+  padding-right: 2rem;
 
-  @apply xl:max-w-[80rem] px-8;
+  @screen xl {
+    /* Apply max-w-[80rem] only at xl breakpoint */
+    max-width: 80rem;
+  }
 }

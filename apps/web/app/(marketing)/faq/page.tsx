@@ -20,33 +20,31 @@ export const generateMetadata = async () => {
 async function FAQPage() {
   const { t } = await createI18nServerInstance();
 
-  // replace this content with translations
+  // Replace generic content with chartChek specific FAQs
   const faqItems = [
     {
-      // or: t('marketing:faq.question1')
-      question: `Do you offer a free trial?`,
-      // or: t('marketing:faq.answer1')
-      answer: `Yes, we offer a 14-day free trial. You can cancel at any time during the trial period and you won't be charged.`,
+      question: `What exactly does chartChek do for my KIPU EMR?`,
+      answer: `chartChek enhances your existing KIPU EMR by adding layers for compliance monitoring, workflow automation, and actionable data insights. It helps you prepare for audits (CARF, Joint Commission, State), streamline processes, and understand your facility's performance better without replacing KIPU.`,
     },
     {
-      question: `Can I cancel my subscription?`,
-      answer: `You can cancel your subscription at any time. You can do this from your account settings.`,
+      question: `Is chartChek a replacement for KIPU?`,
+      answer: `No, chartChek is designed to work *with* your existing KIPU EMR installation. It leverages your KIPU data to provide additional value and functionality, focusing on compliance and process improvement.`,
     },
     {
-      question: `Where can I find my invoices?`,
-      answer: `You can find your invoices in your account settings.`,
+      question: `How does chartChek access KIPU data? Is it secure?`,
+      answer: `chartChek uses secure, KIPU-approved methods for data interaction, following strict security protocols. We prioritize data privacy and security, ensuring compliance with HIPAA and other relevant regulations. We do not store sensitive PHI outside of secure, compliant environments.`,
     },
     {
-      question: `What payment methods do you accept?`,
-      answer: `We accept all major credit cards and PayPal.`,
+      question: `What kind of compliance standards does chartChek help with?`,
+      answer: `Our primary focus is helping facilities meet CARF, Joint Commission, and state-specific behavioral health/substance abuse treatment regulations. We provide tools for automated checks, documentation tracking, and reporting relevant to these standards.`,
     },
     {
-      question: `Can I upgrade or downgrade my plan?`,
-      answer: `Yes, you can upgrade or downgrade your plan at any time. You can do this from your account settings.`,
+      question: `Will using chartChek require extensive retraining for my staff?`,
+      answer: `chartChek is designed to be intuitive and integrate smoothly with existing KIPU workflows where possible. While there will be a learning curve for the new features, the goal is to enhance, not overhaul, your team's processes. We provide comprehensive onboarding and support.`,
     },
     {
-      question: `Do you offer discounts for non-profits?`,
-      answer: `Yes, we offer a 50% discount for non-profits. Please contact us to learn more.`,
+      question: `What is the pricing model for chartChek?`,
+      answer: `We offer tiered subscription plans based on facility size and feature requirements. Please visit our Pricing page or contact our sales team for a detailed quote tailored to your needs.`,
     },
   ];
 

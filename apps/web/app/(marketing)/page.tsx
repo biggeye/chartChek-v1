@@ -1,11 +1,10 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { ArrowRightIcon, LayoutDashboard } from 'lucide-react';
+import { ArrowRightIcon, CheckCircle, FileCheck, Workflow, BarChartBig } from 'lucide-react';
 
 import {
   CtaButton,
-  FeatureCard,
   FeatureGrid,
   FeatureShowcase,
   FeatureShowcaseIconContainer,
@@ -13,6 +12,7 @@ import {
   Pill,
 } from '@kit/ui/marketing';
 import { Trans } from '@kit/ui/trans';
+import { Card, CardHeader, CardTitle, CardDescription } from '@kit/ui/card';
 
 import { withI18n } from '~/lib/i18n/with-i18n';
 
@@ -22,20 +22,18 @@ function Home() {
       <div className={'container mx-auto'}>
         <Hero
           pill={
-            <Pill label={'New'}>
-              <span>The leading SaaS Starter Kit for ambitious developers</span>
+            <Pill label={'Enhancement'}>
+              <span>Supercharge your KIPU EMR</span>
             </Pill>
           }
           title={
             <>
-              <span>The ultimate SaaS Starter</span>
-              <span>for your next project</span>
+              <span>Unlock Compliance & Efficiency with chartChek</span>
             </>
           }
           subtitle={
             <span>
-              Build and Ship a SaaS faster than ever before with the next-gen
-              SaaS Starter Kit. Ship your SaaS in days, not months.
+              Streamline workflows, ensure audit readiness, and gain critical insights from your KIPU data. chartChek transforms your EMR experience.
             </span>
           }
           cta={<MainCallToActionButton />}
@@ -62,48 +60,76 @@ function Home() {
             heading={
               <>
                 <b className="font-semibold dark:text-white">
-                  The ultimate SaaS Starter Kit
+                  Elevate Your KIPU EMR Beyond the Basics
                 </b>
                 .{' '}
                 <span className="text-muted-foreground font-normal">
-                  Unleash your creativity and build your SaaS faster than ever
-                  with Makerkit.
+                  chartChek integrates seamlessly with KIPU, providing tools designed by compliance experts to simplify audits and improve processes.
                 </span>
               </>
             }
             icon={
               <FeatureShowcaseIconContainer>
-                <LayoutDashboard className="h-5" />
-                <span>All-in-one solution</span>
+                <CheckCircle className="h-5" />
+                <span>Achieve compliance confidence</span>
               </FeatureShowcaseIconContainer>
             }
           >
             <FeatureGrid>
-              <FeatureCard
-                className={'relative col-span-2 overflow-hidden'}
-                label={'Beautiful Dashboard'}
-                description={`Makerkit provides a beautiful dashboard to manage your SaaS business.`}
-              />
+              {/* Card 1: Audit Readiness */}
+              <Card className={'relative col-span-2 overflow-hidden'}>
+                <CardHeader>
+                  <div className="flex items-start space-x-3">
+                    <FileCheck className="h-8 w-8 flex-shrink-0 text-primary" />
+                    <div>
+                      <CardTitle className="mb-1">Audit Readiness Simplified</CardTitle>
+                      <CardDescription>
+                        Navigate CARF, Joint Commission, and state audits with automated checks and proactive compliance monitoring integrated with KIPU.
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
 
-              <FeatureCard
-                className={
-                  'relative col-span-2 w-full overflow-hidden lg:col-span-1'
-                }
-                label={'Authentication'}
-                description={`Makerkit provides a variety of providers to allow your users to sign in.`}
-              />
+              {/* Card 2: Streamlined Workflows */}
+              <Card className={'relative col-span-2 w-full overflow-hidden lg:col-span-1'}>
+                <CardHeader>
+                  <div className="flex items-start space-x-3">
+                    <Workflow className="h-8 w-8 flex-shrink-0 text-primary" />
+                    <div>
+                      <CardTitle className="mb-1">Streamlined Workflows</CardTitle>
+                      <CardDescription>
+                        Reduce manual tasks and improve staff efficiency with automated process enhancements built on top of your existing KIPU system.
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
 
-              <FeatureCard
-                className={'relative col-span-2 overflow-hidden lg:col-span-1'}
-                label={'Multi Tenancy'}
-                description={`Multi tenant memberships for your SaaS business.`}
-              />
+              {/* Card 3: Actionable Insights */}
+              <Card className={'relative col-span-2 overflow-hidden lg:col-span-1'}>
+                <CardHeader>
+                  <div className="flex items-start space-x-3">
+                    <BarChartBig className="h-8 w-8 flex-shrink-0 text-primary" />
+                    <div>
+                      <CardTitle className="mb-1">Actionable Insights</CardTitle>
+                      <CardDescription>
+                        Visualize key performance and compliance metrics directly from your KIPU data to drive informed decision-making.
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
 
-              <FeatureCard
-                className={'relative col-span-2 overflow-hidden'}
-                label={'Billing'}
-                description={`Makerkit supports multiple payment gateways to charge your customers.`}
-              />
+              {/* Card 4: Seamless KIPU Integration (No Icon) */}
+              <Card className={'relative col-span-2 overflow-hidden'}>
+                <CardHeader>
+                  <CardTitle className="mb-1">Seamless KIPU Integration</CardTitle>
+                  <CardDescription>
+                    Leverages your existing KIPU EMR data securely and efficiently without requiring complex data migrations or workflow overhauls.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
             </FeatureGrid>
           </FeatureShowcase>
         </div>

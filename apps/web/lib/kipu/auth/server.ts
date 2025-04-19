@@ -5,7 +5,7 @@
  * It can be used in both client and server components.
  */
 
-import { KipuCredentials, KipuApiResponse } from '~/types/kipu/kipuAdapter';
+import { KipuCredentials, KipuApiResponse } from 'types/kipu/kipuAdapter';
 import { generateKipuAuthHeaders } from './signature';
 import { createServer } from '~/utils/supabase/server';
 import crypto from 'crypto';

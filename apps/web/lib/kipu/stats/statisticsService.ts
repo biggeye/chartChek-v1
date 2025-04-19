@@ -1,6 +1,6 @@
 // lib/kipu/stats/statisticsService.ts
 
-import { KipuCredentials } from '~/types/kipu/kipuAdapter';
+import { KipuCredentials } from 'types/kipu/kipuAdapter';
 import { calculatePatientStatistics } from './patientStatistics';
 import { calculateOperationalStatistics } from './operationalStatistics';
 // import { calculateStaffStatistics } from './staffStatistics';

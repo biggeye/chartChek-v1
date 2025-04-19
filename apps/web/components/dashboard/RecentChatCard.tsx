@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MessageSquareIcon, UserIcon, BotIcon } from 'lucide-react';
-import { format, formatDistanceToNow } from 'date-fns';
+import { MessageSquareIcon, BotIcon } from 'lucide-react';
+import { formatDistanceToNow } from 'date-fns';
 import { DashboardCard } from './DashboardCard';
-import { Button } from '~/components/ui/button';
-import { Skeleton } from '~/components/ui/skeleton';
-import { Avatar, AvatarFallback } from '~/components/ui/avatar';
+import { Button } from '@kit/ui/button';
+import { Skeleton } from '@kit/ui/skeleton';
+import { Avatar, AvatarFallback } from '@kit/ui/avatar';
 
 interface ChatSession {
   id: string;
@@ -51,7 +51,7 @@ export function RecentChatCard() {
         <Button 
           variant="ghost" 
           className="w-full justify-center text-indigo_dye-600 hover:text-indigo_dye-900 hover:bg-indigo_dye-50"
-          onClick={() => router.push('/protected/chat')}
+          onClick={() => router.push('/product/chat')}
         >
           Start New Conversation
         </Button>
@@ -75,7 +75,7 @@ export function RecentChatCard() {
             <div 
               key={chat.id} 
               className="flex items-start space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
-              onClick={() => router.push(`/protected/chat/${chat.id}`)}
+              onClick={() => router.push(`/product/chat/${chat.id}`)}
             >
               <Avatar className="h-10 w-10 bg-indigo_dye-100">
                 <AvatarFallback className="bg-indigo_dye-100 text-indigo_dye-700">
@@ -107,7 +107,7 @@ export function RecentChatCard() {
         <div className="text-center py-6">
           <p className="text-gray-500 mb-4">No conversations yet</p>
           <Button 
-            onClick={() => router.push('/protected/chat')}
+            onClick={() => router.push('/product/chat')}
             variant="outline"
           >
             Start Your First Conversation

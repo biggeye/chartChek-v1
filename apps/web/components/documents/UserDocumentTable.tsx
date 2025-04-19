@@ -1,6 +1,6 @@
 'use client'
 
-import { UserDocument } from "~/types/store/doc/userDocument";
+import { UserDocument } from "types/store/doc/userDocument";
 import { Input } from '~/components/ui/input';
 import { ArrowUpTrayIcon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
@@ -17,7 +17,7 @@ interface UserDocumentsTableProps {
 
 export default function UserDocumentsTable({ 
   documents, 
-  detailsUrlPrefix = '/protected/documents', 
+  detailsUrlPrefix = '/product/documents', 
   onFileSelect,
   isLoading = false 
 }: UserDocumentsTableProps) {

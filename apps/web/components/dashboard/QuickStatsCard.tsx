@@ -59,7 +59,7 @@ export function QuickStatsCard() {
         {/* Patients Count */}
         <div 
           className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-          onClick={() => router.push('/protected/patients')}
+          onClick={() => router.push('/product/patients')}
         >
           <div className="p-2 rounded-full bg-indigo_dye-100 text-indigo_dye-600 mb-2">
             <UsersIcon className="h-5 w-5" />
@@ -77,7 +77,7 @@ export function QuickStatsCard() {
         {/* Documents Count */}
         <div 
           className="flex flex-col items-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100"
-          onClick={() => router.push('/protected/documents')}
+          onClick={() => router.push('/product/documents')}
         >
           <div className="p-2 rounded-full bg-indigo_dye-100 text-indigo_dye-600 mb-2">
             <FileTextIcon className="h-5 w-5" />

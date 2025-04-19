@@ -9,7 +9,7 @@
  * accessing multiple facilities/locations that the user has permission to access.
  */
 
-import { createClient } from "../../utils/supabase/client";
+import { createClient } from "../../../utils/supabase/client";
 
 /**
  * Interface for user API settings

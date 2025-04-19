@@ -1,4 +1,4 @@
-import { EvaluationMetricsCollection, parseEvaluations } from '~/lib/types/evaluationMetrics';
+import { EvaluationMetricsCollection, parseEvaluations } from 'types/evaluationMetrics';
 
 /**
  * Parses KIPU evaluation data into a structured metrics format

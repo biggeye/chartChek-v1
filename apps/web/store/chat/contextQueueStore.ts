@@ -1,8 +1,8 @@
 import { create } from "zustand"
 import { v4 as uuidv4 } from "uuid"
-import { KipuEvaluationItemObject as EvaluationDetail } from "~/types/kipu/kipuAdapter"
-import { PatientEvaluationParserService } from "~/lib/kipu/mapping/parse-evaluation"
-import type { ContextItem, EvaluationContextItem, PatientEvaluationItem } from "~/types/chat"
+import { KipuEvaluationItemObject as EvaluationDetail } from "types/kipu/kipuAdapter"
+import { PatientEvaluationParserService } from "~/lib/parse-evaluation"
+import type { ContextItem, EvaluationContextItem, PatientEvaluationItem } from "types/chat"
 import { createClient } from "~/utils/supabase/client"
 
 interface ContextQueueState {

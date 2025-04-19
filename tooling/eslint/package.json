@@ -9,7 +9,7 @@
     "./nextjs.js"
   ],
   "scripts": {
-    "clean": "rm -rf .turbo node_modules",
+    "clean": "rimraf .turbo node_modules",
     "format": "prettier --check \"**/*.{js,json}\""
   },
   "dependencies": {

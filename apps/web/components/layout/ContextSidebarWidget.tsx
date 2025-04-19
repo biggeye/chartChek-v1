@@ -3,9 +3,9 @@
 import React from 'react';
 import { useContextQueueStore } from '~/store/chat/contextQueueStore';
 import { useIsProcessingContext, useProcessingContextError } from '~/store/chat/contextProcessorStore';
-import type { ContextItem } from '~/types/chat';
-import { Button } from '~/components/ui/button'; // Assuming you have a Button component
-import { Checkbox } from '~/components/ui/checkbox'; // Assuming you have a Checkbox component
+import type { ContextItem } from 'types/chat';
+import { Button } from '@kit/ui/button'; // Fix path
+import { Checkbox } from '@kit/ui/checkbox'; // Fix path
 import { XCircleIcon } from '@heroicons/react/24/solid';
 import { Loader2 } from 'lucide-react'; // Example loading icon
 

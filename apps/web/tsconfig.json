@@ -8,7 +8,9 @@
       "~/components/*": ["./components/*"],
       "~/lib/*": ["./lib/*"],
       "~/utils/*": ["./utils/*"],
-      "~/store/*": ["./store/*"]
+      "~/store/*": ["./store/*"],
+      "~/hooks/*": ["./hooks/*"],
+      "~/types/*": ["./types/*"]
     },
     "plugins": [
       {

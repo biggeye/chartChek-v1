@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '~/components/ui/button'
 import { ArrowUpTrayIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { DocumentCategorization } from '~/types/store/doc/userDocument'
+import { DocumentCategorization } from 'types/store/doc/userDocument'
 import { Transition } from '@headlessui/react'
 import { Label } from '~/components/ui/label'
 import { 

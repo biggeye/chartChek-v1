@@ -2,11 +2,11 @@
 
 import { useState } from "react"
 import { Check, ChevronsUpDown } from "lucide-react"
-import { Button } from "~/components/ui/button"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "~/components/ui/command"
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover"
-import { cn } from "~/lib/utils"
-import type { ModelConfig, ModelProvider } from "~/types/chat"
+import { Button } from "@kit/ui/button"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@kit/ui/command"
+import { Popover, PopoverContent, PopoverTrigger } from "@kit/ui/popover"
+import { cn } from "@kit/ui/utils"
+import type { ModelConfig, ModelProvider } from "types/chat"
 
 interface ModelOption {
   value: string

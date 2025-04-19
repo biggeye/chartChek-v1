@@ -1,4 +1,4 @@
-// app/protected/patients/[id]/evaluations/page.tsx
+// app/product/patients/[id]/evaluations/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -64,7 +64,7 @@ export default function KipuPatientEvaluationsPage() {
                   {patientEvaluations.map((evaluation) => (
                     <tr key={evaluation.id}>
                       <td className="px-3 py-2 whitespace-nowrap text-xs font-small text-gray-900">
-                        <Link href={`/protected/patients/${patientId}/evaluations/${evaluation.id}`} className="hover:text-blue-600 hover:underline">
+                        <Link href={`/product/patients/${patientId}/evaluations/${evaluation.id}`} className="hover:text-blue-600 hover:underline">
                           {evaluation.name.length > 15 
                             ? `${evaluation.name.substring(0, 15)}...` 
                             : evaluation.name}

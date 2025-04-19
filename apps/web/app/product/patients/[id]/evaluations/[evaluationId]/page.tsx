@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader } from '~/components/ui/card';
-import { Button } from '~/components/ui/button';
-import { Skeleton } from '~/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@kit/ui/card';
+import { Button } from '@kit/ui/button';
+import { Skeleton } from '@kit/ui/skeleton';
 import { DocumentView } from '~/lib/DocumentView';
 import { fetchEvaluationDetails } from '~/lib/services/evaluationsService';
 import { KipuPatientEvaluation } from '~/types/kipu/kipuAdapter';

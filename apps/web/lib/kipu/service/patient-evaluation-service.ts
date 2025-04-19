@@ -1,4 +1,4 @@
-import { KipuCredentials, KipuApiResponse, KipuPatientOrdersResponse, KipuEvaluation, KipuPatientEvaluation } from '~/types/kipu/kipuAdapter';
+import { KipuCredentials, KipuApiResponse, KipuPatientOrdersResponse, KipuEvaluation, KipuPatientEvaluation } from 'types/kipu/kipuAdapter';
 import { kipuServerGet, kipuServerPost } from '../auth/server';
 import { parsePatientId } from '../auth/config';
 

@@ -1,19 +1,21 @@
 "use client"
 
 import { useState, useMemo, useEffect } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { Input } from "~/components/ui/input"
-import { Button } from "~/components/ui/button"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@kit/ui/tabs"
+import { Input } from "@kit/ui/input"
+import { Button } from "@kit/ui/button"
 import { Loader2, Search, User, FileText, CheckCircle2, X } from "lucide-react"
 import { usePatientStore, PatientStore } from "~/store/patient/patientStore"; 
 import { usePatientEvaluations } from "~/hooks/useEvaluations"; 
 import { useEvaluationsStore } from "~/store/patient/evaluationsStore" 
 import { useContextQueueStore } from "~/store/chat/contextQueueStore"
+import { useFacilityStore } from "~/store/patient/facilityStore"
 import { useChatStore } from "~/store/chat/chatStore"
 import { useContextProcessorStore } from "~/store/chat/contextProcessorStore"
-import { ScrollArea } from "~/components/ui/scroll-area"
-import { KipuPatientEvaluation, PatientBasicInfo } from "~/types/kipu/kipuAdapter"
-import { Checkbox } from "~/components/ui/checkbox"; 
+import { ScrollArea } from "@kit/ui/scroll-area"
+import { KipuPatientEvaluation, PatientBasicInfo } from "types/kipu/kipuAdapter"
+import { Checkbox } from "@kit/ui/checkbox"; 
+import { useFetchPatients } from "~/hooks/usePatients"
  
 interface PatientContextModalProps {
   onClose: () => void;
@@ -26,9 +28,15 @@ export function PatientContextModal({ onClose }: PatientContextModalProps) {
   
   // --- Use Hooks for State and Actions ---
   // Get patient state and actions from patient store
+  const { isLoadingPatients, setIsLoadingPatients } = usePatientStore((state: PatientStore) => state);
   const selectedPatient = usePatientStore((state: PatientStore) => state.selectedPatient);
   const selectPatientAction = usePatientStore((state: PatientStore) => state.selectPatient);
+
   const patients = usePatientStore((state: PatientStore) => state.patients); 
+  const { currentFacilityId } = useFacilityStore(); 
+  
+  // Call hook unconditionally - it handles fetching based on currentFacilityId
+  useFetchPatients(currentFacilityId);
   
   // Use the dedicated hook for evaluations state and fetch trigger
   const { 
@@ -45,7 +53,7 @@ export function PatientContextModal({ onClose }: PatientContextModalProps) {
 
   // Context queue store
   const { addItem, items: contextItems } = useContextQueueStore();
-
+  
   // Context processor store
   const {
     processAndAddKipuEvaluations,

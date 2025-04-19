@@ -2,7 +2,7 @@
 
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { UserDocument, DocumentCategorization } from '~/types/store/doc/userDocument';
+import { UserDocument, DocumentCategorization } from 'types/store/doc/userDocument';
 import { useFacilityStore } from '../patient/facilityStore';
 
 // Define the user document store state

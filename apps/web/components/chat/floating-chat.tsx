@@ -15,10 +15,10 @@ import {
   Eye,
   PlusCircle
 } from "lucide-react"
-import { Button } from "~/components/ui/button"
-import { cn } from "~/lib/utils"
-import { Badge } from "~/components/ui/badge"
-import { Dialog, DialogContent, DialogTitle } from "~/components/ui/dialog"
+import { Button } from "@kit/ui/button"
+import { cn } from "@kit/ui/utils"
+import { Badge } from "@kit/ui/badge"
+import { Dialog, DialogContent, DialogTitle } from "@kit/ui/dialog"
 import { ContextQueue } from "./context-queue"
 import { useContextQueueStore } from "~/store/chat/contextQueueStore"
 import { PatientContextModal } from "./patient-context-modal"
@@ -26,10 +26,10 @@ import { useChatStore } from "~/store/chat/chatStore"
 import { useChat } from "~/hooks/useChat"
 import { MessageList } from "./message-list"
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden"
-import { ModelConfig, ModelProvider } from "~/types/chat"
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "~/components/ui/command"
-import { ContextItem } from "~/types/chat"
+import { ModelConfig, ModelProvider } from "types/chat"
+import { Popover, PopoverContent, PopoverTrigger } from "@kit/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@kit/ui/command"
+import { ContextItem } from "types/chat"
 
 // CSS for animations
 const animationStyles = `

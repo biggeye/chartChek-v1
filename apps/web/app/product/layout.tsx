@@ -1,9 +1,8 @@
-import { createServer } from "~/lib/utils/supabase/server";
-import { getUserProfile } from '@kit/supabase/user-profile'; // Updated path (assuming location)
-import { cookies } from "next/headers";
+import { createServer } from "~/utils/supabase/server";
+import { getUserProfile } from "~/lib/user/service/profile";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
-import TestLayout from "./TestLayout";
+import AppLayout from "./AppLayout";
 import Footer from "~/components/modules/Footer";
 
 export default async function ProtectedLayout({
@@ -31,8 +30,8 @@ export default async function ProtectedLayout({
   const avatarUrl = profile?.avatar_url || null; // Get avatar_url, default to null
 
   return (
-    <TestLayout user_id={user.id} username={username} avatarUrl={avatarUrl}>
+    <AppLayout user_id={user.id} username={username} avatarUrl={avatarUrl}>
       {children}
-    </TestLayout>
+    </AppLayout>
   );
 }

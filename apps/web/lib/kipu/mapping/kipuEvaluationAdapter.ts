@@ -1,5 +1,5 @@
 // /lib/forms/kipuEvaluationAdapter.ts
-import { ChartChekTemplate, TemplateField } from '~/types/store/doc/templates';
+import { ChartChekTemplate, TemplateField } from 'types/store/doc/templates';
 
 // If these types don't exist, define them inline
 

@@ -2,18 +2,18 @@
 
 import { useState } from "react"
 import { useContextQueueStore } from "~/store/chat/contextQueueStore"
-import type { ContextItem } from "~/types/chat"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { ScrollArea } from "~/components/ui/scroll-area"
-import { Button } from "~/components/ui/button"
-import { Checkbox } from "~/components/ui/checkbox"
-import { Badge } from "~/components/ui/badge"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle, CardContent } from "~/components/ui/card"
-import { Collapsible, CollapsibleContent } from "~/components/ui/collapsible"
+import type { ContextItem } from "types/chat"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@kit/ui/tabs"
+import { ScrollArea } from "@kit/ui/scroll-area"
+import { Button } from "@kit/ui/button"
+import { Checkbox } from "@kit/ui/checkbox"
+import { Badge } from "@kit/ui/badge"
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle, CardContent } from "@kit/ui/card"
+import { Collapsible, CollapsibleContent } from "@kit/ui/collapsible"
 import { ChevronDown, ChevronUp, X, FileText, Upload, ClipboardList, Eye } from "lucide-react"
-import { cn } from "~/lib/utils"
+import { cn } from "@kit/ui/utils"
 import { usePatientStore } from "~/store/patient/patientStore"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@kit/ui/dialog"
 
 interface ContextQueueProps {
   compact?: boolean;

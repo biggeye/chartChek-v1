@@ -3,10 +3,10 @@
 import type React from "react"
 
 import { useState, useRef, useEffect } from "react"
-import { Button } from "~/components/ui/button"
-import { Textarea } from "~/components/ui/textarea"
+import { Button } from "@kit/ui/button"
+import { Textarea } from "@kit/ui/textarea"
 import { Send } from "lucide-react"
-import { cn } from "~/lib/utils"
+import { cn } from "@kit/ui/utils"
 
 interface MessageInputProps {
   onSend: (message: string) => void

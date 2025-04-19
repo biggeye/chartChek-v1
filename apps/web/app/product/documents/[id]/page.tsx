@@ -5,26 +5,26 @@ import { EllipsisVerticalIcon } from '@heroicons/react/20/solid';
 import { ArrowDownTrayIcon, PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '~/components/ui/breadcrumb';
+import { Breadcrumb, BreadcrumbList, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage, BreadcrumbSeparator } from '@kit/ui/breadcrumb';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
-import { Button } from '~/components/ui/button';
-import { Card } from '~/components/ui/card';
+import { Button } from '@kit/ui/button';
+import { Card } from '@kit/ui/card';
 import { createClient } from '~/utils/supabase/client';
 import { useUserDocuments } from '~/hooks/useUserDocuments';
-import { UserDocument, DocumentCategorization } from '~/types/store/doc/userDocument';
+import { UserDocument, DocumentCategorization } from 'types/store/doc/userDocument';
 import { format } from 'date-fns';
-import { Badge } from '~/components/ui/badge';
-import { Skeleton } from '~/components/ui/skeleton';
-import { Label } from '~/components/ui/label';
+import { Badge } from '@kit/ui/badge';
+import { Skeleton } from '@kit/ui/skeleton';
+import { Label } from '@kit/ui/label';
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '~/components/ui/select-new';
-import { Input } from '~/components/ui/input';
-import { Textarea } from '~/components/ui/textarea';
+} from '@kit/ui/select';
+import { Input } from '@kit/ui/input';
+import { Textarea } from '@kit/ui/textarea';
 
 // Define processing status enum
 enum ProcessingStatus {
@@ -257,7 +257,7 @@ export default function DocumentDetail() {
           <p className="font-medium">Error</p>
           <p>{error || 'Document not found'}</p>
           <Button 
-            onClick={() => router.push('/protected/documents')} 
+            onClick={() => router.push('/product/documents')} 
             className="mt-4"
           >
             Back to Documents
@@ -268,7 +268,7 @@ export default function DocumentDetail() {
   }
 
   const breadcrumbPages: Page[] = [
-    { name: 'Documents', href: '/protected/documents', current: false },
+    { name: 'Documents', href: '/product/documents', current: false },
     { name: document.file_name || 'Document Details', href: `#`, current: true },
   ];
 

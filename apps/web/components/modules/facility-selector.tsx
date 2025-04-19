@@ -5,10 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useFacilityStore } from '~/store/patient/facilityStore';
 import { usePatientStore } from '~/store/patient/patientStore';
 import { useFetchPatients } from '~/hooks/usePatients';
-import { Facility } from '~/types/kipu/kipuAdapter';
 import { Dialog, Transition } from '@headlessui/react';
 import { BuildingOffice2Icon, XMarkIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { cn } from '~/lib/utils';
+import { cn } from '@kit/ui/utils';
 
 interface FacilitySelectorProps {
   variant?: 'sidebar' | 'header' | 'modal';
@@ -102,7 +101,7 @@ export function FacilitySelector({ variant = 'sidebar', className }: FacilitySel
                       No facilities available
                     </div>
                   ) : (
-                    facilities.map((facility) => (
+                    facilities.map((facility: any) => (
                       <button
                         key={facility.id || `facility-${Math.random()}`}
                         onClick={() => facility.id && handleSelectFacility(Number(facility.id))}

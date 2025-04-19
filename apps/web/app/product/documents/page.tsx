@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { Button } from '~/components/ui/button'
+import { Button } from '@kit/ui/button'
 import UserDocumentUploadDialog from '~/components/documents/UserDocumentUploadDialog'
 import UserDocumentsTable from '~/components/documents/UserDocumentTable'
 import { PlusIcon } from '@heroicons/react/20/solid'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@kit/ui/tabs'
 import { AlertCircle } from 'lucide-react'
-import { ScrollArea } from '~/components/ui/scroll-area'
+import { ScrollArea } from '@kit/ui/scroll-area'
 import { useUserDocuments } from '~/hooks/useUserDocuments'
 import { DocumentCategorization } from '~/types/store/doc/userDocument'
 
@@ -96,7 +96,7 @@ export default function DocumentsPage() {
             <UserDocumentsTable 
               documents={documents} 
               isLoading={isLoading}
-              detailsUrlPrefix="/protected/documents"
+              detailsUrlPrefix="/product/documents"
             />
           </TabsContent>
           
@@ -104,7 +104,7 @@ export default function DocumentsPage() {
             <UserDocumentsTable 
               documents={documents.filter(doc => doc.document_type === 'patient_record')} 
               isLoading={isLoading}
-              detailsUrlPrefix="/protected/documents"
+              detailsUrlPrefix="/product/documents"
             />
           </TabsContent>
           
@@ -112,7 +112,7 @@ export default function DocumentsPage() {
             <UserDocumentsTable 
               documents={documents.filter(doc => doc.document_type === 'compliance_document')} 
               isLoading={isLoading}
-              detailsUrlPrefix="/protected/documents"
+              detailsUrlPrefix="/product/documents"
             />
           </TabsContent>
         </ScrollArea> 

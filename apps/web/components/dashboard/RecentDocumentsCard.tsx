@@ -3,9 +3,9 @@ import { useRouter } from 'next/navigation';
 import { FileTextIcon, FileIcon, ClockIcon } from 'lucide-react';
 import { format, formatDistanceToNow } from 'date-fns';
 import { DashboardCard } from './DashboardCard';
-import { Button } from '~/components/ui/button';
+import { Button } from '@kit/ui/button';
 import { useUserDocuments } from '~/hooks/useUserDocuments';
-import { Skeleton } from '~/components/ui/skeleton';
+import { Skeleton } from '@kit/ui/skeleton';
 
 export function RecentDocumentsCard() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export function RecentDocumentsCard() {
         <Button 
           variant="ghost" 
           className="w-full justify-center text-indigo_dye-600 hover:text-indigo_dye-900 hover:bg-indigo_dye-50"
-          onClick={() => router.push('/protected/documents')}
+          onClick={() => router.push('/product/documents')}
         >
           View All Documents
         </Button>
@@ -60,7 +60,7 @@ export function RecentDocumentsCard() {
             <div 
               key={doc.document_id} 
               className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
-              onClick={() => router.push(`/protected/documents/${doc.document_id}`)}
+              onClick={() => router.push(`/product/documents/${doc.document_id}`)}
             >
               <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo_dye-50 flex items-center justify-center">
                 {getFileIcon(doc.file_type)}
@@ -90,7 +90,7 @@ export function RecentDocumentsCard() {
         <div className="text-center py-6">
           <p className="text-gray-500 mb-4">No documents uploaded yet</p>
           <Button 
-            onClick={() => router.push('/protected/documents')}
+            onClick={() => router.push('/product/documents')}
             variant="outline"
           >
             Upload Your First Document

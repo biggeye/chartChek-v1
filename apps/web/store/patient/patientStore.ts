@@ -1,6 +1,6 @@
 // store/patient/patientStore.ts
 import { create } from 'zustand';
-import { PatientBasicInfo } from '~/types/kipu/kipuAdapter';
+import { PatientBasicInfo } from 'types/kipu/kipuAdapter';
 
 export interface PatientStore {
   patients: PatientBasicInfo[];

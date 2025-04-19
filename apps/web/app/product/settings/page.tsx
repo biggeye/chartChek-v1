@@ -2,20 +2,20 @@
 
 import { useState, useEffect } from 'react';
 import { useFacilityStore } from '~/store/patient/facilityStore';
-import { UserApiSettings } from '~/types/store/user';
+import { UserApiSettings } from 'types/store/user';
 import { createClient } from '~/utils/supabase/client';
-import { Button } from '~/components/ui/button';
-import { Input } from '~/components/ui/input';
-import { Card, CardContent, CardHeader } from '~/components/ui/card';
-import { Label } from '~/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { Button } from '@kit/ui/button';
+import { Input } from '@kit/ui/input';
+import { Card, CardContent, CardHeader } from '@kit/ui/card';
+import { Label } from '@kit/ui/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@kit/ui/tabs';
 import { AlertCircle, CheckCircle2, Info, Key, Globe, User, Lock, BrainCircuit } from 'lucide-react';
-import { cn } from '~/lib/utils';
+import { cn } from '@kit/ui/utils';
 import UserProfile from '~/components/profile/UserProfile';
 import { LLM_OPTIONS, type LLMOption } from '~/lib/llm-service';
-import { RadioGroup, RadioGroupItem } from '~/components/ui/radio-group';
-import { CardTitle, CardDescription, CardFooter } from '~/components/ui/card-extensions';
-import { CustomAlert, AlertTitle, AlertDescription } from '~/components/ui/custom-alert';
+import { RadioGroup, RadioGroupItem } from '@kit/ui/radio-group';
+import { CardTitle, CardDescription, CardFooter } from '@kit/ui/card';
+import { Alert as CustomAlert, AlertTitle, AlertDescription } from '@kit/ui/alert';
 
 export default function SettingsPage() {
   const [userId, setUserId] = useState<string>('');

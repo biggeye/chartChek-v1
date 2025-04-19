@@ -58,7 +58,7 @@ export default function PatientsPage() {
   }, [patients, searchQuery, dateRange, currentFacilityId]);
 
   const handlePatientSelect = (patientId: string) => {
-    router.push(`/protected/patients/${patientId}`);
+    router.push(`/product/patients/${patientId}`);
   };
 
   return (

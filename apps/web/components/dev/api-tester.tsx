@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "~/components/ui/card"
+import { Button } from "@kit/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@kit/ui/card"
 import { llmService } from "~/lib/llm-service"
 import { Loader2 } from "lucide-react"
 

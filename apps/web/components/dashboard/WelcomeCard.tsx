@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '~/utils/supabase/client';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent } from '~/components/ui/card';
+import { Button } from '@kit/ui/button';
+import { Card, CardContent } from '@kit/ui/card';
 import { 
   PlusCircleIcon, 
   FileTextIcon, 
@@ -46,7 +46,8 @@ export function WelcomeCard() {
           setUserName(data.first_name);
         } else if (user.email) {
           // Fallback to email username
-          setUserName(user.email.split('@')[0]);
+          // Provide fallback in case split results in undefined/null unexpectedly
+          setUserName(user.email.split('@')[0] ?? 'User'); 
         }
       }
     };
@@ -59,17 +60,17 @@ export function WelcomeCard() {
     {
       label: 'Upload Document',
       icon: <FileTextIcon className="h-4 w-4 mr-2" />,
-      onClick: () => router.push('/protected/documents')
+      onClick: () => router.push('/product/documents')
     },
     {
       label: 'View Patients',
       icon: <UsersIcon className="h-4 w-4 mr-2" />,
-      onClick: () => router.push('/protected/patients')
+      onClick: () => router.push('/product/patients')
     },
     {
       label: 'Start Chat',
       icon: <MessageSquareIcon className="h-4 w-4 mr-2" />,
-      onClick: () => router.push('/protected/chat')
+      onClick: () => router.push('/product/chat')
     }
   ];
 

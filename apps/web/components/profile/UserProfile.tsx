@@ -3,12 +3,12 @@
 import React, { useState, useEffect, FormEvent, Fragment } from 'react'
 import { useParams } from 'next/navigation'
 import { createClient } from '~/utils/supabase/client'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '~/components/ui/tabs'
-import { Button } from '~/components/ui/button'
-import { Input } from '~/components/ui/input'
-import { Label } from '~/components/ui/label'
-import TextArea from '~/components/ui/text-area'
-import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@kit/ui/tabs'
+import { Button } from '@kit/ui/button'
+import { Input } from '@kit/ui/input'
+import { Label } from '@kit/ui/label'
+import { Textarea } from '@kit/ui/textarea'
+import { Avatar, AvatarFallback, AvatarImage } from '@kit/ui/avatar'
 
 interface ProfileData {
   user_id: string;            // Foreign key to auth.users.id
@@ -165,10 +165,20 @@ export default function UserProfile({ userId }: UserProfileProps) {
       // Organize runs by thread_id
       const runsByThread: Record<string, any[]> = {}
       runsData.forEach((run) => {
-        if (!runsByThread[run.thread_id]) {
-          runsByThread[run.thread_id] = []
+        if (run && typeof run.thread_id === 'string') { 
+          const threadId = run.thread_id;
+          if (!runsByThread[threadId]) {
+            runsByThread[threadId] = []
+          }
+          runsByThread[threadId].push(run)
+        } else {
+           // Optional: Handle or log runs without a thread_id if necessary
+           if (run && run.id) {
+             console.warn(`Run with ID ${run.id} is missing a thread_id.`);
+           } else {
+             console.warn('Encountered a run object without an ID or thread_id.');
+           }
         }
-        runsByThread[run.thread_id].push(run)
       })
       
 
@@ -389,7 +399,7 @@ export default function UserProfile({ userId }: UserProfileProps) {
                 
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="about">About</Label>
-                  <TextArea
+                  <Textarea
                     id="about"
                     name="about"
                     value={formData.about || ''}

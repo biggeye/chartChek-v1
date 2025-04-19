@@ -5,8 +5,8 @@
  * It handles the terminology differences and field naming conventions between systems.
  */
 
-import { Facility, Building, PatientBasicInfo as AppPatientBasicInfo, KipuPatientEvaluation as AppPatientEvaluation, PatientVitalSign as AppPatientVitalSign, PatientAppointment as AppPatientAppointment, PaginatedPatientsResponse as AppPaginatedPatientsResponse, KipuEvaluation } from '~/types/kipu/kipuAdapter';
-import { PatientBasicInfo, Facility as KipuFacility } from '~/types/kipu/kipuAdapter';
+import { Facility, Building, PatientBasicInfo as AppPatientBasicInfo, KipuPatientEvaluation as AppPatientEvaluation, PatientVitalSign as AppPatientVitalSign, PatientAppointment as AppPatientAppointment, PaginatedPatientsResponse as AppPaginatedPatientsResponse, KipuEvaluation } from 'types/kipu/kipuAdapter';
+import { PatientBasicInfo, Facility as KipuFacility } from 'types/kipu/kipuAdapter';
 
 /**
  * Maps a KIPU location object to our Facility format

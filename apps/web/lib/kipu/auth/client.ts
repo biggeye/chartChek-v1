@@ -6,7 +6,7 @@
  * This module provides a client for making authenticated requests to the KIPU API.
  */
 
-import { KipuCredentials, KipuApiResponse } from '~/types/kipu/kipuAdapter';
+import { KipuCredentials, KipuApiResponse } from 'types/kipu/kipuAdapter';
 import { generateKipuAuthHeaders } from './signature';
 
 /**

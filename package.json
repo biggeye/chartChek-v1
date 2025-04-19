@@ -14,7 +14,7 @@
     "preinstall": "pnpm run --filter scripts requirements",
     "postinstall": "manypkg fix",
     "build": "turbo build --cache-dir=.turbo",
-    "clean": "git clean -xdf node_modules dist .next",
+    "clean": "rimraf node_modules dist .next",
     "clean:workspaces": "turbo clean",
     "dev": "cross-env FORCE_COLOR=1 turbo dev --parallel",
     "format": "turbo format --cache-dir=.turbo --continue -- --cache --cache-location='node_modules/.cache/.prettiercache' --ignore-path='../../.gitignore'",
@@ -39,11 +39,15 @@
     }
   },
   "devDependencies": {
+    "@ai-sdk/anthropic": "^1.2.10",
+    "@ai-sdk/google": "^1.2.12",
+    "@ai-sdk/openai": "^1.3.16",
     "@manypkg/cli": "^0.23.0",
     "@turbo/gen": "^2.4.2",
     "cross-env": "^7.0.3",
     "pnpm": "^10.8.1",
     "prettier": "^3.5.1",
+    "rimraf": "^5.0.10",
     "turbo": "2.4.2",
     "typescript": "^5.7.3"
   }

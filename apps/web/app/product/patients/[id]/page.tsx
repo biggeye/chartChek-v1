@@ -1,4 +1,4 @@
-// app/protected/patients/[id]/page.tsx
+// app/product/patients/[id]/page.tsx
 "use client";
 
 import React, { useState } from 'react';

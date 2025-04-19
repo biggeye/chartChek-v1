@@ -1,7 +1,7 @@
 // store/patient/evaluationsStore.ts
 import { create } from 'zustand';
-import { KipuPatientEvaluation } from '~/types/kipu/kipuAdapter';
-import type { KipuEvaluationsState } from '~/types/store/patient/evaluations'; // <-- IMPORT the type
+import { KipuPatientEvaluation } from 'types/kipu/kipuAdapter';
+import type { KipuEvaluationsState } from 'types/store/patient/evaluations'; // <-- IMPORT the type
 export type { KipuEvaluationsState }; // <-- RE-EXPORT using 'export type'
 
 export const useEvaluationsStore = create<KipuEvaluationsState>((set, get) => ({

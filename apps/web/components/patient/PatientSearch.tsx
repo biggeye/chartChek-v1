@@ -1,9 +1,9 @@
 'use client';
 
-import { Input } from '~/components/ui/input';
+import { Input } from '@kit/ui/input';
 import { Search, Calendar, X, SortAsc, SortDesc, Filter } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Button } from '~/components/ui/button';
+import { Button } from '@kit/ui/button';
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuLabel
-} from '~/components/ui/dropdown-menu';
+} from '@kit/ui/dropdown-menu';
 
 export type SortField = 'lastName' | 'admissionDate' | 'status' | null;
 export type SortDirection = 'asc' | 'desc';

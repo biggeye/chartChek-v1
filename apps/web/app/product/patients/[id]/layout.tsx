@@ -7,15 +7,15 @@ import { usePatientStore } from '~/store/patient/patientStore';
 import { useFetchPatient } from '~/hooks/usePatients';
 import { usePatientEvaluations } from '~/hooks/useEvaluations';
 import { PatientBreadcrumb } from "~/components/patient/PatientBreadcrumb";
-import { Button } from '~/components/ui/button';
+import { Button } from '@kit/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu';
+} from '@kit/ui/dropdown-menu';
 import { MoreVertical } from 'lucide-react';
-import { ScrollArea } from '~/components/ui/scroll-area';
+import { ScrollArea } from '@kit/ui/scroll-area';
 
 type ActiveTabType = 'overview' | 'evaluations' | 'appointments' | 'vitals' | 'orders' | 'treatmentPlan';
 
@@ -35,10 +35,10 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
   const activeTab = getActiveTab();
 
   const patientNavigation = [
-    { name: 'Overview', href: `/protected/patients/${patientId}`, current: activeTab === 'overview' },
-    { name: 'Treatment Plan', href: `/protected/patients/${patientId}/treatment`, current: activeTab === 'treatmentPlan' },
-    { name: 'Evaluations', href: `/protected/patients/${patientId}/evaluations`, current: activeTab === 'evaluations' },
-    { name: 'Vitals', href: `/protected/patients/${patientId}/vitals`, current: activeTab === 'vitals' },
+    { name: 'Overview', href: `/product/patients/${patientId}`, current: activeTab === 'overview' },
+    { name: 'Treatment Plan', href: `/product/patients/${patientId}/treatment`, current: activeTab === 'treatmentPlan' },
+    { name: 'Evaluations', href: `/product/patients/${patientId}/evaluations`, current: activeTab === 'evaluations' },
+    { name: 'Vitals', href: `/product/patients/${patientId}/vitals`, current: activeTab === 'vitals' },
   ];
 
   function classNames(...classes: string[]) {

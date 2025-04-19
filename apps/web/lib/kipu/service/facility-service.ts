@@ -8,7 +8,7 @@
 
 import { createKipuRequestConfig } from '~/lib/kipu/auth/signature';
 import { getKipuCredentials } from '~/lib/kipu/service/user-settings';
-import { createServer } from '~/lib/utils/supabase/server';
+import { createServer } from '~/utils/supabase/server';
 import { mapKipuLocationToFacility } from '~/lib/kipu/mapping';
 import { kipuServerGet } from '~/lib/kipu/auth/server';
 

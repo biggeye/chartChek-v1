@@ -9,7 +9,7 @@ import {
   EvaluationMetricsCard,
   ComplianceAlertsCard
 } from '~/components/dashboard';
-import { Skeleton } from '~/components/ui/skeleton';
+import { Skeleton } from '@kit/ui/skeleton';
 
 // Loading skeleton for dashboard components
 function DashboardSkeleton() {

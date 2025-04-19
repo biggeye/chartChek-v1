@@ -1,4 +1,4 @@
-// app/protected/patients/[id]/treatment/page.tsx
+// app/product/patients/[id]/treatment/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { CheckCircleIcon, CalendarDaysIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { usePatientStore } from '~/store/patient/patientStore';
 import { usePatientEvaluations } from '~/hooks/useEvaluations';
-import EvaluationMetricsDashboard from '~/components/treatment/EvaluationMetricsDashboard';
+import EvaluationMetricsDashboard from '~/components/patient/EvaluationMetricsDashboard';
 
 // Define a type for timeline activities
 interface TimelineActivity {

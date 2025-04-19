@@ -3,15 +3,15 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { v4 as uuidv4 } from "uuid";
-import type { ChatSession, Message, ModelConfig, ContextItem, ModelProvider } from "~/types/chat";
+import type { ChatSession, Message, ModelConfig, ContextItem, ModelProvider } from "types/chat";
 import { LLMOption, LLM_OPTIONS, LLMProvider, llmService } from "~/lib/llm-service";
-import { type TrainingDataset, TRAINING_DATASETS } from "~/types/training-datasets";
+import { type TrainingDataset, TRAINING_DATASETS } from "types/trainingDatasets";
 import { conversationService, messageService } from "~/lib/chat/service";
 import type { 
-  Conversation as DbConversation,
-  Message as DbMessage,
-  ModelConfig as DbModelConfig
-} from "~/types/chat/database";
+  DbConversation, 
+  DbMessage, 
+  DbModelConfig 
+} from "types/chat";
 import { getCurrentUserId } from "~/utils/supabase/user";
 import { createClient } from "~/utils/supabase/client";
 
@@ -195,7 +195,7 @@ export const useChatStore = create<ChatState>()(
             threadId: null,
             modelConfig: {
               ...config,
-              modelId: model.id,
+              modelId: model?.id ?? null, // Use optional chaining and nullish coalescing
             },
           };
           
@@ -220,7 +220,7 @@ export const useChatStore = create<ChatState>()(
           set((state) => {
             const updatedSessions = state.sessions.filter((session) => session.id !== sessionId);
             const newCurrentId = state.currentSessionId === sessionId 
-              ? (updatedSessions.length > 0 ? updatedSessions[0].id : null) 
+              ? (updatedSessions.length > 0 ? updatedSessions[0]?.id : null) // Use optional chaining
               : state.currentSessionId;
             
             return {

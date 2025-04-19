@@ -4,21 +4,21 @@ import { useState, useEffect, useRef } from "react"
 import { v4 as uuidv4 } from "uuid"
 import { useChatStore } from "~/store/chat/chatStore"
 import { useContextQueueStore } from "~/store/chat/contextQueueStore"
-import { useSidebarStore } from "~/store/layout/sidebarStore"
+import { useSidebarStore } from "~/store/sidebarStore"
 import { useChat } from "~/hooks/useChat"
 import { ModelAdapterFactory } from "~/lib/models"
 import { getCurrentUserId } from "~/utils/supabase/user"
-import type { Message, ModelConfig, ContextItem, ModelProvider } from "~/types/chat"
+import type { Message, ModelConfig, ContextItem, ModelProvider } from "types/chat"
 import { MessageList } from "~/components/chat/message-list"
 import { MessageInput } from "~/components/chat/message-input"
 import { ModelSelector } from "~/components/chat/model-selector"
 import { ContextQueue } from "~/components/chat/context-queue"
 import { PatientContextModal } from "~/components/chat/patient-context-modal"
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "~/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "~/components/ui/dialog"
-import { Button } from "~/components/ui/button"
-import { Badge } from "~/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@kit/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@kit/ui/tabs"
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@kit/ui/dialog"
+import { Button } from "@kit/ui/button"
+import { Badge } from "@kit/ui/badge"
 import {
   Loader2,
   Settings,
@@ -35,10 +35,10 @@ import {
   PlusCircle,
   ChevronsUpDown
 } from "lucide-react"
-import { cn } from "~/lib/utils"
-import { VisuallyHidden } from "../ui/visually-hidden"
-import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "~/components/ui/command"
+import { cn } from "@kit/ui/utils"
+import { VisuallyHidden } from "~/components/visually-hidden"
+import { Popover, PopoverContent, PopoverTrigger } from "@kit/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@kit/ui/command"
 
 export function ChatUI() {
   const [currentResponse, setCurrentResponse] = useState("")

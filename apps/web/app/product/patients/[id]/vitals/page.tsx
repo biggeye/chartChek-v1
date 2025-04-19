@@ -1,9 +1,9 @@
-// app/protected/patients/[id]/vitals/page.tsx
+// app/product/patients/[id]/vitals/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { PatientVitalSign } from '~/types/kipu/kipuAdapter';
+import { PatientVitalSign } from 'types/kipu/kipuAdapter';
 import { usePatientStore } from '~/store/patient/patientStore';
 // Define a local interface for formatted vital signs
 interface VitalSign {

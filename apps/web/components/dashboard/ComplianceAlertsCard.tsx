@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangleIcon, ShieldAlertIcon, ExternalLinkIcon } from 'lucide-react';
 import { DashboardCard } from './DashboardCard';
-import { Button } from '~/components/ui/button';
-import { Skeleton } from '~/components/ui/skeleton';
+import { Button } from '@kit/ui/button';
+import { Skeleton } from '@kit/ui/skeleton';
 
 interface ComplianceAlert {
   id: string;
@@ -87,7 +87,7 @@ export function ComplianceAlertsCard() {
         <Button 
           variant="ghost" 
           className="w-full justify-center text-indigo_dye-600 hover:text-indigo_dye-900 hover:bg-indigo_dye-50"
-          onClick={() => router.push('/protected/documents')}
+          onClick={() => router.push('/product/documents')}
         >
           View All Compliance Documents
         </Button>
@@ -113,9 +113,9 @@ export function ComplianceAlertsCard() {
               className="flex items-start space-x-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer"
               onClick={() => {
                 if (alert.relatedPatientId) {
-                  router.push(`/protected/patients/${encodeURIComponent(alert.relatedPatientId)}`);
+                  router.push(`/product/patients/${encodeURIComponent(alert.relatedPatientId)}`);
                 } else if (alert.relatedDocumentId) {
-                  router.push(`/protected/documents/${alert.relatedDocumentId}`);
+                  router.push(`/product/documents/${alert.relatedDocumentId}`);
                 }
               }}
             >

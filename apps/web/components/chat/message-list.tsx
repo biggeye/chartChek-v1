@@ -1,12 +1,12 @@
 "use client"
 
 import { useRef, useEffect } from "react"
-import { Avatar, AvatarFallback } from "~/components/ui/avatar"
-import { cn } from "~/lib/utils"
-import type { Message } from "~/types/chat"
+import { Avatar, AvatarFallback } from "@kit/ui/avatar"
+import { cn } from "@kit/ui/utils"
+import type { Message } from 'types/chat'
 import { Bot, User } from "lucide-react"
-import { ScrollArea } from "~/components/ui/scroll-area"
-import { Markdown } from "~/components/ui/markdown"
+import { ScrollArea } from "@kit/ui/scroll-area"
+import { Markdown } from "~/components/chat/markdown"
 
 interface MessageListProps {
   messages: Message[]

@@ -1,11 +1,11 @@
 import { create } from "zustand";
-import { KipuPatientEvaluation } from "~/types/kipu/kipuAdapter";
-import { adaptKipuEvaluation } from "~/types/kipu/kipuEvaluationEnhanced";
-import { PatientEvaluationParserService } from "~/lib/kipu/mapping/parse-evaluation";
+import { KipuPatientEvaluation } from "types/kipu/kipuAdapter";
+import { adaptKipuEvaluation } from "types/kipu/kipuEvaluationEnhanced";
+import { PatientEvaluationParserService } from "~/lib/parse-evaluation";
 import { useEvaluationsStore } from "../patient/evaluationsStore";
 import { useContextQueueStore } from "~/store/chat/contextQueueStore"; // To add to the UI queue after successful API calls
 import { getCurrentUserId } from "~/utils/supabase/user";
-import type { PatientBasicInfo } from "~/types/kipu/kipuAdapter";
+import type { PatientBasicInfo } from "types/kipu/kipuAdapter";
 import { useChatStore } from "./chatStore"; // To potentially get the current session ID
 import { fetchEvaluationDetails } from '~/lib/services/evaluationsService';
 

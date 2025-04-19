@@ -15,6 +15,7 @@ import { Trans } from '@kit/ui/trans';
 import { Card, CardHeader, CardTitle, CardDescription } from '@kit/ui/card';
 
 import { withI18n } from '~/lib/i18n/with-i18n';
+import { WaitlistForm } from '~/(marketing)/_components/site-waitlist-form';
 
 function Home() {
   return (
@@ -36,7 +37,26 @@ function Home() {
               Streamline workflows, ensure audit readiness, and gain critical insights from your KIPU data. chartChek transforms your EMR experience.
             </span>
           }
-          cta={<MainCallToActionButton />}
+          cta={
+            <WaitlistForm>
+              <CtaButton>
+                <Link href={'/auth/sign-up'}>
+                  <span className={'flex items-center space-x-0.5'}>
+                    <span>
+                      <Trans i18nKey={'common:getStarted'} />
+                    </span>
+
+                    <ArrowRightIcon
+                      className={
+                        'animate-in fade-in slide-in-from-left-8 h-4' +
+                        ' zoom-in fill-mode-both delay-1000 duration-1000'
+                      }
+                    />
+                  </span>
+                </Link>
+              </CtaButton>
+            </WaitlistForm>
+          }
           image={
             <Image
               priority
@@ -134,37 +154,39 @@ function Home() {
           </FeatureShowcase>
         </div>
       </div>
+
+      <div className={'container mx-auto'}>
+        <div className={'flex space-x-4'}>
+          <WaitlistForm>
+            <CtaButton>
+              <Link href={'/auth/sign-up'}>
+                <span className={'flex items-center space-x-0.5'}>
+                  <span>
+                    <Trans i18nKey={'common:getStarted'} />
+                  </span>
+
+                  <ArrowRightIcon
+                    className={
+                      'animate-in fade-in slide-in-from-left-8 h-4' +
+                      ' zoom-in fill-mode-both delay-1000 duration-1000'
+                    }
+                  />
+                </span>
+              </Link>
+            </CtaButton>
+          </WaitlistForm>
+
+          <WaitlistForm>
+            <CtaButton variant={'link'}>
+              <Link href={'/contact'}>
+                <Trans i18nKey={'common:contactUs'} />
+              </Link>
+            </CtaButton>
+          </WaitlistForm>
+        </div>
+      </div>
     </div>
   );
 }
 
 export default withI18n(Home);
-
-function MainCallToActionButton() {
-  return (
-    <div className={'flex space-x-4'}>
-      <CtaButton>
-        <Link href={'/auth/sign-up'}>
-          <span className={'flex items-center space-x-0.5'}>
-            <span>
-              <Trans i18nKey={'common:getStarted'} />
-            </span>
-
-            <ArrowRightIcon
-              className={
-                'animate-in fade-in slide-in-from-left-8 h-4' +
-                ' zoom-in fill-mode-both delay-1000 duration-1000'
-              }
-            />
-          </span>
-        </Link>
-      </CtaButton>
-
-      <CtaButton variant={'link'}>
-        <Link href={'/contact'}>
-          <Trans i18nKey={'common:contactUs'} />
-        </Link>
-      </CtaButton>
-    </div>
-  );
-}

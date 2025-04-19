@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BarChart3Icon, CheckCircleIcon, ClockIcon, AlertCircleIcon } from 'lucide-react';
 import { DashboardCard } from './DashboardCard';
-import { Button } from '~/components/ui/button';
-import { Progress } from '~/components/ui/progress';
+import { Button } from '@kit/ui/button';
+import { Progress } from '@kit/ui/progress';
 import { usePatientStore } from '~/store/patient/patientStore';
-import { parseEvaluationMetrics, calculateCompletionPercentage } from '~/lib/kipu/service/evaluationMetricsService';
+import { parseEvaluationMetrics, calculateCompletionPercentage } from '~/lib/kipu/service/evaluation-metrics-service';
 
 export function EvaluationMetricsCard() {
   const router = useRouter();
@@ -122,7 +122,7 @@ export function EvaluationMetricsCard() {
         <Button 
           variant="ghost" 
           className="w-full justify-center text-indigo_dye-600 hover:text-indigo_dye-900 hover:bg-indigo_dye-50"
-          onClick={() => router.push('/protected/patients')}
+          onClick={() => router.push('/product/patients')}
         >
           View All Patients
         </Button>
@@ -195,7 +195,7 @@ export function EvaluationMetricsCard() {
         <div className="text-center py-6">
           <p className="text-gray-500 mb-4">No evaluation data available</p>
           <Button 
-            onClick={() => router.push('/protected/patients')}
+            onClick={() => router.push('/product/patients')}
             variant="outline"
           >
             View Patients

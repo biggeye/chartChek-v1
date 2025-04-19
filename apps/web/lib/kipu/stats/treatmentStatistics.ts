@@ -1,5 +1,5 @@
 // lib/kipu/stats/treatmentStatistics.ts
-import { KipuCredentials } from '~/types/kipu/kipuAdapter';
+import { KipuCredentials } from 'types/kipu/kipuAdapter';
 import { TreatmentStatistics } from './types';
 import { kipuServerGet } from '../auth/server';
 

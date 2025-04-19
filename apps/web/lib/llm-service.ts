@@ -2,7 +2,7 @@ import { generateText, streamText } from "ai"
 import { openai } from "@ai-sdk/openai"
 import { anthropic } from "@ai-sdk/anthropic"
 import { google } from "@ai-sdk/google"
-import type { Patient, PatientRecord, Document, QueueItem } from "@/types/store/chat/globalChat"
+import type { Patient, PatientRecord, Document, QueueItem } from "~/types/store/chat/globalChat"
 
 // LLM Models
 export type LLMProvider = "openai" | "anthropic" | "google" | "assistants"
@@ -191,35 +191,36 @@ export const processQueueForLLM = (queueItems: QueueItem[]): string => {
   // Add patient information
   if (patients.length > 0) {
     patients.forEach((patient) => {
-      const patientRecords = records.filter((r) => r.patientId === patient.patientId)
-      context += formatPatientContext(patient, patientRecords) + "\n\n"
+      if (patient) {
+        const patientRecords = records.filter((r) => r.patientId === patient.patientId)
+        context += formatPatientContext(patient, patientRecords) + "\n\n"
+      }
     })
   } else if (records.length > 0) {
-    // If we have records but no patient, group by patientId
-    const recordsByPatient = records.reduce(
-      (acc, record) => {
-        if (!acc[record.patientId]) {
-          acc[record.patientId] = []
-        }
-        acc[record.patientId].push(record)
-        return acc
-      },
-      {} as Record<string, PatientRecord[]>,
-    )
+    // If we have records but no patient, group by patientId using Map for type safety
+    const recordsByPatient = new Map<string, PatientRecord[]>();
+    records.forEach(record => {
+      if (!recordsByPatient.has(record.patientId)) {
+        recordsByPatient.set(record.patientId, []);
+      }
+      recordsByPatient.get(record.patientId)!.push(record);
+    });
 
-    Object.values(recordsByPatient).forEach((patientRecords) => {
-      context += `Patient Records (Patient ID: ${patientRecords[0].patientId}):\n`
-      patientRecords.forEach((record) => {
-        context +=
-          `
+    recordsByPatient.forEach((patientRecords, patientId) => {
+      if (patientRecords.length > 0) {
+        context += `Patient Records (Patient ID: ${patientId}):\n`;
+        patientRecords.forEach(record => {
+          context +=
+            `
 - Type: ${record.type}
 - Date: ${record.date}
 - Title: ${record.title}
 - Provider: ${record.provider}
 - Summary: ${record.summary}
-        `.trim() + "\n\n"
-      })
-    })
+            `.trim() + "\n\n";
+        });
+      }
+    });
   }
 
   // Add document information

@@ -21,7 +21,7 @@ export const useChat = (): UseChatReturn => {
     updateStreamingMessage, // Use existing store action
     setIsProcessing: setStoreProcessingState, // Use the actual setIsProcessing action
     setError: setStoreError, // Assume store has an action like this
-  } = useChatStore(state => ({ ...state })); // Ensure stable reference if needed
+  } = useChatStore();
 
   // Hook's internal state (can also use store state if preferred)
   const [isProcessing, setIsProcessing] = useState(false);

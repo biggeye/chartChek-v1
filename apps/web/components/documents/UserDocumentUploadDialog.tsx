@@ -1,19 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Button } from '~/components/ui/button'
+import { Button } from '@kit/ui/button'
 import { ArrowUpTrayIcon, XMarkIcon } from '@heroicons/react/24/outline'
 import { DocumentCategorization } from 'types/store/doc/userDocument'
 import { Transition } from '@headlessui/react'
-import { Label } from '~/components/ui/label'
+import { Label } from '@kit/ui/label'
 import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue
-} from '~/components/ui/select-new'
-import { Input } from '~/components/ui/input'
+} from '@kit/ui/select'
+import { Input } from '@kit/ui/input'
 import { useFacilityStore } from '~/store/patient/facilityStore'
 import { createClient } from '~/utils/supabase/client'
 

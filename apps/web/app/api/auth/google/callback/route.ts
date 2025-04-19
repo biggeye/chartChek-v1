@@ -1,11 +1,11 @@
 // app/api/auth/google/callback/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { exchangeCodeForTokens, getUserInfo } from '@/lib/google/auth';
-import { createServerService } from '~/utils/supabase/serverService';
+//import { exchangeCodeForTokens, getUserInfo } from '~/lib/google/auth';
+import { createServer } from '~/utils/supabase/server';
 
 export async function GET(request: NextRequest) {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-  const supabase = await createServerService();
+  const supabase = await createServer();
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const state = searchParams.get('state');

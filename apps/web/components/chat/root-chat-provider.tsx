@@ -116,6 +116,8 @@ export function RootChatProvider() {
   // Create a default session if none exists
   useEffect(() => {
     if (sessions.length === 0) {
+      // create hook for fetching user's default model selection
+
       createSession({
         provider: "openai",
         modelName: "gpt-4o",
@@ -501,15 +503,15 @@ export function RootChatProvider() {
       )}
 
       <CommandDialog open={isModelDialogOpen} onOpenChange={setIsModelDialogOpen}>
-        {/* @ts-expect-error IntrinsicAttributes issues with Command components */}
+
         <CommandInput placeholder="Search models..." />
-        {/* @ts-expect-error IntrinsicAttributes issues with Command components */}
+ 
         <CommandList>
           <CommandEmpty>No model found.</CommandEmpty>
-          {/* @ts-expect-error IntrinsicAttributes issues with Command components */}
+
           <CommandGroup heading="Select model for new chat">
             {availableModels.map((option) => (
-              // @ts-expect-error IntrinsicAttributes issues with Command components
+
               <CommandItem
                 key={option.id}
                 value={option.id}

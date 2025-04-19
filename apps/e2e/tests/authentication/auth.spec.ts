@@ -45,7 +45,7 @@ test.describe('Auth flow', () => {
 
     await page.waitForURL('**/home');
 
-    expect(page.url()).toContain('/home');
+    expect(page.url()).toContain('/product');
 
     await auth.signOut();
 

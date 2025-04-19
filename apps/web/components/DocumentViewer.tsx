@@ -1,7 +1,7 @@
-// app/product/admin/knowledge/DocumentViewer.tsx
+
 "use client";
 
-import { evaluationFieldComponents, MatrixField, extractContent } from "../components/patient-evaluation-items";
+import { evaluationFieldComponents, MatrixField, extractContent } from "./patient-evaluation-items";
 import { KipuPatientEvaluationItem } from "../types/kipu/kipuAdapter";
 
 interface DocumentViewerProps {

@@ -12,7 +12,7 @@ import { useSupabase } from './use-supabase';
  * @name PRIVATE_PATH_PREFIXES
  * @description A list of private path prefixes
  */
-const PRIVATE_PATH_PREFIXES = ['/home', '/update-password'];
+const PRIVATE_PATH_PREFIXES = ['/product', '/update-password'];
 
 /**
  * @name AUTH_PATHS

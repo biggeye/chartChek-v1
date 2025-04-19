@@ -1,6 +1,6 @@
 // app/api/auth/google/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthUrl } from '@/lib/google/auth';
+import { getAuthUrl } from '~/lib/google/auth';
 import { createServerService } from '~/utils/supabase/serverService';
 
 // app/api/auth/google/route.ts - update this file

@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@kit/ui/card';
 import { Button } from '@kit/ui/button';
 import { Skeleton } from '@kit/ui/skeleton';
-import { DocumentView } from '~/lib/DocumentView';
+import DocumentViewer from '~/components/DocumentViewer';
 import { fetchEvaluationDetails } from '~/lib/services/evaluationsService';
 import { KipuPatientEvaluation } from '~/types/kipu/kipuAdapter';
 
@@ -123,7 +123,7 @@ export default function EvaluationDetailPage() {
           </Button>
           
           {evaluation.patientEvaluationItems && evaluation.patientEvaluationItems.length > 0 ? (
-            <DocumentView items={evaluation.patientEvaluationItems} />
+            <DocumentViewer items={evaluation.patientEvaluationItems} />
           ) : (
             <p>No items found in this evaluation.</p>
           )}

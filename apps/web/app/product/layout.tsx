@@ -16,13 +16,13 @@ export default async function ProtectedLayout({
 
   if (authError || !user) {
     console.error("Auth error or no user, redirecting to login:", authError?.message);
-    redirect("/login");
+    redirect("/auth/sign-in");
   }
 
   // Add validation for existing user ID
   if (!user.id) {
     console.error('Authenticated user missing ID:', user);
-    redirect("/login");
+    redirect("/auth/sign-in");
   }
 
   const profile = await getUserProfile(user.id);

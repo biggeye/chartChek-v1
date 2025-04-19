@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Fragment } from 'react'
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@kit/ui/utils';
-import { signOutAction } from '../actions';
+import { signOutAction } from '../../lib/actions';
 import { ThemeSwitcher } from '~/components/modules/theme-switcher';
 import { initializeStoreSubscriptions } from '~/store/storeInitializers';
 import { useSidebarStore } from '~/store/sidebarStore';

@@ -1,9 +1,7 @@
 // types/store/chat/globalChat.ts
-import { LLMOption } from "@/lib/llm-service";
-import { LLM_OPTIONS } from "@/lib/llm-service"; // Although LLM_OPTIONS likely not needed here
-import { TrainingDataset } from "../../training-datasets";
-import { TRAINING_DATASETS } from "../../training-datasets"; // Although TRAINING_DATASETS likely not needed here
-import { KipuPatientEvaluation } from "../../kipu/kipuAdapter";
+import { LLMOption } from "~/lib/llm-service";
+import { TrainingDataset } from "~/types/trainingDatasets";
+import { KipuPatientEvaluation } from "~/types/kipu/kipuAdapter";
 
 // Define ChatMessage Interface here for shared use
 export interface ChatMessage {

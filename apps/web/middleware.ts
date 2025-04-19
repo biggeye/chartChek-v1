@@ -124,7 +124,7 @@ function getPatterns() {
       },
     },
     {
-      pattern: new URLPattern({ pathname: '/home/*?' }),
+      pattern: new URLPattern({ pathname: '/product/*?' }),
       handler: async (req: NextRequest, res: NextResponse) => {
         const {
           data: { user },

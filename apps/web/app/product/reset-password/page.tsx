@@ -1,11 +1,11 @@
-import { resetPasswordAction } from "~/app/actions";
-import { FormMessage, Message } from "~/components/ui/form-message";
-import { SubmitButton } from "~/components/ui/submit-button";
-import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
+import { resetPasswordAction } from "~/lib/actions";
+import { FormMessage } from "@kit/ui/form";
+import { Button as SubmitButton } from "@kit/ui/button";
+import { Input } from "@kit/ui/input";
+import { Label } from "@kit/ui/label";
 
 export default async function ResetPassword(props: {
-  searchParams: Promise<Message>;
+  searchParams: Promise<any>;
 }) {
   const searchParams = await props.searchParams;
   return (
@@ -31,7 +31,9 @@ export default async function ResetPassword(props: {
       <SubmitButton formAction={resetPasswordAction}>
         Reset password
       </SubmitButton>
-      <FormMessage message={searchParams} />
+      {searchParams.message && (
+        <FormMessage>{searchParams.message}</FormMessage>
+      )}
     </form>
   );
 }

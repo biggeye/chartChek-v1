@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@kit/ui/card"
 import type { OperationalStatistics } from "~/lib/kipu/stats/types"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
 

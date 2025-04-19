@@ -5,7 +5,7 @@ import type { ModelConfig, Message } from "~/types/chat"
 export async function POST(request: Request) {
   try {
     const { messages, systemMessage, modelConfig } = await request.json()
-
+console.log('chat/stream API] modelConfig: ', modelConfig);
     if (!messages || !Array.isArray(messages) || !modelConfig) {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
     }

@@ -1,10 +1,10 @@
 "use client"
 
 import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
-import { Skeleton } from "~/components/ui/skeleton"
-import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@kit/ui/card"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@kit/ui/tabs"
+import { Skeleton } from "@kit/ui/skeleton"
+import { Alert, AlertDescription, AlertTitle } from "@kit/ui/alert"
 import { AlertCircle } from "lucide-react"
 import type { KipuCredentials } from "types/kipu/kipuAdapter"
 import { createKipuClient } from "~/lib/kipu/auth/client"
@@ -239,8 +239,8 @@ export function StatsModule({ facilityId, credentials }: StatsModuleProps) {
 
         const monthAgo = new Date(now)
         monthAgo.setDate(monthAgo.getDate() - 30)
-
-        const dateRange: DateRange = {
+// ADD TYPE DEFINITION LATER AI
+        const dateRange: any = {
           daily: {
             start: yesterday.toISOString().split("T")[0],
             end: today,

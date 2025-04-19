@@ -41,7 +41,7 @@ test.describe('Password Reset Flow', () => {
       })
       .click();
 
-    await page.waitForURL('/home');
+    await page.waitForURL('/product');
 
     await auth.signOut();
     await page.waitForURL('/');
@@ -60,6 +60,6 @@ test.describe('Password Reset Flow', () => {
       password: newPassword,
     });
 
-    await page.waitForURL('/home');
+    await page.waitForURL('/product');
   });
 });

@@ -1,4 +1,4 @@
-import type { ModelConfig, Message } from "@/types/chat"
+import type { ModelConfig, Message } from "~/types/chat"
 
 export interface ModelAdapter {
   generateResponse: (
@@ -19,7 +19,9 @@ export class ModelAdapterFactory {
   private static adapters: Record<string, (config: ModelConfig) => ModelAdapter> = {}
 
   static register(provider: string, factory: (config: ModelConfig) => ModelAdapter): void {
+    console.log(`Registering model adapter for provider: ${provider}`)
     this.adapters[provider] = factory
+    console.log(`Registered adapters: ${Object.keys(this.adapters).join(", ")}`)
   }
 
   static create(config: ModelConfig): ModelAdapter {

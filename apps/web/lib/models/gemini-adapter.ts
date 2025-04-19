@@ -1,5 +1,5 @@
 import { type ModelAdapter, ModelAdapterFactory } from "./model-adapter"
-import type { ModelConfig, Message } from "@/types/chat"
+import type { ModelConfig, Message } from "~/types/chat"
 import { generateText, streamText } from "ai"
 import { google } from "@ai-sdk/google"
 

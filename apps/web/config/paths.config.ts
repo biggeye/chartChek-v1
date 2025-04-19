@@ -25,7 +25,7 @@ const pathsConfig = PathsSchema.parse({
     passwordUpdate: '/update-password',
   },
   app: {
-    home: '/home',
+    home: '/product',
     profileSettings: '/home/settings',
   },
 } satisfies z.infer<typeof PathsSchema>);

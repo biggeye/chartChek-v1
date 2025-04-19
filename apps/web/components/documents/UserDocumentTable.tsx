@@ -1,12 +1,12 @@
 'use client'
 
 import { UserDocument } from "types/store/doc/userDocument";
-import { Input } from '~/components/ui/input';
+import { Input } from '@kit/ui/input';
 import { ArrowUpTrayIcon } from '@heroicons/react/20/solid';
 import Link from 'next/link';
-import { Badge } from '~/components/ui/badge';
+import { Badge } from '@kit/ui/badge';
 import { format } from 'date-fns';
-import { Skeleton } from '~/components/ui/skeleton';
+import { Skeleton } from '@kit/ui/skeleton';
 
 interface UserDocumentsTableProps {
   documents: UserDocument[];

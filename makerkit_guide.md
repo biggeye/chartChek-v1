@@ -994,7 +994,7 @@ function isMarketingPage(req: NextRequest) {
     '/faq',
     '/contact',
     '/about',
-    '/home',
+    '/product',
     '/privacy-policy',
     '/terms-and-conditions',
     '/cookie-policy',

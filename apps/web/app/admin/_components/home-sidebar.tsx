@@ -9,7 +9,7 @@ import {
 } from '@kit/ui/shadcn-sidebar';
 
 import { AppLogo } from '~/components/app-logo';
-import { ProfileAccountDropdownContainer } from '~/components/personal-account-dropdown-container';
+import { ProfileAccountDropdownContainer } from '../../../../../personal-account-dropdown-container';
 import { navigationConfig } from '~/config/navigation.config';
 import { Tables } from '~/lib/database.types';
 

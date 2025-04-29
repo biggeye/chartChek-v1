@@ -1,0 +1,46 @@
+***NOTE***
+ALL MOCK DATA IS TO BE REMOVED
+
+this is a NextJS15 (app router config) MakerKit.dev boilerplate project
+
+ALWAYS REFER TO THE SPECIFCIATIONS (aliases, paths, types, patterns, etc) OF THE BOILERPLATE:
+
+/makerkit.md
+
+AND THE PROJECT (chartChek) ITSELF:
+
+/apps/web/README.md
+
+before writing new code or logic.
+
+🛠 Tech Stack Overview
+
+Next.js 15 (App Router for routing & SSR)
+
+Supabase for Authentication and PostgreSQL integration
+
+Zustand for state management
+
+
+KIPU EMR Integration for behavioral health/substance abuse records management
+
+🔗 KIPU EMR Integration Guidelines
+
+DO NOT modify KIPU auth logic located at: /lib/kipu/auth/*
+
+Follow existing patterns strictly: utilize server/auth functions for headers, signatures, etc.
+
+🎨 UI/UX Component Guidelines
+
+Always reuse existing UI components:
+
+Check thoroughly in /components/* and /components/ui/* before creating new components.
+
+
+SERVICE LAYERS
+
+/lib/kipu/service/* is only for services directly accessing KIPU API
+
+anything else should be in:
+
+/lib/services

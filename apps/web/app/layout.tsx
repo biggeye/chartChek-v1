@@ -36,7 +36,7 @@ export default async function RootLayout({
   const className = getClassName(theme);
 
   return (
-    <html lang={language} className={className}>
+    <html lang={language} className={className} suppressHydrationWarning>
       <body className={`${barlowCondensed.variable} ${montserrat.variable}`}>
         <RootProviders theme={theme} lang={language}>
           {children}

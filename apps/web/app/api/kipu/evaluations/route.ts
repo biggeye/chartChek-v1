@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const page = searchParams.get('page') || '1';
-    const limit = searchParams.get('limit') || '50';
+    const limit = searchParams.get('limit') || '200';
     const supabase = await createServer();
     
     // Get the user session to ensure they're authenticated

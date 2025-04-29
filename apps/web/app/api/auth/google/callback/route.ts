@@ -1,6 +1,6 @@
 // app/api/auth/google/callback/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-//import { exchangeCodeForTokens, getUserInfo } from '~/lib/google/auth';
+import { exchangeCodeForTokens, getUserInfo } from '~/lib/google/auth';
 import { createServer } from '~/utils/supabase/server';
 
 export async function GET(request: NextRequest) {

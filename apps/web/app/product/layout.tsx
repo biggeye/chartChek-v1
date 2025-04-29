@@ -1,9 +1,11 @@
 import { createServer } from "~/utils/supabase/server";
-import { getUserProfile } from "~/lib/user/service/profile";
+import { getUserProfile } from "~/lib/services/accountService";
 import { redirect } from "next/navigation";
 import { ReactNode } from "react";
 import AppLayout from "./AppLayout";
-import Footer from "~/components/modules/Footer";
+import Footer from "~/components/footer";
+import { DebugPanel } from "~/components/dev/DebugPanel";
+
 
 export default async function ProtectedLayout({
   children
@@ -30,8 +32,9 @@ export default async function ProtectedLayout({
   const avatarUrl = profile?.avatar_url || null; // Get avatar_url, default to null
 
   return (
-    <AppLayout user_id={user.id} username={username} avatarUrl={avatarUrl}>
+    <AppLayout account_id={user.id} username={username} avatarUrl={avatarUrl}>
       {children}
+      <DebugPanel />
     </AppLayout>
   );
 }

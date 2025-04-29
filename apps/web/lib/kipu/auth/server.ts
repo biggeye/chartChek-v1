@@ -240,6 +240,28 @@ export async function kipuServerPost<T>(
   }
 }
 
+export async function kipuServerPatch(endpoint: string, credentials: KipuCredentials, body: any) {
+  const { accessId, secretKey, baseUrl } = credentials;
+  const url = `${baseUrl}${endpoint}`;
+
+  try {
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Access-Id': accessId,
+        'X-Secret-Key': secretKey,
+      },
+      body: JSON.stringify(body),
+    });
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('KIPU PATCH request failed:', error);
+    throw error;
+  }
+}
 
 export async function serverLoadKipuCredentialsFromSupabase(ownerId?: string): Promise<KipuCredentials | null> {
     const supabase = await createServer();
@@ -255,7 +277,7 @@ export async function serverLoadKipuCredentialsFromSupabase(ownerId?: string): P
  const { data, error } = await supabase
  .from('user_api_settings')
  .select('*')
- .eq('user_id', ownerId)
+ .eq('account_id', ownerId)
  .single();
  if (error) {
   console.warn('Error fetching user API settings:', error);
@@ -281,12 +303,10 @@ export async function serverSaveKipuCredentialsToSupabase(credentials: KipuCrede
       .single();
     
     const credentialsRecord = {
-      api_name: 'kipu',
-      access_id: credentials.accessId,
-      secret_key: credentials.secretKey,
-      app_id: credentials.appId,
-      base_url: credentials.baseUrl,
-      updated_at: new Date().toISOString()
+      kipu_access_id: credentials.accessId,
+      kipu_secret_key: credentials.secretKey,
+      kipu_app_id: credentials.appId,
+      kpu_api_endpoint: credentials.baseUrl,
     };
     
     let result;

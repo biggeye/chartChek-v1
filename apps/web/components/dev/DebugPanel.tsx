@@ -12,9 +12,9 @@ import { useChatStore } from '~/store/chat/chatStore';
 //doc state
 import { useUserDocumentStore } from '~/store/doc/userDocumentStore';
 import useTemplateStore from '~/store/doc/templateStore';
-
+import { useProtocolStore } from '~/store/protocolStore';
 // debug components
-import { ApiTester } from '~/components/dev/api-tester';
+
 
 interface DebugSectionProps {
   title: string;
@@ -73,6 +73,7 @@ const FunctionExecutor = ({ func, onClose }: FunctionExecutorProps) => {
   const [selectedFunction, setSelectedFunction] = useState<Function | null>(null);
   const [showStateSelector, setShowStateSelector] = useState(false);
   const [selectedParamIndex, setSelectedParamIndex] = useState<number>(-1);
+  const [checkedPaths, setCheckedPaths] = useState<Set<string>>(new Set());
 
   // Get all stores for state selection
   const facilityStore = useFacilityStore();
@@ -97,7 +98,7 @@ const FunctionExecutor = ({ func, onClose }: FunctionExecutorProps) => {
   // Parse function signature to get parameter names
   const funcString = func.toString();
   const paramMatch = funcString.match(/\(([^)]*)\)/);
-  const paramString = paramMatch ? paramMatch[1] : '';
+  const paramString = paramMatch?.[1] ?? '';
   const paramNames = paramString.split(',').map(p => p.trim()).filter(p => p);
 
   // Initialize args with empty strings for each parameter
@@ -180,6 +181,18 @@ const FunctionExecutor = ({ func, onClose }: FunctionExecutorProps) => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleToggleCheck = (path: string) => {
+    setCheckedPaths(prev => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
   };
 
   // Recursive component to display store structure for selection
@@ -350,6 +363,9 @@ const FunctionExecutor = ({ func, onClose }: FunctionExecutorProps) => {
                       <ObjectInspector 
                         data={result} 
                         setSelectedFunction={setSelectedFunction}
+                        checkedPaths={checkedPaths}
+                        onToggleCheck={handleToggleCheck}
+                        currentPath=""
                       />
                     </div>
                   )}
@@ -363,16 +379,23 @@ const FunctionExecutor = ({ func, onClose }: FunctionExecutorProps) => {
   );
 };
 
-// New recursive object inspector component
+interface ObjectInspectorProps {
+  data: any;
+  depth?: number;
+  setSelectedFunction: (func: Function) => void;
+  checkedPaths: Set<string>;
+  onToggleCheck: (path: string) => void;
+  currentPath?: string;
+}
+
 const ObjectInspector = ({ 
   data, 
   depth = 0,
-  setSelectedFunction 
-}: { 
-  data: any, 
-  depth?: number,
-  setSelectedFunction: (func: Function) => void
-}) => {
+  setSelectedFunction,
+  checkedPaths,
+  onToggleCheck,
+  currentPath = ''
+}: ObjectInspectorProps) => {
   const [expandedProps, setExpandedProps] = useState<Record<string, boolean>>({});
 
   const toggleProp = (prop: string) => {
@@ -383,14 +406,34 @@ const ObjectInspector = ({
   };
 
   if (typeof data === 'function') {
-    return <FunctionInspector 
-      func={data} 
-      setSelectedFunction={setSelectedFunction} 
-    />;
+    return (
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={checkedPaths.has(currentPath)}
+          onChange={() => onToggleCheck(currentPath)}
+          className="rounded border-gray-600"
+        />
+        <FunctionInspector 
+          func={data} 
+          setSelectedFunction={setSelectedFunction} 
+        />
+      </div>
+    );
   }
 
   if (typeof data !== 'object' || data === null) {
-    return <span>{JSON.stringify(data)}</span>;
+    return (
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={checkedPaths.has(currentPath)}
+          onChange={() => onToggleCheck(currentPath)}
+          className="rounded border-gray-600"
+        />
+        <span>{JSON.stringify(data)}</span>
+      </div>
+    );
   }
 
   const isArray = Array.isArray(data);
@@ -398,7 +441,15 @@ const ObjectInspector = ({
     
   return (
     <div style={{ marginLeft: depth > 0 ? 16 : 0 }}>
-      <span>{isArray ? '[' : '{'}</span>
+      <div className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={checkedPaths.has(currentPath)}
+          onChange={() => onToggleCheck(currentPath)}
+          className="rounded border-gray-600"
+        />
+        <span>{isArray ? '[' : '{'}</span>
+      </div>
       {entries.length > 0 && (
         <div>
           {entries.map(([key, value]) => {
@@ -406,10 +457,12 @@ const ObjectInspector = ({
             const isFunction = typeof value === 'function';
             const isExpandable = isObject || isFunction;
             const isExpanded = expandedProps[key];
+            const newPath = currentPath ? `${currentPath}.${key}` : key;
+            const isChecked = checkedPaths.has(newPath);
 
             return (
               <div key={key} className="my-1">
-                <div className="flex">
+                <div className="flex items-center gap-2">
                   {isExpandable && (
                     <span
                       className="mr-1 cursor-pointer text-gray-400 hover:text-white"
@@ -417,6 +470,14 @@ const ObjectInspector = ({
                     >
                       {isExpanded ? '▼' : '▶'}
                     </span>
+                  )}
+                  {!isExpanded && (
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={() => onToggleCheck(newPath)}
+                      className="rounded border-gray-600"
+                    />
                   )}
                   <span className="text-yellow-300">{isArray ? '' : `"${key}": `}</span>
                   {isExpandable ? (
@@ -442,6 +503,9 @@ const ObjectInspector = ({
                     data={value} 
                     depth={depth + 1} 
                     setSelectedFunction={setSelectedFunction}
+                    checkedPaths={checkedPaths}
+                    onToggleCheck={onToggleCheck}
+                    currentPath={newPath}
                   />
                 )}
               </div>
@@ -459,10 +523,58 @@ const DebugSection = ({
   data, 
   isExpanded, 
   onToggle,
-  setSelectedFunction 
+  setSelectedFunction,
+  sectionKey
 }: DebugSectionProps & { 
-  setSelectedFunction: (func: Function) => void 
+  setSelectedFunction: (func: Function) => void;
+  sectionKey: string;
 }) => {
+  const [checkedPaths, setCheckedPaths] = useState<Set<string>>(new Set());
+
+  const handleToggleCheck = (path: string) => {
+    setCheckedPaths(prev => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  };
+
+  const renderCheckedItems = () => {
+    if (checkedPaths.size === 0) return null;
+
+    const getValueByPath = (obj: any, path: string) => {
+      return path.split('.').reduce((acc, part) => acc?.[part], obj);
+    };
+
+    return (
+      <div className="mt-2 p-2 bg-gray-800 rounded">
+        {Array.from(checkedPaths).map(path => {
+          const value = getValueByPath(data, path);
+          return (
+            <div key={path} className="flex items-center gap-2 py-1">
+              <input
+                type="checkbox"
+                checked
+                onChange={() => handleToggleCheck(path)}
+                className="rounded border-gray-600"
+              />
+              <span className="text-yellow-300">{path}:</span>
+              <span className="text-blue-300">
+                {typeof value === 'function' 
+                  ? `[Function: ${value.name || 'anonymous'}]`
+                  : JSON.stringify(value)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-gray-800 rounded overflow-hidden">
       <button
@@ -473,11 +585,16 @@ const DebugSection = ({
         <span>{isExpanded ? '−' : '+'}</span>
       </button>
 
+      {!isExpanded && renderCheckedItems()}
+
       {isExpanded && (
         <div className="p-2 text-xs font-mono bg-gray-950 overflow-x-auto">
           <ObjectInspector 
             data={data} 
             setSelectedFunction={setSelectedFunction}
+            checkedPaths={checkedPaths}
+            onToggleCheck={handleToggleCheck}
+            currentPath=""
           />
         </div>
       )}
@@ -487,8 +604,15 @@ const DebugSection = ({
 
 export const DebugPanel = () => {
   const [isVisible, setIsVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState<'chat' | 'doc' | 'patient' | 'api'>('chat');
-  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+  const [activeTab, setActiveTab] = useState<'chat' | 'doc' | 'patient' | 'api' | 'protocol'>('chat');
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    chatStore: false,
+    patientStore: false,
+    facilityStore: false,
+    evaluationsStore: false,
+    userDocumentStore: false,
+    templateStore: false
+  });
   const [selectedFunction, setSelectedFunction] = useState<Function | null>(null);
   
   // Get all the contexts and stores
@@ -498,6 +622,7 @@ export const DebugPanel = () => {
   const evaluationsStore = useEvaluationsStore();
   const templateStore = useTemplateStore();
   const chatStore = useChatStore();
+  const protocolStore = useProtocolStore();
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev: Record<string, boolean>) => ({
@@ -546,12 +671,20 @@ export const DebugPanel = () => {
             <button
               className={`px-3 py-1 rounded ${activeTab === 'patient' ? 'bg-indigo-600' : 'bg-gray-700'}`}
               onClick={() => setActiveTab('patient')}
-            >patientState
+            >
+              patientState
             </button>
             <button
               className={`px-3 py-1 rounded ${activeTab === 'api' ? 'bg-indigo-600' : 'bg-gray-700'}`}
               onClick={() => setActiveTab('api')}
-            >api
+            >
+              api
+            </button>
+            <button
+              className={`px-3 py-1 rounded ${activeTab === 'protocol' ? 'bg-indigo-600' : 'bg-gray-700'}`}
+              onClick={() => setActiveTab('protocol')}
+            >
+              protocol
             </button>
           </div>
           <button
@@ -568,9 +701,10 @@ export const DebugPanel = () => {
               <DebugSection
                 title="Chat State"
                 data={chatStore}
-                isExpanded={expandedSections['chatStore']}
+                isExpanded={expandedSections['chatStore'] || false}
                 onToggle={() => toggleSection('chatStore')}
                 setSelectedFunction={setSelectedFunction}
+                sectionKey="chatStore"
               />
             </div>
           )}
@@ -580,23 +714,26 @@ export const DebugPanel = () => {
               <DebugSection
                 title="Patient State"
                 data={patientStore}
-                isExpanded={expandedSections['patientStore']}
+                isExpanded={expandedSections['patientStore'] || false}
                 onToggle={() => toggleSection('patientStore')}
                 setSelectedFunction={setSelectedFunction}
+                sectionKey="patientStore"
               />
               <DebugSection
                 title="Facility State"
                 data={facilityStore}
-                isExpanded={expandedSections['facilityStore']}
+                isExpanded={expandedSections['facilityStore'] || false}
                 onToggle={() => toggleSection('facilityStore')}
                 setSelectedFunction={setSelectedFunction}
+                sectionKey="facilityStore"
               />
               <DebugSection
                 title="Evaluations State"
                 data={evaluationsStore}
-                isExpanded={expandedSections['evaluationsStore']}
+                isExpanded={expandedSections['evaluationsStore'] || false}
                 onToggle={() => toggleSection('evaluationsStore')}
                 setSelectedFunction={setSelectedFunction}
+                sectionKey="evaluationsStore"
               />
             </div>
           )}
@@ -606,23 +743,24 @@ export const DebugPanel = () => {
               <DebugSection
                 title="Document State"
                 data={userDocumentStore}
-                isExpanded={expandedSections['userDocumentStore']}
+                isExpanded={expandedSections['userDocumentStore'] || false}
                 onToggle={() => toggleSection('userDocumentStore')}
                 setSelectedFunction={setSelectedFunction}
+                sectionKey="userDocumentStore"
               />
               <DebugSection
                 title="Template State"
                 data={templateStore}
-                isExpanded={expandedSections['templateStore']}
+                isExpanded={expandedSections['templateStore'] || false}
                 onToggle={() => toggleSection('templateStore')}
                 setSelectedFunction={setSelectedFunction}
+                sectionKey="templateStore"
               />
-      
             </div>
           )}
           {activeTab === 'api' && (
             <div className="space-y-2">
-              <ApiTester />
+              {/* Remove ApiTester for now since it's not defined */}
             </div>
           )}
         </div>

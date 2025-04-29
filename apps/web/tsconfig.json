@@ -29,6 +29,6 @@
     "lib/**/*.ts",
     "app/**/*",
     "utils/**/*"
-  ],
+, "../../personal-account-dropdown-container.tsx"  ],
   "exclude": ["node_modules", ".next"]
 }

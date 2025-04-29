@@ -296,7 +296,7 @@ export async function enrichFacilityWithData(
     const { data: apiSettings } = await supabase
       .from('user_api_settings')
       .select('has_api_key_configured')
-      .eq('user_id', ownerId)
+      .eq('account_id', ownerId)
       .eq('has_api_key_configured', true)
       .limit(1)
       .single();

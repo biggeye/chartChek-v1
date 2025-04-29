@@ -355,8 +355,8 @@
         { "name": "end_date", "type": "string", "location": "query", "description": "Ending date of the census", "format": "$date" },
         { "name": "location_id", "type": "integer", "location": "query", "format": "$int32", "description": "Location ID (Can be found through the Locations index route)" },
         { "name": "exclude_preadmission", "type": "boolean", "location": "query", "description": "if true returns patient records that have an MR #" },
-        { "name": "care_team_role", "type": "string", "location": "query", "description": "Care Team Role (Required if user_id is provided)", "availableValues": ["therapist", "nurse", "physician", "case_manager"] },
-        { "name": "user_id", "type": "string", "location": "query", "description": "User Id (Required if care_team_role is provided)" }
+        { "name": "care_team_role", "type": "string", "location": "query", "description": "Care Team Role (Required if account_id is provided)", "availableValues": ["therapist", "nurse", "physician", "case_manager"] },
+        { "name": "account_id", "type": "string", "location": "query", "description": "User Id (Required if care_team_role is provided)" }
       ],
       "responses": [
         {

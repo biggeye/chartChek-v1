@@ -1,6 +1,6 @@
 {
-  "name": "Makerkit",
-  "short_name": "makerkit",
+  "name": "chartChek",
+  "short_name": "chartchek",
   "theme_color": "#fff",
   "background_color": "#fff",
   "display": "fullscreen",
@@ -28,6 +28,5 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ],
-  "display": "standalone"
+  ]
 }

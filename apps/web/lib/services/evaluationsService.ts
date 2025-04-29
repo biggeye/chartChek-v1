@@ -78,3 +78,12 @@ export const fetchEvaluationsByPatientId = async (
     throw error; // Re-throw the error to be handled by the caller
   }
 };
+
+// Fetches evaluation templates from /api/kipu/evaluations
+export const fetchEvaluationTemplates = async () => {
+  const endpoint = '/api/kipu/evaluations';
+  const response = await fetch(endpoint);
+  if (!response.ok) throw new Error(`Failed to fetch evaluation templates: ${response.statusText}`);
+  const result = await response.json();
+  return result;
+};

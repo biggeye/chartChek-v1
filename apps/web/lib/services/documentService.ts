@@ -84,7 +84,7 @@ export const documentService = {
             file_name: file.name,
             file_type: file.type,
             file_size: file.size,
-            user_id: userId,
+            account_id: userId,
             bucket: 'documents',
             patient_id: categorization?.patient_id,
             compliance_concern: categorization?.compliance_concern,

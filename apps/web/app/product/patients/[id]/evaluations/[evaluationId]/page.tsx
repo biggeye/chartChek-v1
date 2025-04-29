@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader } from '@kit/ui/card';
 import { Button } from '@kit/ui/button';
 import { Skeleton } from '@kit/ui/skeleton';
-import DocumentViewer from '~/components/DocumentViewer';
+import DocumentViewer from '~/components/documents/DocumentViewer';
 import { fetchEvaluationDetails } from '~/lib/services/evaluationsService';
 import { KipuPatientEvaluation } from '~/types/kipu/kipuAdapter';
 

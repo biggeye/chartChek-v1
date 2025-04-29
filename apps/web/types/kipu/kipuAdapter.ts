@@ -382,12 +382,12 @@ export interface KipuCredentials {
     mar_start_time: string;
     mar_end_time: string;
     user_name: string;
-    user_id: number;
+    account_id: number;
     discontinued: boolean;
     discontinue_reason: string;
     discontinued_timestamp: string;
     discontinued_user_name: string;
-    discontinued_user_id: number;
+    discontinued_account_id: number;
     discontinue_physician_id: number;
     original_patient_order_id: number;
     instructed_by: string;

@@ -33,7 +33,7 @@ import * as z from 'zod';
     bucket?: string;
     created_at?: string;
     updated_at?: string;
-    user_id?: string;
+    account_id?: string;
     processing_status?: 'pending' | 'processing' | 'indexed' | 'failed' | 'unsupported_format' | string;
     processing_error?: string;
     metadata?: DocumentMetadata[];

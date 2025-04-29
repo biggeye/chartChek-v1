@@ -5,7 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@kit/ui/utils';
 import { signOutAction } from '../../lib/actions';
-import { ThemeSwitcher } from '~/components/modules/theme-switcher';
+import { ThemeSwitcher } from '~/components/theme-switcher';
 import { initializeStoreSubscriptions } from '~/store/storeInitializers';
 import { useSidebarStore } from '~/store/sidebarStore';
 
@@ -28,8 +28,7 @@ import {
   UserCircleIcon,
   ChatBubbleBottomCenterIcon
 } from '@heroicons/react/24/outline'
-import { ContextSidebarWidget } from '~/components/layout/ContextSidebarWidget';
-import { FacilitySelector } from '~/components/modules/facility-selector';
+import { FacilitySelector } from '~/components/facility-selector';
 import { Avatar, AvatarFallback, AvatarImage } from "@kit/ui/avatar";
 import { AppLogo } from '~/components/app-logo';
 
@@ -48,12 +47,14 @@ function classNames(...classes: (string | boolean | undefined)[]) {
 // Define Props interface
 interface TestLayoutProps {
   children: React.ReactNode;
-  user_id: string;
+  account_id: string;
   username: string;
   avatarUrl: string | null;
 }
 
-export default function TestLayout({ children, user_id, username, avatarUrl }: TestLayoutProps) {
+export default function AppLayout({ children, account_id, username, avatarUrl }: TestLayoutProps) {
+
+
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const { isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed } = useSidebarStore();
   const pathname = usePathname();
@@ -124,6 +125,9 @@ export default function TestLayout({ children, user_id, username, avatarUrl }: T
                       <FacilitySelector />
                     </li>
                   </ul>
+                  <Avatar>
+
+                  </Avatar>
                 </nav>
               </div>
             </DialogPanel>
@@ -232,7 +236,7 @@ export default function TestLayout({ children, user_id, username, avatarUrl }: T
 
                       return (
                         <li key={item.name}>
-                          <Link
+                          <Link 
                             href={item.href}
                             className={classNames(
                               isActive

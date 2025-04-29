@@ -6,8 +6,6 @@ export const useFetchPatients = (facilityId?: number) => {
   const { setPatients, setIsLoadingPatients, setError } = usePatientStore();
 
   useEffect(() => {
-    if (!facilityId) return;
-
     setIsLoadingPatients(true);
     fetchPatients(facilityId)
       .then(setPatients)

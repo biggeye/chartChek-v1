@@ -1,0 +1,27 @@
+---
+description: Spec and pattern for creating tool invocations for LLMs with vercel AI SDK
+globs: 
+alwaysApply: false
+---
+Chatbot Tool Usage
+With useChat and streamText, you can use tools in your chatbot application. The AI SDK supports three types of tools in this context:
+
+Automatically executed server-side tools
+Automatically executed client-side tools
+Tools that require user interaction, such as confirmation dialogs
+
+The flow is as follows:
+
+The user enters a message in the chat UI.
+The message is sent to the API route.
+In your server side route, the language model generates tool calls during the streamText call.
+All tool calls are forwarded to the client.
+Server-side tools are executed using their execute method and their results are forwarded to the client.
+Client-side tools that should be automatically executed are handled with the onToolCall callback. You can return the tool result from the callback.
+Client-side tool that require user interactions can be displayed in the UI. The tool calls and results are available as tool invocation parts in the parts property of the last assistant message.
+When the user interaction is done, addToolResult can be used to add the tool result to the chat.
+When there are tool calls in the last assistant message and all tool results are available, the client sends the updated messages back to the server. This triggers another iteration of this flow.
+The tool call and tool executions are integrated into the assistant message as tool invocation parts. A tool invocation is at first a tool call, and then it becomes a tool result when the tool is executed. The tool result contains all information about the tool call as well as the result of the tool execution.
+
+
+In order to automatically send another request to the server when all tool calls are server-side, you need to set maxSteps to a value greater than 1 in the useChat options. It is disabled by default for backward compatibility.s

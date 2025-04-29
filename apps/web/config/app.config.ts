@@ -12,7 +12,7 @@ const AppConfigSchema = z
       .min(1),
     title: z
       .string({
-        description: `Compliance Management & Administration`,
+        description: `Enhanced Medical Records`,
         required_error: `Please provide the variable NEXT_PUBLIC_SITE_TITLE`,
       })
       .min(1),

@@ -8,7 +8,7 @@
  */
 export interface UserDocument {
   document_id: string;
-  user_id: string;
+  account_id: string;
   facility_id?: string; // UUID in the database
   patient_id?: string;
   file_name: string;

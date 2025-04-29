@@ -1,15 +1,13 @@
 // Evaluation types for metrics and deficiency tracking
 
 export interface EvaluationMetric {
-  id: number;
+  id: string;
   name: string;
-  normalizedName: string; // Cleaned name without extra spaces
-  category: string;       // Grouping evaluations by type
-  status: string;
-  evaluationContent: string;
-  lastUpdated: string;
-  createdBy?: string;     // Person who created the evaluation
-  updatedBy?: string;     // Person who last updated the evaluation
+  status: 'completed' | 'inProgress' | 'readyForReview' | 'inUse' | 'pending';
+  type: 'admission' | 'daily' | 'cyclic';
+  expectedDate: string;
+  completedDate: string | null;
+  category: string;
 }
 
 export interface EvaluationMetricsCollection {
@@ -20,9 +18,6 @@ export interface EvaluationMetricsCollection {
   administrative: EvaluationMetric[];
   medical: EvaluationMetric[];
   other: EvaluationMetric[];
-  // Lookup by ID for quick access
-  byId: Record<number, EvaluationMetric>;
-  // Status counts
   statusCounts: {
     completed: number;
     inProgress: number;
@@ -103,7 +98,6 @@ export function parseEvaluations(evaluations: any[]): EvaluationMetricsCollectio
     administrative: [],
     medical: [],
     other: [],
-    byId: {},
     statusCounts: {
       completed: 0,
       inProgress: 0,
@@ -119,22 +113,17 @@ export function parseEvaluations(evaluations: any[]): EvaluationMetricsCollectio
     const metric: EvaluationMetric = {
       id: evaluation.id,
       name: evaluation.name,
-      normalizedName,
+      status: evaluation.status.toLowerCase() as 'completed' | 'inProgress' | 'readyForReview' | 'inUse' | 'pending',
+      type: evaluation.type.toLowerCase() as 'admission' | 'daily' | 'cyclic',
+      expectedDate: evaluation.expectedDate,
+      completedDate: evaluation.completedDate,
       category,
-      status: evaluation.status.toLowerCase(),
-      evaluationContent: evaluation.evaluationContent,
-      lastUpdated: evaluation.updatedAt,
-      createdBy: evaluation.createdBy,
-      updatedBy: evaluation.updatedBy
     };
     
     // Add to appropriate category
     if (category in result && Array.isArray(result[category as keyof typeof result])) {
       (result[category as keyof typeof result] as EvaluationMetric[]).push(metric);
     }
-    
-    // Add to lookup by ID
-    result.byId[evaluation.id] = metric;
     
     // Update status counts
     const status = evaluation.status.toLowerCase().replace(/\s+/g, '');

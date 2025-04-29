@@ -1,6 +1,6 @@
 // hooks/useKipuStatistics.ts
 import { useState } from 'react';
-import { FacilityStatistics } from '@/lib/kipu/stats/types';
+import { FacilityStatistics } from '../lib/kipu/stats/types';
 
 export function useKipuStatistics() {
   const [statistics, setStatistics] = useState<FacilityStatistics | null>(null);

@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     // Prepare the data for the user_api_settings table
     const userApiSettings: UserApiSettings = {
-      user_id: user.id,
+      account_id: user.id,
       kipu_access_id: body.kipu_access_id || '',
       kipu_secret_key: body.kipu_secret_key || '',
       kipu_app_id: body.kipu_app_id || '',
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       .from('user_api_settings')
       .upsert({
         ...userApiSettings,
-        user_id: user.id,
+        account_id: user.id,
         updated_at: new Date().toISOString()
       })
       .select()

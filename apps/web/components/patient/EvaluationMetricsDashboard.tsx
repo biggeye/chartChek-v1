@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { 
   CheckCircleIcon, 
   ExclamationCircleIcon, 
@@ -11,35 +11,12 @@ import {
   DocumentDuplicateIcon,
   UserGroupIcon
 } from '@heroicons/react/24/outline';
-import { EvaluationMetricsCollection } from '~/types/evaluations'
-import { parseEvaluationMetrics, calculateCompletionPercentage, identifyMissingEvaluations } from '~/lib/kipu/service/evaluation-metrics-service';
-
-// Define props for the component
+import { EvaluationMetrics } from '~/types/evaluations';
+s
 interface EvaluationMetricsDashboardProps {
-  patientId: string;
-  evaluationsData: any; // Raw evaluations data from API
+  metrics: EvaluationMetrics | any;
 }
 
-// Required evaluations for compliance
-const REQUIRED_EVALUATIONS = [
-  'Pre-Admission Assessment',
-  'Bio-psychosocial Assessment',
-  'LOCUS Assessment with Scoring',
-  'Initial Psychiatric Evaluation',
-  'History and Physical Exam',
-  'Problem List',
-  'Clinical Individualized Treatment Plan',
-  'Trauma Assessment',
-  'Columbia-Suicide Severity Rating Scale',
-  'Medications Informed Consent',
-  'Nutritional Screen',
-  'Pain Screen',
-  'Self Preservation Statement',
-  'Initial Aftercare Plan',
-  'Social Risk Assessment'
-];
-
-// Category icons mapping
 const CATEGORY_ICONS = {
   assessments: DocumentCheckIcon,
   screenings: BeakerIcon,
@@ -50,51 +27,15 @@ const CATEGORY_ICONS = {
   other: DocumentIcon
 };
 
-export default function EvaluationMetricsDashboard({ patientId, evaluationsData }: EvaluationMetricsDashboardProps) {
-  const [metrics, setMetrics] = useState<EvaluationMetricsCollection | null>(null);
-  const [completionPercentage, setCompletionPercentage] = useState<number>(0);
-  const [missingEvaluations, setMissingEvaluations] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!evaluationsData) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      // Parse the evaluations data
-      const parsedMetrics = parseEvaluationMetrics(evaluationsData);
-      setMetrics(parsedMetrics);
-
-      // Calculate completion percentage
-      const percentage = calculateCompletionPercentage(parsedMetrics);
-      setCompletionPercentage(percentage);
-
-      // Identify missing evaluations
-      const missing = identifyMissingEvaluations(parsedMetrics, REQUIRED_EVALUATIONS);
-      setMissingEvaluations(missing);
-
-      setLoading(false);
-    } catch (err) {
-      setError('Error processing evaluation metrics');
-      setLoading(false);
-      console.error('Error processing evaluation metrics:', err);
-    }
-  }, [evaluationsData]);
-
-  if (loading) {
-    return <div className="p-4 text-center">Loading evaluation metrics...</div>;
-  }
-
-  if (error) {
-    return <div className="p-4 text-red-500">{error}</div>;
-  }
-
+export default function EvaluationMetricsDashboard({ metrics }: EvaluationMetricsDashboardProps) {
   if (!metrics) {
     return <div className="p-4 text-center">No evaluation data available</div>;
   }
+
+  // Calculate completion percentage
+  const totalRequired = metrics.totalRequired || 0;
+  const completed = metrics.completed || 0;
+  const completionPercentage = totalRequired > 0 ? (completed / totalRequired) * 100 : 0;
 
   // Determine completion status color
   const getCompletionStatusColor = (percentage: number) => {
@@ -109,6 +50,7 @@ export default function EvaluationMetricsDashboard({ patientId, evaluationsData 
       case 'completed':
         return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
       case 'inprogress':
+      case 'in progress':
         return <ClockIcon className="h-5 w-5 text-yellow-500" />;
       case 'readyforreview':
         return <DocumentCheckIcon className="h-5 w-5 text-blue-500" />;
@@ -117,9 +59,11 @@ export default function EvaluationMetricsDashboard({ patientId, evaluationsData 
     }
   };
 
+  // Missing evaluations (if provided)
+  const missingEvaluations = metrics.missingEvaluations || [];
+
   return (
     <div className="bg-white shadow rounded-lg p-6 mb-6">
-      
       {/* Overall Completion Status */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
@@ -128,7 +72,6 @@ export default function EvaluationMetricsDashboard({ patientId, evaluationsData 
             {completionPercentage.toFixed(0)}%
           </span>
         </div>
-        
         {/* Progress Bar */}
         <div className="w-full bg-gray-200 rounded-full h-2.5">
           <div 
@@ -139,28 +82,26 @@ export default function EvaluationMetricsDashboard({ patientId, evaluationsData 
             style={{ width: `${completionPercentage}%` }}
           ></div>
         </div>
-        
         {/* Status Counts */}
         <div className="grid grid-cols-4 gap-2 mt-4">
           <div className="text-center p-2 bg-gray-50 rounded">
             <div className="text-sm text-gray-500">Completed</div>
-            <div className="text-xl font-semibold text-green-500">{metrics.statusCounts.completed}</div>
+            <div className="text-xl font-semibold text-green-500">{metrics.completed}</div>
           </div>
           <div className="text-center p-2 bg-gray-50 rounded">
             <div className="text-sm text-gray-500">In Progress</div>
-            <div className="text-xl font-semibold text-yellow-500">{metrics.statusCounts.inProgress}</div>
+            <div className="text-xl font-semibold text-yellow-500">{metrics.inProgress}</div>
           </div>
           <div className="text-center p-2 bg-gray-50 rounded">
             <div className="text-sm text-gray-500">For Review</div>
-            <div className="text-xl font-semibold text-blue-500">{metrics.statusCounts.readyForReview}</div>
+            <div className="text-xl font-semibold text-blue-500">{metrics.readyForReview}</div>
           </div>
           <div className="text-center p-2 bg-gray-50 rounded">
-            <div className="text-sm text-gray-500">In Use</div>
-            <div className="text-xl font-semibold text-indigo_dye-500">{metrics.statusCounts.inUse}</div>
+            <div className="text-sm text-gray-500">Overdue</div>
+            <div className="text-xl font-semibold text-red-500">{metrics.overdue}</div>
           </div>
         </div>
       </div>
-      
       {/* Missing Evaluations */}
       {missingEvaluations.length > 0 && (
         <div className="mb-6">
@@ -169,21 +110,19 @@ export default function EvaluationMetricsDashboard({ patientId, evaluationsData 
             Missing Required Evaluations
           </h3>
           <ul className="list-disc pl-5 text-sm text-gray-700">
-            {missingEvaluations.map((evaluation, index) => (
+            {missingEvaluations.map((evaluation: string, index: number) => (
               <li key={index} className="mb-1">{evaluation}</li>
             ))}
           </ul>
         </div>
       )}
-      
       {/* Category Breakdown */}
       <div>
         <h3 className="text-lg font-medium mb-3">Evaluation Categories</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.entries(CATEGORY_ICONS).map(([category, Icon]) => {
-            const categoryItems = metrics[category as keyof EvaluationMetricsCollection] as any[];
+            const categoryItems = metrics[category as keyof EvaluationMetrics] as any[];
             if (!categoryItems || categoryItems.length === 0) return null;
-            
             return (
               <div key={category} className="border rounded-lg p-3">
                 <div className="flex items-center mb-2">
@@ -194,7 +133,7 @@ export default function EvaluationMetricsDashboard({ patientId, evaluationsData 
                   </span>
                 </div>
                 <ul className="text-sm space-y-1">
-                  {categoryItems.slice(0, 3).map((item) => (
+                  {categoryItems.slice(0, 3).map((item: any) => (
                     <li key={item.id} className="flex items-center">
                       {getStatusIcon(item.status)}
                       <span className="ml-2 truncate">{item.name}</span>

@@ -6,7 +6,9 @@ import { useParams } from 'next/navigation';
 import { CheckCircleIcon, CalendarDaysIcon, HeartIcon } from '@heroicons/react/24/outline';
 import { usePatientStore } from '~/store/patient/patientStore';
 import { usePatientEvaluations } from '~/hooks/useEvaluations';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@kit/ui/select';
 import EvaluationMetricsDashboard from '~/components/patient/EvaluationMetricsDashboard';
+import { useProtocolStore } from '~/store/protocolStore';
 
 // Define a type for timeline activities
 interface TimelineActivity {
@@ -26,6 +28,10 @@ const activityTypeIcons = {
 };
 
 export default function PatientTreatmentPlan() {
+  const [selectedProtocol, setSelectedProtocol] = useState<string | null>(null);
+  const [metrics, setMetrics] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { id: patientId } = useParams<{ id: string }>();
   
   // Access patient state (still needed for context, maybe patient name?)
@@ -41,6 +47,49 @@ export default function PatientTreatmentPlan() {
     isLoadingEvaluations,
     error: evaluationsError // Alias evaluations error
   } = usePatientEvaluations();
+
+  const { fetchProtocols, protocols, isLoading: isLoadingProtocols, error: protocolsError } = useProtocolStore();
+ 
+  // Fetch protocols on mount
+  useEffect(() => {
+    fetchProtocols();
+  }, []);
+
+  // Fetch metrics when selectedProtocol changes
+  useEffect(() => {
+    if (selectedProtocol) {
+      fetchMetrics();
+    }
+  }, [selectedProtocol]);
+
+  // Handle protocol fetch errors
+  useEffect(() => {
+    if (protocolsError) {
+      setError(protocolsError);
+    }
+  }, [protocolsError]);
+
+  const fetchMetrics = async () => {
+    if (!selectedProtocol) {
+      setError('Please select a protocol.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setMetrics(null);
+    try {
+      const res = await fetch(
+        `/api/compliance/metrics?protocolId=${selectedProtocol}&patientId=${patientId}`
+      );
+      const json = await res.json();
+      if (!json.success) throw new Error(json.error || 'Failed to fetch metrics');
+      setMetrics(json.data);
+    } catch (err: any) {
+      setError(err.message || 'An error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Format evaluations data for the metrics dashboard
   const [evaluationsData, setEvaluationsData] = useState<any>(null);
@@ -102,13 +151,42 @@ export default function PatientTreatmentPlan() {
     <div className="container mx-auto px-4 py-6">
       
       {/* Evaluation Metrics Dashboard */}
-      {evaluationsData && (
-        <EvaluationMetricsDashboard 
-          patientId={patientId} 
-          evaluationsData={evaluationsData} 
-        />
-      )}
-      
+      <div>
+        <label className="block text-sm font-medium mb-1">Protocol</label>
+        <Select
+          value={selectedProtocol ?? ''}
+          onValueChange={setSelectedProtocol}
+          disabled={isLoadingProtocols}
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder={isLoadingProtocols ? 'Loading protocols...' : 'Select a protocol'} />
+          </SelectTrigger>
+          <SelectContent>
+            {isLoadingProtocols ? (
+              <SelectItem value="loading" disabled>
+                Loading...
+              </SelectItem>
+            ) : protocols && protocols.length > 0 ? (
+              protocols.map(protocol => (
+                <SelectItem key={protocol.id} value={protocol.id}>
+                  {protocol.name}
+                </SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-protocols" disabled>
+                No protocols available
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
+        {protocolsError && (
+          <div className="text-red-500 text-xs mt-1">{protocolsError}</div>
+        )}
+      </div>
+      <div className="mt-4">
+        <EvaluationMetricsDashboard metrics={metrics} />
+      </div>
+
       {/* Timeline */}
       <div className="bg-white shadow rounded-lg p-4">
         <h2 className="text-xl font-semibold mb-4">Treatment Timeline</h2>

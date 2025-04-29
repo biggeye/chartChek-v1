@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import dynamic from 'next/dynamic';
 
@@ -43,6 +43,8 @@ export function RootProviders({
   theme?: string;
 }>) {
   const i18nSettings = useMemo(() => getI18nSettings(lang), [lang]);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <ReactQueryProvider>
@@ -58,14 +60,24 @@ export function RootProviders({
               defaultTheme={theme}
               enableColorScheme={false}
             >
-              {children}
+              {mounted ? (
+                <>
+                  <If condition={featuresFlagConfig.enableVersionUpdater}>
+                    <VersionUpdater />
+                  </If>
+                  {children}
+                </>
+              ) : (
+                <div style={{ visibility: 'hidden' }}>
+                  <If condition={featuresFlagConfig.enableVersionUpdater}>
+                    <VersionUpdater />
+                  </If>
+                  {children}
+                </div>
+              )}
             </ThemeProvider>
           </AuthProvider>
         </CaptchaProvider>
-
-        <If condition={featuresFlagConfig.enableVersionUpdater}>
-          <VersionUpdater />
-        </If>
       </I18nProvider>
     </ReactQueryProvider>
   );

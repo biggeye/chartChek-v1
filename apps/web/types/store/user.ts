@@ -19,7 +19,7 @@ export interface UserApiSettings {
  */
 export interface UserApiSettingsDB {
   id?: number;
-  user_id: string;
+  account_id: string;
   kipu_access_id?: string;
   kipu_secret_key?: string;
   kipu_app_id?: string;

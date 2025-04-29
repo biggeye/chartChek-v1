@@ -138,7 +138,7 @@ export const useContextQueueStore = create<ContextQueueState>()((set, get) => ({
             content: contextContent,
             title: `Thread ${threadId} Context`,
             type: "document",
-            user_id: userData.user.id,
+            account_id: userData.user.id,
             metadata: metadata,
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()

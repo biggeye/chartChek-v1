@@ -86,7 +86,7 @@ export function useUserDocuments(options?: {
         let query = supabase
           .from('user_documents')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('account_id', user.id)
           .order('created_at', { ascending: false });
         
         // Apply filters
@@ -159,7 +159,7 @@ export function useUserDocuments(options?: {
               file_name: file.name,
               file_type: file.type,
               file_size: file.size,
-              user_id: userId,
+              account_id: userId,
               facility_id: facilityUuid || '',
               patient_id: categorization?.patient_id,
               document_type: categorization?.document_type || 'document_page_upload',

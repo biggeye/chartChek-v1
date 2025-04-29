@@ -3,7 +3,6 @@
 import { create } from 'zustand';
 import { createClient } from '~/utils/supabase/client';
 import { Facility, FacilityStore, Pagination } from 'types/store/patient/facility';
-import { getCachedData, cacheKeys, cacheTTL } from '~/utils/cache/redis';
 import { queryKeys } from '~/utils/react-query/config';
 import { usePatientStore } from './patientStore';
 import { useFetchPatients } from '~/hooks/usePatients';
@@ -58,8 +57,8 @@ export const useFacilityStore = create<FacilityStore>((set, get) => ({
       patientStore.setPatients([]);
       patientStore.setIsLoadingPatients(true);
       
-      // Pass the numeric facilityId to the fetch function
-      useFetchPatients(facilityId);
+      // The actual patient fetching will be handled by the useFetchPatients hook
+      // in the components that need it
       patientStore.setIsLoadingPatients(false);
     }
   },
@@ -92,7 +91,8 @@ export const useFacilityStore = create<FacilityStore>((set, get) => ({
       });
       
       if (!response.ok) {
-        throw new Error(`Failed to fetch facilities: ${response.statusText}`);
+        console.warn('No facilities found or KIPU not configured');
+        return { facilities: [], pagination: null };
       }
 
       const data = await response.json();

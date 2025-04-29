@@ -38,7 +38,7 @@ export async function POST(req: Request) {
       title,
       content,
       metadata,
-      user_id: userId,
+      account_id: userId,
     }).select('id').single();
     
     return NextResponse.json({ id: newItemId }, { status: 201 }); // 201 Created

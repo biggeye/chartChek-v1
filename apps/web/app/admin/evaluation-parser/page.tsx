@@ -18,11 +18,11 @@ import { ScrollArea } from '@kit/ui/scroll-area';
 import { usePatientStore } from '~/store/patient/patientStore';
 import { Badge } from '@kit/ui/badge';
 import { RefreshCcw } from 'lucide-react';
-import { fetchPatientEvaluations, fetchEvaluationDetails } from '~/lib/services/evaluationsService';
+import { usePatientEvaluations } from '~/hooks/useEvaluations';
 import { fetchPatients } from '~/lib/services/patientService';
 
 export default function EvaluationParserTestPage() {
-  const { patientEvaluations, setPatientEvaluations, selectPatientEvaluation, clearSelectedPatientEvaluation } = useEvaluationsStore();
+  const { patientEvaluations, selectPatientEvaluation, clearSelectedPatientEvaluation, fetchEvaluations } = usePatientEvaluations();
   const { patients, setPatients } = usePatientStore();
   
   const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
@@ -34,7 +34,6 @@ export default function EvaluationParserTestPage() {
   
   // Initialize the parser service
   const parserService = new PatientEvaluationParserService();
-  
   // Fetch patients on initial load
   useEffect(() => {
     const loadPatients = async () => {
@@ -54,10 +53,10 @@ export default function EvaluationParserTestPage() {
   useEffect(() => {
     if (selectedPatient) {
       setLoading(true);
-      fetchPatientEvaluations(selectedPatient)
+      fetchEvaluations(selectedPatient)
         .then((data) => {
-          setPatientEvaluations(data);
           setLoading(false);
+          
         })
         .catch((error: unknown) => {
           const errorMessage = error instanceof Error ? error.message : 'Failed to fetch evaluations';
@@ -65,7 +64,7 @@ export default function EvaluationParserTestPage() {
           setLoading(false);
         });
     }
-  }, [selectedPatient, setPatientEvaluations]);
+  }, [selectedPatient]);
   
   // Function to reset the state
   const resetState = () => {
@@ -87,8 +86,9 @@ export default function EvaluationParserTestPage() {
       setParsedResult('');
       
       // Fetch the complete evaluation with items
-      const rawEvaluation = await fetchEvaluationDetails(evaluation.id);
-      
+     console.log('evaluationParser] evaluation.id:', evaluation.id)
+      const rawEvaluation = await selectPatientEvaluation(evaluation.id);
+     
       // Adapt the raw evaluation to our enhanced interface
       const adaptedEvaluation = adaptKipuEvaluation(rawEvaluation);
       setSelectedEvaluation(adaptedEvaluation);

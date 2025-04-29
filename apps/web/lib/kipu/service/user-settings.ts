@@ -17,7 +17,7 @@ import { createClient } from "../../../utils/supabase/client";
  */
 export interface UserApiSettings {
   id?: number;
-  user_id: string;
+  account_id: string;
   kipu_access_id?: string;  // KIPU API access ID for HMAC authentication
   kipu_secret_key?: string; // KIPU API secret key for HMAC authentication
   kipu_app_id?: string;     // KIPU API app ID (recipient_id)
@@ -59,7 +59,7 @@ export async function getUserApiSettings(ownerId?: string): Promise<UserApiSetti
     const { data, error } = await supabase
       .from('user_api_settings')
       .select('*')
-      .eq('user_id', ownerId)
+      .eq('account_id', ownerId)
       .single();
     
     if (error) {
@@ -100,14 +100,14 @@ export async function updateUserApiSettings(
     // Prepare the data for update
     const updateData = {
       ...settings,
-      user_id: ownerId
+      account_id: ownerId
     };
     
     // Check if the user has existing API settings
     const { data: existingSettings, error: fetchError } = await supabase
       .from('user_api_settings')
       .select('id')
-      .eq('user_id', ownerId)
+      .eq('account_id', ownerId)
       .maybeSingle();
     
     if (fetchError) {

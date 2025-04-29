@@ -4,7 +4,7 @@ import {
 } from '@kit/ui/bordered-navigation-menu';
 
 import { AppLogo } from '~/components/app-logo';
-import { ProfileAccountDropdownContainer } from '~/components/personal-account-dropdown-container';
+import { AccountDropdown } from '~/components/account-dropdown';
 import { navigationConfig } from '~/config/navigation.config';
 
 export function HomeMenuNavigation() {
@@ -41,7 +41,7 @@ export function HomeMenuNavigation() {
 
       <div className={'flex justify-end space-x-2.5'}>
         <div>
-          <ProfileAccountDropdownContainer showProfileName={false} />
+          <AccountDropdown />
         </div>
       </div>
     </div>

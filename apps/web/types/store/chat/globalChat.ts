@@ -1,5 +1,5 @@
 // types/store/chat/globalChat.ts
-import { LLMOption } from "~/lib/llm-service";
+import { LLMOption } from "~/lib/services/llmService";
 import { TrainingDataset } from "~/types/trainingDatasets";
 import { KipuPatientEvaluation } from "~/types/kipu/kipuAdapter";
 

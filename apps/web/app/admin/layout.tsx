@@ -1,89 +1,40 @@
-import { use } from 'react';
+import { ReactNode } from 'react';
+import Link from 'next/link';
+import { User } from 'lucide-react';
 
-import { cookies } from 'next/headers';
-
-import {
-  Page,
-  PageLayoutStyle,
-  PageMobileNavigation,
-  PageNavigation,
-} from '@kit/ui/page';
-import { SidebarProvider } from '@kit/ui/shadcn-sidebar';
-
-import { AppLogo } from '~/components/app-logo';
-import { navigationConfig } from '~/config/navigation.config';
-import { withI18n } from '~/lib/i18n/with-i18n';
-import { requireUserInServerComponent } from '~/lib/server/require-user-in-server-component';
-
-// home imports
-import { HomeMenuNavigation } from './_components/home-menu-navigation';
-import { HomeMobileNavigation } from './_components/home-mobile-navigation';
-import { HomeSidebar } from './_components/home-sidebar';
-
-function HomeLayout({ children }: React.PropsWithChildren) {
-  const style = use(getLayoutStyle());
-
-  if (style === 'sidebar') {
-    return <SidebarLayout>{children}</SidebarLayout>;
-  }
-
-  return <HeaderLayout>{children}</HeaderLayout>;
-}
-
-export default withI18n(HomeLayout);
-
-function SidebarLayout({ children }: React.PropsWithChildren) {
-  const sidebarMinimized = navigationConfig.sidebarCollapsed;
-  const [user] = use(Promise.all([requireUserInServerComponent()]));
-
+export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <SidebarProvider defaultOpen={sidebarMinimized}>
-      <Page style={'sidebar'}>
-        <PageNavigation>
-          <HomeSidebar user={user} />
-        </PageNavigation>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            <div className="flex items-center">
+              <Link href="/admin" className="text-xl font-bold">
+                Admin
+              </Link>
+              <nav className="ml-10 flex space-x-4">
+                <Link href="/admin/evaluation-metrics" className="text-gray-600 hover:text-gray-900">
+                  Evaluation Metrics
+                </Link>
+                <Link href="/admin/evaluation-parser" className="text-gray-600 hover:text-gray-900">
+                  Evaluation Parser
+                </Link>
+              </nav>
+            </div>
+            <div className="flex items-center">
+              <button className="rounded-full p-1 text-gray-600 hover:text-gray-900">
+                <User className="h-6 w-6" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
 
-        <PageMobileNavigation className={'flex items-center justify-between'}>
-          <MobileNavigation />
-        </PageMobileNavigation>
-
+      {/* Main content */}
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         {children}
-      </Page>
-    </SidebarProvider>
-  );
-}
-
-function HeaderLayout({ children }: React.PropsWithChildren) {
-  return (
-    <Page style={'header'}>
-      <PageNavigation>
-        <HomeMenuNavigation />
-      </PageNavigation>
-
-      <PageMobileNavigation className={'flex items-center justify-between'}>
-        <MobileNavigation />
-      </PageMobileNavigation>
-
-      {children}
-    </Page>
-  );
-}
-
-function MobileNavigation() {
-  return (
-    <>
-      <AppLogo />
-
-      <HomeMobileNavigation />
-    </>
-  );
-}
-
-async function getLayoutStyle() {
-  const cookieStore = await cookies();
-
-  return (
-    (cookieStore.get('layout-style')?.value as PageLayoutStyle) ??
-    navigationConfig.style
+      </main>
+    </div>
   );
 }

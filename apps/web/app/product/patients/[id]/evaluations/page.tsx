@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { usePatientEvaluations } from '~/hooks/useEvaluations';
+import PatientEvaluationCreateModal from '~/components/patient/evaluations/CreatePatientEvaluation';
 
 import Link from 'next/link';
 
@@ -34,6 +35,10 @@ export default function KipuPatientEvaluationsPage() {
 
   return (
       <div className="bg-white shadow rounded-lg p-1">
+        
+        <div className="flex justify-end mb-2">
+          <PatientEvaluationCreateModal patientId={patientId} onSuccess={() => window.location.reload()} />
+        </div>
         
         {/* Stats grid */}
         <div className="grid grid-cols-3 md:grid-cols-4 gap-1 mb-2">

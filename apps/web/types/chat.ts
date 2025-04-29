@@ -20,6 +20,7 @@ export interface Message {
   role: "user" | "assistant" | "system"
   content: string
   createdAt: Date
+  context?: string
 }
 
 export interface ChatSession {
@@ -125,7 +126,7 @@ export interface DbModelConfig { // Renamed to avoid conflict
 export interface DbConversation { // Renamed to avoid conflict
   id: string;
   title: string | null;
-  user_id: string;
+  account_id: string;
   model_config: DbModelConfig; // Use renamed type
   status: ConversationStatus;
   context_items: DbContextItem[]; // Use renamed type
@@ -151,7 +152,7 @@ export interface DbContextItem { // Renamed to avoid conflict
   title: string;
   content: string;
   metadata: Record<string, any> | null;
-  user_id: string;
+  account_id: string;
   created_at: string;
   updated_at: string;
 }

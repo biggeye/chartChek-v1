@@ -27,7 +27,9 @@ function ContextItemViewer({ item }: { item: ContextItem | null }) {
     <div className="space-y-4">
       <div className="space-y-2">
         <h3 className="text-lg font-semibold">{item.title}</h3>
-        <Badge variant="outline">{item.type}</Badge>
+        <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
+          {item.type}
+        </Badge>
         <p className="text-sm text-muted-foreground">
           Added on {new Date(item.createdAt).toLocaleString()}
         </p>
@@ -82,10 +84,8 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
           <div className="text-sm font-medium">{patient?.firstName} {patient?.lastName}({selectedCount} selected)</div>
           {items.length > 0 && (
             <Button 
-              variant="ghost" 
-              size="sm" 
+              className="h-7 px-2 text-xs bg-red-500 hover:bg-red-600 text-white rounded-md"
               onClick={clearQueue} 
-              className="h-7 px-2 text-xs"
             >
               Clear All
             </Button>
@@ -120,7 +120,9 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle>{patient?.firstName} {patient?.lastName}</CardTitle>
-          <Badge variant="secondary">{selectedCount} selected</Badge>
+          <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
+            {selectedCount} selected
+          </Badge>
         </div>
         <CardDescription>Add documents, uploads, and evaluations to provide context for your chat</CardDescription>
       </CardHeader>
@@ -131,7 +133,7 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
             <FileText className="h-4 w-4" />
             <span>Documents</span>
             {documents.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
+              <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
                 {documents.length}
               </Badge>
             )}
@@ -140,7 +142,7 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
             <Upload className="h-4 w-4" />
             <span>Uploads</span>
             {uploads.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
+              <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
                 {uploads.length}
               </Badge>
             )}
@@ -149,7 +151,7 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
             <ClipboardList className="h-4 w-4" />
             <span>Evaluations</span>
             {evaluations.length > 0 && (
-              <Badge variant="secondary" className="ml-1">
+              <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
                 {evaluations.length}
               </Badge>
             )}
@@ -205,7 +207,9 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
                         Select All
                       </label>
                     </div>
-                    <Badge variant="outline">{evaluations.filter(item => item.selected).length}/{evaluations.length}</Badge>
+                    <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
+                      {evaluations.filter(item => item.selected).length}/{evaluations.length}
+                    </Badge>
                   </div>
                   
                   {evaluations.map((item) => (
@@ -225,7 +229,11 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
       </Tabs>
 
       <CardFooter className="flex justify-between pt-0">
-        <Button variant="destructive" size="sm" onClick={clearQueue} disabled={items.length === 0}>
+        <Button 
+          className="bg-red-500 hover:bg-red-600 text-white rounded-md px-3 py-1.5 text-sm"
+          onClick={clearQueue} 
+          disabled={items.length === 0}
+        >
           Clear All
         </Button>
       </CardFooter>
@@ -265,16 +273,17 @@ function ContextItemCard({ item, onToggle, onRemove, onView }: ContextItemCardPr
       <div className="flex items-center">
         {onView && (
           <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-7 w-7" 
+            className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-7 w-7"
             onClick={() => onView(item)} 
             title="View content"
           >
             <Eye className="h-4 w-4" />
           </Button>
         )}
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onRemove(item.id)}>
+        <Button 
+          className="bg-red-500 hover:bg-red-600 text-white rounded-md h-7 w-7"
+          onClick={() => onRemove(item.id)}
+        >
           <X className="h-4 w-4" />
         </Button>
       </div>
@@ -309,9 +318,7 @@ function CompactContextItem({ item, onToggle, onRemove, onToggleSection, onView 
         <div className="flex-1 min-w-0 truncate text-xs">{item.title}</div>
         {isEvaluation && (
           <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-5 w-5" 
+            className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-5 w-5"
             onClick={() => setIsOpen(!isOpen)}
           >
             {isOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -320,9 +327,7 @@ function CompactContextItem({ item, onToggle, onRemove, onToggleSection, onView 
         <div className="flex items-center">
           {onView && (
             <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-5 w-5" 
+              className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-5 w-5"
               onClick={() => onView(item)} 
               title="View content"
             >
@@ -330,9 +335,7 @@ function CompactContextItem({ item, onToggle, onRemove, onToggleSection, onView 
             </Button>
           )}
           <Button 
-            variant="ghost" 
-            size="icon" 
-            className="h-5 w-5" 
+            className="bg-red-500 hover:bg-red-600 text-white rounded-md h-5 w-5"
             onClick={() => onRemove(item.id)}
           >
             <X className="h-3 w-3" />
@@ -404,15 +407,16 @@ function EvaluationCard({ item, onToggle, onRemove, onToggleSection }: Evaluatio
           </div>
         </div>
         <Button
-          variant="ghost"
-          size="icon"
-          className="h-7 w-7"
+          className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-7 w-7"
           onClick={() => setIsOpen(!isOpen)}
           aria-label={isOpen ? "Collapse sections" : "Expand sections"}
         >
           {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
         </Button>
-        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onRemove(item.id)}>
+        <Button 
+          className="bg-red-500 hover:bg-red-600 text-white rounded-md h-7 w-7"
+          onClick={() => onRemove(item.id)}
+        >
           <X className="h-4 w-4" />
         </Button>
       </div>

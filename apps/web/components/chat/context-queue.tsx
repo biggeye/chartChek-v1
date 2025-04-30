@@ -79,37 +79,48 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
   // In compact mode, render a simplified version
   if (compact) {
     return (
-      <div className="w-full h-full flex flex-col">
-        <div className="flex items-center justify-between px-3 py-2 border-b">
-          <div className="text-sm font-medium">{patient?.firstName} {patient?.lastName}({selectedCount} selected)</div>
-          {items.length > 0 && (
-            <Button 
-              className="h-7 px-2 text-xs bg-red-500 hover:bg-red-600 text-white rounded-md"
-              onClick={clearQueue} 
+      <div className="w-full flex flex-col gap-1 px-2 pt-2 pb-1">
+        {/* Tag row for context items */}
+        <div className="flex flex-wrap items-center gap-2">
+          {items.map((item) => (
+            <span
+              key={item.id}
+              className="flex items-center bg-muted border border-border rounded-full px-2 py-1 text-xs font-medium shadow-sm max-w-xs truncate"
+              title={item.title}
             >
-              Clear All
-            </Button>
+              {item.type === 'document' && <FileText className="h-3 w-3 mr-1 text-muted-foreground" />}
+              {item.type === 'upload' && <Upload className="h-3 w-3 mr-1 text-muted-foreground" />}
+              {item.type === 'evaluation' && <ClipboardList className="h-3 w-3 mr-1 text-muted-foreground" />}
+              <span className="truncate max-w-[120px]">{item.title}</span>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="ml-1 h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                onClick={() => removeItem(item.id)}
+                tabIndex={-1}
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            </span>
+          ))}
+          {items.length > 0 && (
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button size="sm" variant="outline" className="ml-2 h-6 px-2 text-xs">View All</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Context Items</DialogTitle>
+                </DialogHeader>
+                {/* Render the full context queue in the modal */}
+                <div className="mt-2">
+                  {/* Reuse the full context queue UI here, but without compact mode */}
+                  <ContextQueue compact={false} />
+                </div>
+              </DialogContent>
+            </Dialog>
           )}
         </div>
-        
-        <ScrollArea className="flex-1 max-h-[350px]">
-          <div className="p-2 space-y-2">
-            {items.map((item) => (
-              <CompactContextItem 
-                key={item.id} 
-                item={item} 
-                onToggle={toggleItem} 
-                onRemove={removeItem}
-                onToggleSection={
-                  item.type === "evaluation" 
-                    ? toggleEvaluationItemDetail
-                    : undefined
-                }
-                onView={handleViewItem}
-              />
-            ))}
-          </div>
-        </ScrollArea>
       </div>
     )
   }

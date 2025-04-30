@@ -427,11 +427,9 @@ export default function ComplianceConfigSettings() {
         <Dialog open={!!selectedType} onOpenChange={handleCloseModal}>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
-              <DialogTitle asChild>
-                <span className="font-semibold text-lg">
-                  Select {selectedType ? selectedType.charAt(0).toUpperCase() + selectedType.slice(1) : ""} Evaluations
-                </span>
-              </DialogTitle>
+              <span className="font-semibold text-lg">
+                Select {selectedType ? selectedType.charAt(0).toUpperCase() + selectedType.slice(1) : ""} Evaluations
+              </span>
             </DialogHeader>
             {selectedType && (
               <EvaluationSelectionTable

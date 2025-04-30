@@ -17,6 +17,7 @@ interface FacilitySelectorProps {
 export function FacilitySelector({ variant = 'sidebar', className }: FacilitySelectorProps) {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFacilityId, setSelectedFacilityId] = useState<number | null>(null);
   const { setIsLoadingPatients } = usePatientStore();
   // Use the facility store
   const {
@@ -28,6 +29,8 @@ export function FacilitySelector({ variant = 'sidebar', className }: FacilitySel
     getCurrentFacility
   } = useFacilityStore();
 
+  // Call the hook at the top level, triggered by selectedFacilityId
+  useFetchPatients(selectedFacilityId ?? undefined);
 
   // Get the current facility object
   const currentFacility = getCurrentFacility();
@@ -42,9 +45,9 @@ export function FacilitySelector({ variant = 'sidebar', className }: FacilitySel
   }, [fetchFacilities, facilities.length]); // Depend on fetchFacilities and facilities.length
 
   // Handle facility selection
-  const handleSelectFacility = async (facilityId: number) => {
-    changeFacilityWithContext(facilityId);
-    await useFetchPatients(facilityId);
+  const handleSelectFacility = (facilityId: number | null) => {
+    changeFacilityWithContext(facilityId ?? 0); // 0 for "All Facilities" as null is not supported in store
+    setSelectedFacilityId(facilityId);
     setIsModalOpen(false);
   };
 
@@ -92,6 +95,26 @@ export function FacilitySelector({ variant = 'sidebar', className }: FacilitySel
                 </div>
 
                 <div className="mt-4 space-y-2">
+                  {/* All Facilities Option */}
+                  <button
+                    key="all-facilities"
+                    onClick={() => handleSelectFacility(null)}
+                    className={cn(
+                      "w-full flex items-center justify-between px-4 py-3 rounded-lg text-left border",
+                      currentFacilityId === 0 || currentFacilityId === null
+                        ? "bg-primary/10 border-primary/20"
+                        : "hover:bg-muted border-border"
+                    )}
+                  >
+                    <div>
+                      <h4 className="font-medium">All Facilities</h4>
+                      <p className="text-sm text-foreground-muted">View patients across all facilities</p>
+                    </div>
+                    {(currentFacilityId === 0 || currentFacilityId === null) && (
+                      <CheckIcon className="h-5 w-5 text-primary" />
+                    )}
+                  </button>
+                  {/* Dynamically rendered facilities */}
                   {isLoading ? (
                     <div className="text-center py-8 text-foreground-muted">
                       Loading facilities...

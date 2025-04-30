@@ -1,9 +1,11 @@
 
 export const fetchPatients = async (facilityId?: number) => {
     const endpoint = 
-    facilityId
-      ? `/api/kipu/patients/census?facilityId=${facilityId}`
-      :'/api/kipu/patients/admissions';
+    facilityId === 0
+      ? '/api/kipu/patients/admissions'
+      : facilityId
+        ? `/api/kipu/patients/census?facilityId=${facilityId}`
+        :'/api/kipu/patients/admissions';
   
     const response = await fetch(endpoint);
     if (!response.ok) throw new Error(`Failed to fetch patients: ${response.statusText}`);

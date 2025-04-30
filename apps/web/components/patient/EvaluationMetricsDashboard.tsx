@@ -12,7 +12,7 @@ import {
   UserGroupIcon
 } from '@heroicons/react/24/outline';
 import { EvaluationMetrics } from '~/types/evaluations';
-s
+
 interface EvaluationMetricsDashboardProps {
   metrics: EvaluationMetrics | any;
 }

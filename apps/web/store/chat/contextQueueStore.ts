@@ -185,8 +185,8 @@ export const useContextQueueStore = create<ContextQueueState>()((set, get) => ({
       }
       
       // Check if we got any results
-      if (data && data.length > 0) {
-        return data[0].content || '';
+      if (data?.length > 0) {
+        return data[0]?.content || '';
       }
       
       return '';

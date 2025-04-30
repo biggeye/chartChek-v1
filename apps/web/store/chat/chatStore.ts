@@ -47,7 +47,6 @@ export const useChatStore = create<ChatStore>((set, get) => {
     currentResponse: null,
 
     createSession: (title = 'New Chat') => {
-      const id = uuidv4();
       const newSession: ChatSession = {
         id,
         title,

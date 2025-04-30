@@ -8,7 +8,7 @@ import { usePatientStore } from './patientStore';
 import { useFetchPatients } from '~/hooks/usePatients';
 
 // Initialize Supabase client
-const supabase = createClient();
+const supabase = await createClient();
 
 // Create facility store with Zustand
 export const useFacilityStore = create<FacilityStore>((set, get) => ({
@@ -17,6 +17,7 @@ export const useFacilityStore = create<FacilityStore>((set, get) => ({
   currentFacilityId: typeof window !== 'undefined' 
     ? Number(localStorage.getItem('currentFacilityId')) || 0 
     : 0,
+  capacity: 0,
   pagination: null,
   isLoading: false,
   error: null,
@@ -25,13 +26,23 @@ export const useFacilityStore = create<FacilityStore>((set, get) => ({
   setDocuments: (facilities: Facility[]) => set({ facilities }),
 
   // Set current facility ID
-  setCurrentFacilityId: (facilityId: number) => {
-    // Only update if the ID has changed
+  setCurrentFacilityId: async (facilityId: number) => {
     if (facilityId !== get().currentFacilityId) {
       set({ currentFacilityId: facilityId });
-      // Update localStorage when ID changes
       if (typeof window !== 'undefined') {
         localStorage.setItem('currentFacilityId', String(facilityId));
+      }
+      // Fetch capacity from Supabase
+      const { data, error } = await supabase
+        .from('facilities')
+        .select('capacity')
+        .eq('id', facilityId)
+        .single();
+      if (error) {
+        console.error('Error fetching facility capacity:', error);
+        set({ capacity: 0 });
+      } else {
+        set({ capacity: data?.capacity ?? 0 });
       }
     }
   },

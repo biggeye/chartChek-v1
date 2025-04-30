@@ -49,6 +49,17 @@ export default function SettingsPage() {
           </p>
         </CardContent>
       </Card>
+
+      <Card className="hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => window.location.href = '/product/settings/staff'}>
+        <CardHeader>
+          <CardTitle>Staff</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">
+            Create and manage staff accounts for your employees
+          </p>
+        </CardContent>
+      </Card>
     </div>
     )
 }

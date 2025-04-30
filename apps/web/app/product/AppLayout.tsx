@@ -31,13 +31,14 @@ import {
 import { FacilitySelector } from '~/components/facility-selector';
 import { Avatar, AvatarFallback, AvatarImage } from "@kit/ui/avatar";
 import { AppLogo } from '~/components/app-logo';
+import { FileLockIcon } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', href: '#', icon: HomeIcon },
   { name: 'Chat', href: '/product/chat', icon: ChatBubbleBottomCenterIcon },
   { name: 'Patients', href: '/product/patients', icon: UsersIcon },
   { name: 'Documents', href: '/product/documents', icon: FolderIcon },
-  { name: 'Statistics', href: '/product/dashboard/stats', icon: ChartPieIcon },
+  { name: 'Records', href: '/product/records', icon: FileLockIcon },
 ]
 
 function classNames(...classes: (string | boolean | undefined)[]) {

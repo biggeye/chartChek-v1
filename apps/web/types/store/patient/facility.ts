@@ -1,5 +1,5 @@
 // Extend the existing facility types to include API key management
-import { Facility as KipuFacility, FacilityApiSettings as KipuFacilityApiSettings, FacilityApiSettingsDisplay } from '@/types/kipu/kipuAdapter';
+import { Facility as KipuFacility, FacilityApiSettings as KipuFacilityApiSettings, FacilityApiSettingsDisplay } from '~/types/kipu/kipuAdapter';
 
 // Re-export the Facility and FacilityApiSettings interfaces from KIPU types to maintain backward compatibility
 export type Facility = KipuFacility;
@@ -22,6 +22,7 @@ export interface FacilityStore {
   // State
   facilities: Facility[];
   currentFacilityId: number;
+  capacity: number;
   pagination: Pagination | null;
   isLoading: boolean;
   error: string | null;

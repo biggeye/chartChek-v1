@@ -51,6 +51,7 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
   const evaluations = items.filter((item) => item.type === "evaluation")
   const [viewingItem, setViewingItem] = useState<ContextItem | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const selectedCount = items.filter((item) => item.selected).length
   
@@ -79,47 +80,68 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
   // In compact mode, render a simplified version
   if (compact) {
     return (
-      <div className="w-full flex flex-col gap-1 px-2 pt-2 pb-1">
-        {/* Tag row for context items */}
-        <div className="flex flex-wrap items-center gap-2">
-          {items.map((item) => (
-            <span
-              key={item.id}
-              className="flex items-center bg-muted border border-border rounded-full px-2 py-1 text-xs font-medium shadow-sm max-w-xs truncate"
-              title={item.title}
-            >
-              {item.type === 'document' && <FileText className="h-3 w-3 mr-1 text-muted-foreground" />}
-              {item.type === 'upload' && <Upload className="h-3 w-3 mr-1 text-muted-foreground" />}
-              {item.type === 'evaluation' && <ClipboardList className="h-3 w-3 mr-1 text-muted-foreground" />}
-              <span className="truncate max-w-[120px]">{item.title}</span>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="ml-1 h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
-                onClick={() => removeItem(item.id)}
-                tabIndex={-1}
+      <div className={cn(
+        "w-full flex flex-col gap-1 transition-all duration-300 ease-in-out",
+        isCollapsed ? "h-8" : "px-2 pt-2 pb-1"
+      )}>
+        <div className="relative w-full">
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 flex items-center justify-center bg-background border border-border rounded-full h-6 w-6 shadow-sm hover:bg-accent transition-all duration-200"
+            title={isCollapsed ? "Expand context" : "Collapse context"}
+          >
+            {isCollapsed ? (
+              <ChevronUp className="h-3 w-3 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="h-3 w-3 text-muted-foreground" />
+            )}
+          </button>
+        </div>
+        
+        {/* Content that slides up/down */}
+        <div className={cn(
+          "transition-all duration-300 ease-in-out overflow-hidden",
+          isCollapsed ? "h-0" : "h-auto"
+        )}>
+          {/* Tag row for context items */}
+          <div className="flex flex-wrap items-center gap-2">
+            {items.map((item) => (
+              <span
+                key={item.id}
+                className="flex items-center bg-muted border border-border rounded-full px-2 py-1 text-xs font-medium shadow-sm max-w-xs truncate"
+                title={item.title}
               >
-                <X className="h-3 w-3" />
-              </Button>
-            </span>
-          ))}
-          {items.length > 0 && (
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button size="sm" variant="outline" className="ml-2 h-6 px-2 text-xs">View All</Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-2xl">
-                <DialogHeader>
-                  <DialogTitle>Context Items</DialogTitle>
-                </DialogHeader>
-                {/* Render the full context queue in the modal */}
-                <div className="mt-2">
-                  {/* Reuse the full context queue UI here, but without compact mode */}
-                  <ContextQueue compact={false} />
-                </div>
-              </DialogContent>
-            </Dialog>
-          )}
+                {item.type === 'document' && <FileText className="h-3 w-3 mr-1 text-muted-foreground" />}
+                {item.type === 'upload' && <Upload className="h-3 w-3 mr-1 text-muted-foreground" />}
+                {item.type === 'evaluation' && <ClipboardList className="h-3 w-3 mr-1 text-muted-foreground" />}
+                <span className="truncate max-w-[120px]">{item.title}</span>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="ml-1 h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
+                  onClick={() => removeItem(item.id)}
+                  tabIndex={-1}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </span>
+            ))}
+            {items.length > 0 && (
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button size="sm" variant="outline" className="ml-2 h-6 px-2 text-xs">View All</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Context Items</DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-2">
+                    <ContextQueue compact={false} />
+                  </div>
+                </DialogContent>
+              </Dialog>
+            )}
+          </div>
         </div>
       </div>
     )
@@ -276,15 +298,16 @@ function ContextItemCard({ item, onToggle, onRemove, onView }: ContextItemCardPr
         id={`item-${item.id}`}
         checked={item.selected}
         onCheckedChange={(checked) => onToggle(item.id, !!checked)}
+        className="flex-shrink-0"
       />
-      <div className="flex-1 min-w-0">
-        <div className="font-medium truncate">{item.title}</div>
-        <div className="text-sm text-muted-foreground">{item.content.substring(0, 100)}</div>
+      <div className="flex-1 min-w-0 overflow-hidden">
+        <div className="font-medium truncate pr-2">{item.title}</div>
+        <div className="text-sm text-muted-foreground truncate">{item.content.substring(0, 100)}</div>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center gap-1 flex-shrink-0">
         {onView && (
           <Button 
-            className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-7 w-7"
+            className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-7 w-7 flex-shrink-0"
             onClick={() => onView(item)} 
             title="View content"
           >
@@ -292,7 +315,7 @@ function ContextItemCard({ item, onToggle, onRemove, onView }: ContextItemCardPr
           </Button>
         )}
         <Button 
-          className="bg-red-500 hover:bg-red-600 text-white rounded-md h-7 w-7"
+          className="bg-red-500 hover:bg-red-600 text-white rounded-md h-7 w-7 flex-shrink-0"
           onClick={() => onRemove(item.id)}
         >
           <X className="h-4 w-4" />
@@ -410,26 +433,29 @@ function EvaluationCard({ item, onToggle, onRemove, onToggleSection }: Evaluatio
           id={`item-${item.id}`}
           checked={item.selected}
           onCheckedChange={(checked) => onToggle(item.id, !!checked)}
+          className="flex-shrink-0"
         />
-        <div className="flex-1 min-w-0">
-          <div className="font-medium">{item.title}</div>
-          <div className="text-sm text-muted-foreground">
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <div className="font-medium truncate pr-2">{item.title}</div>
+          <div className="text-sm text-muted-foreground truncate">
             {item.evaluationType} • {item.evaluationDate.toLocaleDateString()}
           </div>
         </div>
-        <Button
-          className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-7 w-7"
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label={isOpen ? "Collapse sections" : "Expand sections"}
-        >
-          {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-        </Button>
-        <Button 
-          className="bg-red-500 hover:bg-red-600 text-white rounded-md h-7 w-7"
-          onClick={() => onRemove(item.id)}
-        >
-          <X className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <Button
+            className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-7 w-7"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label={isOpen ? "Collapse sections" : "Expand sections"}
+          >
+            {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+          </Button>
+          <Button 
+            className="bg-red-500 hover:bg-red-600 text-white rounded-md h-7 w-7"
+            onClick={() => onRemove(item.id)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -441,10 +467,11 @@ function EvaluationCard({ item, onToggle, onRemove, onToggleSection }: Evaluatio
                   id={`section-${section.id}`}
                   checked={section.selected}
                   onCheckedChange={(checked) => onToggleSection(item.id, section.id, !!checked)}
+                  className="flex-shrink-0"
                 />
                 <label
                   htmlFor={`section-${section.id}`}
-                  className="flex-1 text-sm cursor-pointer hover:underline"
+                  className="flex-1 text-sm cursor-pointer hover:underline truncate"
                 >
                   {section.title}
                 </label>

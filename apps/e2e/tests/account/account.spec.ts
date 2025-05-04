@@ -59,7 +59,7 @@ test.describe('Account Deletion', () => {
     const response = page
       .waitForResponse((resp) => {
         return (
-          resp.url().includes('home/settings') &&
+          resp.url().includes('product/settings') &&
           resp.request().method() === 'POST'
         );
       })

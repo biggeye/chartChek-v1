@@ -1,0 +1,1010 @@
+---
+description: 
+globs: /apps/web/app/api/*
+alwaysApply: false
+---
+[vercel-ai-sdk--reference.mdc](mdc:.cursor/rules/vercel-ai-sdk--reference.mdc)
+[message-list.tsx](mdc:apps/web/components/chat/message-list.tsx)
+[message-input.tsx](mdc:apps/web/components/chat/message-input.tsx)
+[chat-history.tsx](mdc:apps/web/components/chat/chat-history.tsx)
+[chatHistory.ts](mdc:apps/web/lib/ai/chatHistory.ts)
+[chatStore.ts](mdc:apps/web/store/chat/chatStore.ts)
+
+# API Reference
+
+* **AI SDK Core:** Switch between model providers without changing your code.
+* **AI SDK RSC:** Use React Server Components to stream user interfaces to the client.
+* **AI SDK UI:** Use hooks to integrate user interfaces that interact with language models.
+* **Stream Helpers:** Use special functions that help stream model generations from various providers.
+
+## AI SDK Core
+
+AI SDK Core is a set of functions that allow you to interact with language models and other AI models. These functions are designed to be easy-to-use and flexible, allowing you to generate text, structured data, and embeddings from language models and other AI models.
+
+**Main functions include:**
+
+* `generateText()`: Generate text and call tools from a language model.
+* `streamText()`: Stream text and call tools from a language model.
+* `generateObject()`: Generate structured data from a language model.
+* `streamObject()`: Stream structured data from a language model.
+* `embed()`: Generate an embedding for a single value using an embedding model.
+* `embedMany()`: Generate embeddings for several values using an embedding model (batch embedding).
+* `generateImage()`: Generate images based on a given prompt using an image model.
+* `transcribe()`: Generate a transcript from an audio file.
+* `generateSpeech()`: Generate speech audio from text.
+
+**Helper functions include:**
+
+* `tool()`: Type inference helper function for tools.
+* `experimental_createMCPClient()`: Creates a client for connecting to MCP servers.
+* `jsonSchema()`: Creates AI SDK compatible JSON schema objects.
+* `zodSchema()`: Creates AI SDK compatible Zod schema objects.
+* `createProviderRegistry()`: Creates a registry for using models from multiple providers.
+* `cosineSimilarity()`: Calculates the cosine similarity between two vectors (e.g., embeddings).
+* `simulateReadableStream()`: Creates a ReadableStream that emits values with configurable delays.
+* `wrapLanguageModel()`: Wraps a language model with middleware.
+* `extractReasoningMiddleware()`: Extracts reasoning from the generated text and exposes it as a `reasoning` property on the result.
+* `simulateStreamingMiddleware()`: Simulates streaming behavior with responses from non-streaming language models.
+* `defaultSettingsMiddleware()`: Applies default settings to a language model.
+* `smoothStream()`: Smooths text streaming output.
+* `generateId()`: Helper function for generating unique IDs.
+* `createIdGenerator()`: Creates an ID generator.
+
+## AI SDK UI
+
+AI SDK UI is designed to help you build interactive chat, completion, and assistant applications with ease. It is a framework-agnostic toolkit, streamlining the integration of advanced AI functionalities into your applications.
+
+**Main hooks include:**
+
+* `useChat`: Hook to interact with language models in a chat interface.
+* `useCompletion`: Hook to interact with language models in a completion interface.
+* `useObject`: Hook for consuming streamed JSON objects.
+* `useAssistant`: Hook to interact with OpenAI assistants.
+* `convertToCoreMessages`: Convert `useChat` messages to CoreMessages for AI core functions.
+* `appendResponseMessages`: Append an array of CoreMessage from an AI response to an existing array of UI messages.
+* `appendClientMessage`: Append a client message to an existing array of UI messages.
+* `createDataStream`: Create a data stream to stream additional data to the client.
+* `createDataStreamResponse`: Create a response object to stream additional data to the client.
+* `pipeDataStreamToResponse`: Pipe a data stream to a Node.js ServerResponse object.
+* `streamData`: Stream additional data to the client along with generations.
+
+**Helper function:**
+
+* `AssistantResponse`: Streaming helper for assistant responses.
+
+**UI Framework Support:** AI SDK UI supports React, Svelte, Vue.js, and SolidJS (deprecated). (Contributions are welcome to implement missing features for non-React frameworks.)
+
+## AI SDK RSC
+
+AI SDK RSC is currently experimental. We recommend using **AI SDK UI** for production. For guidance on migrating from RSC to UI, see our migration guide.
+
+**Functions and hooks include:**
+
+* `streamUI`: Helper function that streams React Server Components on tool execution.
+* `createAI`: Create a context provider that wraps your application and shares state between the client and the language model on the server.
+* `createStreamableUI`: Create a streamable UI component that can be rendered on the server and streamed to the client.
+* `createStreamableValue`: Create a streamable value that can be rendered on the server and streamed to the client.
+* `getAIState`: Read the AI state on the server.
+* `getMutableAIState`: Read and update the AI state on the server.
+* `useAIState`: Get the AI state on the client from the context provider.
+* `useUIState`: Get the UI state on the client from the context provider.
+* `useActions`: Call server actions from the client.
+
+## Stream Helpers
+
+**Available stream helper functions:**
+
+* `AIStream`: Create a readable stream for AI responses.
+* `StreamingTextResponse`: Create a streaming response for text generations.
+* `streamToResponse`: Pipe a `ReadableStream` to a Node.js ServerResponse object.
+* `OpenAIStream`: Transform the response from OpenAI’s language models into a readable stream.
+* `AnthropicStream`: Transform the response from Anthropic’s language models into a readable stream.
+* `AWSBedrockStream`: Transform the response from AWS Bedrock’s language models into a readable stream.
+* `AWSBedrockAnthropicStream`: Transform the response from AWS Bedrock Anthropic’s language models into a readable stream.
+* `AWSBedrockAnthropicMessagesStream`: Transform the response from AWS Bedrock’s Anthropic messages into a readable stream.
+* `AWSBedrockCohereStream`: Transform the response from AWS Bedrock Cohere’s language models into a readable stream.
+* `AWSBedrockLlama2Stream`: Transform the response from AWS Bedrock Llama-2’s language models into a readable stream.
+* `CohereStream`: Transform the response from Cohere’s language models into a readable stream.
+* `GoogleGenerativeAIStream`: Transform the response from Google’s language models into a readable stream.
+* `HuggingFaceStream`: Transform the response from Hugging Face’s language models into a readable stream.
+* `LangChainAdapter`: Transform the response from a LangChain stream into data streams.
+* `LangChainStream`: Transform the response from LangChain’s language models into a readable stream.
+* `LlamaIndexAdapter`: Transform the response from LlamaIndex’s streams into data streams.
+* `MistralStream`: Transform the response from Mistral’s language models into a readable stream.
+* `ReplicateStream`: Transform the response from Replicate’s language models into a readable stream.
+* `InkeepStream`: Transform the response from Inkeep’s language models into a readable stream.
+
+## AI SDK Errors
+
+The following error classes are provided by the AI SDK:
+
+* `AI_APICallError`
+* `AI_DownloadError`
+* `AI_EmptyResponseBodyError`
+* `AI_InvalidArgumentError`
+* `AI_InvalidMessageRoleError`
+* `AI_InvalidPromptError`
+* `AI_InvalidResponseDataError`
+* `AI_InvalidToolArgumentsError`
+* `AI_JSONParseError`
+* `AI_LoadAPIKeyError`
+* `AI_LoadSettingError`
+* `AI_MessageConversionError`
+* `AI_NoContentGeneratedError`
+* `AI_NoImageGeneratedError`
+* `AI_NoObjectGeneratedError`
+* `AI_NoOutputSpecifiedError`
+* `AI_NoSuchModelError`
+* `AI_NoSuchProviderError`
+* `AI_NoSuchToolError`
+* `AI_RetryError`
+* `AI_ToolCallRepairError`
+* `AI_ToolExecutionError`
+* `AI_TooManyEmbeddingValuesForCallError`
+* `AI_TypeValidationError`
+* `AI_UnsupportedFunctionalityError`
+
+---
+
+# Advanced Guides
+
+## Caching Responses
+
+Depending on the type of application you're building, you may want to cache the responses you receive from your AI provider, at least temporarily.
+
+### Using Language Model Middleware (Recommended)
+
+The recommended approach to caching responses is using **language model middleware** and the `simulateReadableStream` function. Language model middleware is a way to enhance the behavior of language models by intercepting and modifying the calls to the language model. Let's see how you can use language model middleware to cache responses.
+
+`ai/middleware.ts` (using Upstash Redis for caching):
+
+```ts
+import { Redis } from '@upstash/redis';
+import {
+  type LanguageModelV1,
+  type LanguageModelV1Middleware,
+  type LanguageModelV1StreamPart,
+  simulateReadableStream,
+} from 'ai';
+
+const redis = new Redis({
+  url: process.env.KV_URL,
+  token: process.env.KV_TOKEN,
+});
+
+export const cacheMiddleware: LanguageModelV1Middleware = {
+  wrapGenerate: async ({ doGenerate, params }) => {
+    const cacheKey = JSON.stringify(params);
+    const cached = (await redis.get(cacheKey)) as Awaited<ReturnType<LanguageModelV1['doGenerate']>> | null;
+    if (cached !== null) {
+      return {
+        ...cached,
+        response: {
+          ...cached.response,
+          timestamp: cached?.response?.timestamp ? new Date(cached?.response?.timestamp) : undefined,
+        },
+      };
+    }
+    const result = await doGenerate();
+    redis.set(cacheKey, result);
+    return result;
+  },
+
+  wrapStream: async ({ doStream, params }) => {
+    const cacheKey = JSON.stringify(params);
+    // Check if the result is in the cache
+    const cached = await redis.get(cacheKey);
+    // If cached, return a simulated ReadableStream that yields the cached result
+    if (cached !== null) {
+      // Format the timestamps in the cached response
+      const formattedChunks = (cached as LanguageModelV1StreamPart[]).map(p => {
+        if (p.type === 'response-metadata' && p.timestamp) {
+          return { ...p, timestamp: new Date(p.timestamp) };
+        } else return p;
+      });
+      return {
+        stream: simulateReadableStream({
+          initialDelayInMs: 0,
+          chunkDelayInMs: 10,
+          chunks: formattedChunks,
+        }),
+        rawCall: { rawPrompt: null, rawSettings: {} },
+      };
+    }
+    const { stream, ...rest } = await doStream();
+    const fullResponse: LanguageModelV1StreamPart[] = [];
+    const transformStream = new TransformStream<LanguageModelV1StreamPart, LanguageModelV1StreamPart>({
+      transform(chunk, controller) {
+        fullResponse.push(chunk);
+        controller.enqueue(chunk);
+      },
+      flush() {
+        // Store the full response in the cache after streaming is complete
+        redis.set(cacheKey, fullResponse);
+      },
+    });
+    return {
+      stream: stream.pipeThrough(transformStream),
+      ...rest,
+    };
+  },
+};
+```
+
+This example uses `@upstash/redis` to store and retrieve the assistant's responses, but you can use any KV storage provider you like.
+
+`LanguageModelMiddleware` has two methods: `wrapGenerate` and `wrapStream`. `wrapGenerate` is called when using `generateText` and `generateObject`, while `wrapStream` is called when using `streamText` and `streamObject`.
+
+For `wrapGenerate`, you can cache the response directly. For `wrapStream`, you cache an array of the stream parts, which can then be used with the `simulateReadableStream` function to create a simulated `ReadableStream` that returns the cached response. In this way, the cached response is returned chunk-by-chunk as if it were being generated by the model. You can control the initial delay and delay between chunks by adjusting the `initialDelayInMs` and `chunkDelayInMs` parameters of `simulateReadableStream`.
+
+You can see a full example of caching with Redis in a Next.js application in our **Caching Middleware Recipe**.
+
+### Using Lifecycle Callbacks
+
+Alternatively, each AI SDK Core function has special lifecycle callbacks you can use. One of interest is `onFinish`, which is called when the generation is complete. This is where you can cache the full response.
+
+Here's an example of how you can implement caching using Vercel KV and Next.js to cache the OpenAI response for 1 hour (using Upstash Redis and Next.js):
+
+`app/api/chat/route.ts`:
+
+```ts
+import { openai } from '@ai-sdk/openai';
+import { formatDataStreamPart, streamText } from 'ai';
+import { Redis } from '@upstash/redis';
+
+// Allow streaming responses up to 30 seconds 
+export const maxDuration = 30;
+
+const redis = new Redis({
+  url: process.env.KV_URL,
+  token: process.env.KV_TOKEN,
+});
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+
+  // come up with a key based on the request:
+  const key = JSON.stringify(messages);
+
+  // Check if we have a cached response
+  const cached = await redis.get(key);
+  if (cached != null) {
+    return new Response(formatDataStreamPart('text', cached), {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+
+  // Call the language model:
+  const result = streamText({
+    model: openai('gpt-4o'),
+    messages,
+    async onFinish({ text }) {
+      // Cache the response text:
+      await redis.set(key, text);
+      await redis.expire(key, 60 * 60);
+    },
+  });
+
+  // Respond with the stream
+  return result.toDataStreamResponse();
+}
+```
+
+In this example, we first check the cache for a stored response. If found, we return it immediately. If not, we call the model via `streamText`. The `onFinish` callback caches the response text for 1 hour (`expire` sets the TTL). The result is then streamed back to the client.
+
+## Rate Limiting
+
+Rate limiting helps you protect your APIs from abuse. It involves setting a maximum threshold on the number of requests a client can make within a specified timeframe. This simple technique acts as a gatekeeper, preventing excessive usage that can degrade service performance and incur unnecessary costs.
+
+### Rate Limiting with Vercel KV and Upstash Ratelimit
+
+In this example, you will protect an API endpoint using **Vercel KV** and **Upstash Ratelimit**.
+
+`app/api/generate/route.ts`:
+
+```ts
+import kv from '@vercel/kv';
+import { openai } from '@ai-sdk/openai';
+import { streamText } from 'ai';
+import { Ratelimit } from '@upstash/ratelimit';
+import { NextRequest } from 'next/server';
+
+// Allow streaming responses up to 30 seconds 
+export const maxDuration = 30;
+
+// Create rate limiter
+const ratelimit = new Ratelimit({
+  redis: kv,
+  limiter: Ratelimit.fixedWindow(5, '30s'),
+});
+
+export async function POST(req: NextRequest) {
+  // call ratelimit with request IP
+  const ip = req.ip ?? 'ip';
+  const { success, remaining } = await ratelimit.limit(ip);
+  // block the request if unsuccessful
+  if (!success) {
+    return new Response('Ratelimited!', { status: 429 });
+  }
+
+  const { messages } = await req.json();
+  const result = streamText({
+    model: openai('gpt-3.5-turbo'),
+    messages,
+  });
+  return result.toDataStreamResponse();
+}
+```
+
+### Simplify API Protection
+
+With Vercel KV and Upstash Ratelimit, it is possible to protect your APIs from such attacks with ease. To learn more about how Ratelimit works and how it can be configured to your needs, see the Upstash Ratelimit documentation.
+
+*(In the example above, we rate limit clients to 5 requests per 30 seconds. If the limit is exceeded, a 429 response is returned. Otherwise, the request proceeds and the AI response is streamed back.)*
+
+## Rendering User Interfaces with Language Models
+
+Language models generate text, so at first it may seem like you would only need to render text in your application. However, language models can also generate **structured outputs** that can be used to render entire user interfaces (UIs) on the fly.
+
+For example, consider using a tool function to get weather data and returning a JSON object instead of text, then rendering a React component with that data:
+
+`app/actions.tsx` – using a tool that returns text:
+
+```ts
+const text = generateText({
+  model: openai('gpt-3.5-turbo'),
+  system: 'You are a friendly assistant',
+  prompt: 'What is the weather in SF?',
+  tools: {
+    getWeather: {
+      description: 'Get the weather for a location',
+      parameters: z.object({
+        city: z.string().describe('The city to get the weather for'),
+        unit: z.enum(['C', 'F']).describe('The unit to display the temperature in'),
+      }),
+      execute: async ({ city, unit }) => {
+        const weather = getWeather({ city, unit });
+        return `It is currently ${weather.value}°${unit} and ${weather.description} in ${city}!`;
+      },
+    },
+  },
+});
+```
+
+Above, the language model is passed a **tool** called `getWeather` that returns the weather information as text. However, instead of returning text, if you return a JSON object that represents the weather information, you can use it to render a React component instead.
+
+`app/action.ts` – using a tool that returns a JSON object:
+
+```ts
+const text = generateText({
+  model: openai('gpt-3.5-turbo'),
+  system: 'You are a friendly assistant',
+  prompt: 'What is the weather in SF?',
+  tools: {
+    getWeather: {
+      description: 'Get the weather for a location',
+      parameters: z.object({
+        city: z.string().describe('The city to get the weather for'),
+        unit: z.enum(['C', 'F']).describe('The unit to display the temperature in'),
+      }),
+      execute: async ({ city, unit }) => {
+        const weather = getWeather({ city, unit });
+        const { temperature, unit: unitUsed, description, forecast } = weather;
+        return {
+          temperature,
+          unit: unitUsed,
+          description,
+          forecast,
+        };
+      },
+    },
+  },
+});
+```
+
+Now you can use the object returned by the `getWeather` function to conditionally render a React component `<WeatherCard/>` that displays the weather information by passing the object as props.
+
+`app/page.tsx` – rendering a component based on the tool’s output:
+
+```tsx
+return (
+  <div>
+    {messages.map(message => {
+      if (message.role === 'function') {
+        const { name, content } = message;
+        const { temperature, unit, description, forecast } = content;
+        return (
+          <WeatherCard
+            weather={{
+              temperature: 47,
+              unit: 'F',
+              description: 'sunny',
+              forecast,
+            }}
+          />
+        );
+      }
+    })}
+  </div>
+)
+```
+
+*Here's a preview of what that might look like (the assistant streaming a weather UI):*
+
+```
+What is the weather in SF?
+
+getWeather("San Francisco")
+
+Thursday, March 7
+
+47°  
+sunny  
+
+7am – 48°  
+8am – 50°  
+9am – 52°  
+10am – 54°  
+11am – 56°  
+12pm – 58°  
+1pm – 60°
+
+Thanks!
+```
+
+*Weather – An example of an assistant that renders the weather information in a streamed component.*
+
+Rendering interfaces as part of language model generations elevates the user experience of your application, allowing people to interact with language models beyond text. They also make it easier for you to interpret **sequential tool calls** that take place in multiple steps and help identify and debug where the model reasoned incorrectly.
+
+### Rendering Multiple User Interfaces
+
+To recap, an application has to go through the following steps to render user interfaces as part of model generations:
+
+1. The user prompts the language model.
+2. The language model generates a response that includes a tool call.
+3. The tool call returns a JSON object that represents the user interface.
+4. The response is sent to the client.
+5. The client receives the response and checks if the latest message was a tool call.
+6. If it was a tool call, the client renders the user interface based on the JSON object returned by the tool call.
+
+Most applications have multiple tools that can be called by the language model, and each tool can return a different user interface. For example, a tool that searches for courses can return a list of courses, while a tool that searches for people can return a list of people. As this list grows, the complexity of your application will grow as well, and it can become increasingly difficult to manage these user interfaces.
+
+Consider an application with multiple possible UI outputs. You might end up with code like this on the client:
+
+`app/page.tsx` – conditional client-side rendering for multiple tools:
+
+```tsx
+{
+  message.role === 'tool' ? (
+    message.name === 'api-search-course' ? (
+      <Courses courses={message.content} />
+    ) : message.name === 'api-search-profile' ? (
+      <People people={message.content} />
+    ) : message.name === 'api-meetings' ? (
+      <Meetings meetings={message.content} />
+    ) : message.name === 'api-search-building' ? (
+      <Buildings buildings={message.content} />
+    ) : message.name === 'api-events' ? (
+      <Events events={message.content} />
+    ) : message.name === 'api-meals' ? (
+      <Meals meals={message.content} />
+    ) : null
+  ) : (
+    <div>{message.content}</div>
+  );
+}
+```
+
+As the number of tools grows, maintaining this client-side routing logic becomes cumbersome.
+
+### Rendering User Interfaces on the Server
+
+The AI SDK RSC (`ai/rsc`) takes advantage of React Server Components to solve the problem of managing all your React components on the client side. It allows you to render React components on the server and stream them to the client.
+
+Rather than conditionally rendering user interfaces on the client based on the data returned by the language model, you can directly stream them from the server during a model generation.
+
+For example, using AI SDK RSC:
+
+`app/action.ts` – generating a UI stream on the server:
+
+```ts
+import { createStreamableUI } from 'ai/rsc'
+
+const uiStream = createStreamableUI();
+
+const text = generateText({
+  model: openai('gpt-3.5-turbo'),
+  system: 'you are a friendly assistant',
+  prompt: 'what is the weather in SF?',
+  tools: {
+    getWeather: {
+      description: 'Get the weather for a location',
+      parameters: z.object({
+        city: z.string().describe('The city to get the weather for'),
+        unit: z.enum(['C', 'F']).describe('The unit to display the temperature in'),
+      }),
+      execute: async ({ city, unit }) => {
+        /* ... returns a weather object ... */
+        return {
+          temperature,
+          unit,
+          description,
+          forecast,
+        };
+      },
+    },
+  },
+  // Instead of returning a text response, we stream a UI component:
+  functions: {
+    getWeather: async (weatherObject) => {
+      // Render WeatherCard component on the server
+      uiStream.render(<WeatherCard weather={weatherObject} />);
+      return { display: uiStream.value };
+    }
+  }
+});
+return {
+  display: uiStream.value
+}
+```
+
+The `createStreamableUI` function (from `ai/rsc`) creates a stream that can send React components to the client. In the example above, on the server we render the `<WeatherCard/>` component with the props passed to it, and then stream it to the client. On the client side, we only need to render the UI that is streamed from the server.
+
+`app/page.tsx` – consuming the streamed UI on the client:
+
+```tsx
+return (
+  <div>
+    {messages.map(message => (
+      <div>{message.display}</div>
+    ))}
+  </div>
+);
+```
+
+Now the steps involved are simplified:
+
+1. The user prompts the language model.
+2. The language model generates a response that includes a tool call.
+3. The tool call renders a React component along with relevant props that represent the user interface.
+4. The response is streamed to the client and rendered directly.
+
+> **Note:** You can also render text on the server and stream it to the client using React Server Components. This way, all operations from language model generation to UI rendering can be done on the server, while the client only needs to render the UI that is streamed from the server.
+
+Check out this **example** for a full illustration of how to stream component updates with React Server Components in Next.js App Router.
+
+## Language Models as Routers
+
+*(This section builds on the concept of generative user interfaces, exploring how language models can handle routing logic in an application.)*
+
+Historically, developers had to write routing logic that connected different parts of an application so that a user could navigate and complete specific tasks. In web applications today, most of the routing logic takes place in the form of routes, for example:
+
+* `/login` would navigate to a page with a login form.
+* `/user/john` would navigate to a page with profile details about John.
+* `/api/events?limit=5` would return the five most recent events from an events database.
+
+While routes help build web applications that connect different parts into a seamless user experience, it can become a burden to manage them as the complexity of applications grows. Next.js has helped reduce this complexity by introducing features like file-based routing, dynamic routing, API routes, middleware, the App Router, and so on.
+
+With language models becoming better at reasoning, we believe there is a future where developers only write core application-specific components while models take care of routing between them based on the user's state in an application.
+
+Using **generative user interfaces**, the language model decides which user interface to render based on the user's state in the application, giving users the flexibility to interact with your application in a conversational manner instead of navigating through a series of predefined routes.
+
+### Deterministic Routes and Probabilistic Routing
+
+Generative user interfaces are not deterministic in nature because they depend on the model's generated output. Since these generations are probabilistic, it is possible for every user query to result in a different user interface.
+
+Users expect their experience using your application to be predictable, so non-deterministic user interfaces might sound problematic at first. However, language models can be set up to limit their generations to a particular set of outputs using their ability to call functions.
+
+When language models are provided with a set of function definitions and instructed to execute any of them based on the user query, they will do one of the following:
+
+* Execute the function that is most relevant to the user query.
+* Not execute any function if the user query is outside the bounds of the available functions.
+
+For example, consider a simple scenario with one tool function:
+
+`app/actions.ts` – ensuring deterministic outputs via tool calls:
+
+```ts
+const sendMessage = (prompt: string) =>
+  generateText({
+    model: 'gpt-3.5-turbo',
+    system: 'you are a friendly weather assistant!',
+    prompt,
+    tools: {
+      getWeather: {
+        description: 'Get the weather in a location',
+        parameters: z.object({
+          location: z.string().describe('The location to get the weather for'),
+        }),
+        execute: async ({ location }: { location: string }) => ({
+          location,
+          temperature: 72 + Math.floor(Math.random() * 21) - 10,
+        }),
+      },
+    },
+  });
+
+sendMessage('What is the weather in San Francisco?'); // getWeather is called  
+sendMessage('What is the weather in New York?'); // getWeather is called  
+sendMessage('What events are happening in London?'); // No function is called
+```
+
+In the code above, the model will call `getWeather` for weather-related queries, and not call any function if the query is unrelated (like asking about events in London, since no relevant tool is provided). This way, we ensure that the generations result in **deterministic outputs** (either a specific function is called or not), while the choice the model makes remains probabilistic.
+
+This emergent ability of a language model to decide whether a function needs to be executed based on a user query is essentially the model emulating "reasoning."
+
+As a result, combining the model’s ability to reason about which function to execute *and* to render user interfaces at the same time gives you the ability to build applications where language models can be used as a **router**.
+
+### Routing by parameters
+
+For routes that have segments dependent on dynamic data (for example: `/profile/[username]`, `/search?q=[query]`, `/media/[id]`), a language model can generate the correct parameters and render the user interface accordingly.
+
+For example, imagine a media search application. You can ask the language model to search for artworks from different artists. The model will call a `searchImages` function with the artist's name as a parameter and render the search results:
+
+```
+User: Art made by Van Gogh?  
+Tool: searchImages("Van Gogh")  
+Model: Here are a few of his notable works:  
+- Starry Night  
+- Sunflowers  
+- Olive Trees  
+
+User: Wow, these look great! How about Monet?  
+Tool: searchImages("Monet")  
+Model: Sure! Here are a few of his paintings:  
+- Frau im Garten  
+- Cliff Walk  
+- Waves
+```
+
+*Media Search – Let your users see more than words can say by rendering image components directly within your search experience.*
+
+In this example, the language model generates image results (here represented by titles) for the given artist name, effectively handling what would traditionally be a dynamic route parameter (`artist`).
+
+### Routing by sequence
+
+For actions that require a sequence of steps to be completed by navigating through different routes, the language model can generate the correct sequence of tool calls (and hence UI updates) to fulfill the user's request.
+
+For example, imagine a calendar application. A user asks the model to schedule a happy hour evening with friends. The model could then perform a sequence of tool calls to:
+
+1. Look up your calendar.
+2. Look up your friends' calendars.
+3. Determine the best time for everyone.
+4. Search for nearby happy hour spots.
+5. Create an event and send out invites.
+
+A sample interaction might look like:
+
+```
+User: I'd like to get drinks with Max tomorrow evening after studio!  
+Tool: searchContacts("Max")  
+*Model finds Max (and perhaps others):*  
+- max (@mleiter)  
+- shu (@shuding)  
+
+Tool: getEvents("2023-10-18", ["jrmy", "mleiter"])  
+*Model checks calendars:*  
+(studio 4-6 PM is on the calendar)  
+
+Tool: searchNearby("Bar")  
+*Model finds places:*  
+- wild colonial (200m)  
+- the eddy (1.3km)  
+
+Tool: createEvent("2023-10-18", ["jrmy", "mleiter"])  
+*Model schedules event:*  
+- studio 4-6 PM  
+- Drinks at Wild Colonial 6-7 PM  
+
+Model: Exciting! Max is free around that time and Wild Colonial is right around the corner. Would you like me to mark it on your calendar?  
+User: Sure, sounds good!
+```
+
+*Planning an Event – The model calls functions and generates interfaces based on user intent, acting like a router.*
+
+In the above scenario, the model sequentially navigates what would be multiple routes (contacts, events, nearby spots, calendar event creation) through tool calls, without the user explicitly clicking through a UI. Just by defining functions to lookup contacts, pull events from a calendar, search for nearby locations, etc., the model is able to sequentially **navigate the routes for you**.
+
+To learn more, check out examples using the `streamUI` function to stream generative user interfaces to the client based on the model’s responses.
+
+## Multistep Interfaces
+
+Multistep interfaces refer to user interfaces that require multiple independent steps to be executed in order to complete a specific task.
+
+In order to understand multistep interfaces, it is important to understand two concepts:
+
+* **Tool composition**
+* **Application context**
+
+**Tool composition** is the process of combining multiple **tools** to create a new tool. This allows you to break down complex tasks into smaller, more manageable steps.
+
+**Application context** refers to the state of the application at any given point in time. This includes the user's input, the output of the language model, and any other relevant information.
+
+When designing multistep interfaces, consider how the tools in your application can be composed together to form a coherent user experience, as well as how the application context changes as the user progresses through the interface.
+
+### Application Context
+
+The application context can be thought of as the conversation history between the user and the language model. The richer the context, the more information the model has to generate relevant responses.
+
+In multistep interfaces, the application context is even more important because the user's input in one step may affect the output of the model in the next step.
+
+For example, consider a meal logging application that helps users track their daily food intake. The language model is provided with the following tools:
+
+* `log_meal`: logs a meal with parameters like the name of the food, quantity, and time of consumption.
+* `delete_meal`: deletes a meal given the name of the meal.
+
+When the user logs a meal, the model generates a response confirming the meal has been logged:
+
+```
+    User: Log a chicken shawarma for lunch.
+
+    Tool: log_meal("chicken shawarma", "250g", "12:00 PM")
+
+    Model: Chicken shawarma has been logged for lunch.
+```
+
+Now, when the user decides to delete the meal, the model should be able to reference the previous step to identify the meal to be deleted:
+
+```
+    User: Log a chicken shawarma for lunch.
+
+    Tool: log_meal("chicken shawarma", "250g", "12:00 PM")
+
+    Model: Chicken shawarma has been logged for lunch.
+
+    ...
+
+    ...
+
+    User: I skipped lunch today, can you update my log?
+
+    Tool: delete_meal("chicken shawarma")
+
+    Model: Chicken shawarma has been deleted from your log.
+```
+
+In this example, managing the application context is important for the model to generate the correct response. The model needs information about the previous actions (the logged meal) in order to generate the parameters for the `delete_meal` tool.
+
+### Tool Composition
+
+Tool composition is the process of combining multiple tools to create a new tool. This involves defining the inputs and outputs of each tool, as well as how they interact with each other.
+
+Designing how these tools compose together for a multistep interface is crucial to both the user experience of your application and the model's ability to generate the correct output.
+
+For example, consider a flight booking assistant that can help users book flights. The assistant might have the following tools:
+
+* `searchFlights`: searches for flights based on the user's query (e.g., origin and destination).
+* `lookupFlight`: looks up details of a specific flight (e.g., by flight number).
+* `bookFlight`: books a flight based on the user's selection.
+
+A typical usage of these tools could be:
+
+```
+    User: I want to book a flight from New York to London.
+
+    Tool: searchFlights("New York", "London")
+
+    Model: Here are the available flights from New York to London.
+
+    User: I want to book flight number BA123 on 12th December for myself and my wife.
+
+    Tool: lookupFlight("BA123") -> "4 seats available"
+
+    Model: Sure, there are seats available! Can you provide the names of the passengers?
+
+    User: John Doe and Jane Doe.
+
+    Tool: bookFlight("BA123", "12th December", ["John Doe", "Jane Doe"])
+
+    Model: Your flight has been booked!
+```
+
+In the last tool call above, the `bookFlight` tool did not have the passenger details initially, so the model asked for them. The model had to request that information from the user because it wasn't yet in the context.
+
+We could imagine adding another tool to optimize this flow. For instance, if the user is logged in, a `lookupContacts` tool could retrieve the passenger names without asking the user:
+
+```
+    User: I want to book a flight from New York to London.
+
+    Tool: searchFlights("New York", "London")
+
+    Model: Here are the available flights from New York to London.
+
+    User: I want to book flight number BA123 on 12th December for myself and my wife.
+
+    Tool: lookupContacts() -> ["John Doe", "Jane Doe"]
+
+    Tool: bookFlight("BA123", "12th December", ["John Doe", "Jane Doe"])
+
+    Model: Your flight has been booked!
+```
+
+Here, the `lookupContacts` tool is called before `bookFlight` to ensure the passenger details are available in the context. The model was able to fill in the missing details automatically, reducing the number of steps for the user.
+
+We can extend this further. Let's introduce another tool called `lookupBooking` that shows booking details given a passenger name. We can compose this with existing tools to provide a more complete experience:
+
+```
+    User: What's the status of my wife's upcoming flight?
+
+    Tool: lookupContacts() -> ["John Doe", "Jane Doe"]
+
+    Tool: lookupBooking("Jane Doe") -> "BA123 confirmed"
+
+    Tool: lookupFlight("BA123") -> "Flight BA123 is scheduled to depart on 12th December."
+
+    Model: Your wife's flight BA123 is confirmed and scheduled to depart on 12th December.
+```
+
+In this example, the `lookupBooking` tool is used to get the status of the wife's flight. By composing this tool with the others, the model is able to provide a response that includes the booking status and departure date without needing additional user input.
+
+As a result, the more tools you design that can be composed together, the more complex and powerful your application can become.
+
+## Sequential Generations
+
+When working with the AI SDK, you may want to create sequences of generations (often referred to as "chains" or "pipes"), where the output of one becomes the input for the next. This can be useful for creating more complex AI-powered workflows or for breaking down larger tasks into smaller, more manageable steps.
+
+### Example
+
+In a sequential chain, the output of one generation is directly used as input for the next generation. This allows you to create a series of dependent generations, where each step builds upon the previous one.
+
+Here's an example of how you can implement sequential actions:
+
+```ts
+import { openai } from '@ai-sdk/openai';
+import { generateText } from 'ai';
+
+async function sequentialActions() {
+  // Generate blog post ideas
+  const ideasGeneration = await generateText({
+    model: openai('gpt-4o'),
+    prompt: 'Generate 10 ideas for a blog post about making spaghetti.',
+  });
+  console.log('Generated Ideas:\n', ideasGeneration);
+
+  // Pick the best idea
+  const bestIdeaGeneration = await generateText({
+    model: openai('gpt-4o'),
+    prompt: `Here are some blog post ideas about making spaghetti:\n\n${ideasGeneration}\n\nPick the best idea from the list above and explain why it's the best.`,
+  });
+  console.log('\nBest Idea:\n', bestIdeaGeneration);
+
+  // Generate an outline
+  const outlineGeneration = await generateText({
+    model: openai('gpt-4o'),
+    prompt: `We've chosen the following blog post idea about making spaghetti:\n\n${bestIdeaGeneration}\n\nCreate a detailed outline for a blog post based on this idea.`,
+  });
+  console.log('\nBlog Post Outline:\n', outlineGeneration);
+}
+
+sequentialActions().catch(console.error);
+```
+
+In this example, we first generate ideas for a blog post, then pick the best idea, and finally create an outline based on that idea. Each step uses the output from the previous step as input for the next generation.
+
+## Prompt Engineering
+
+### What is a Large Language Model (LLM)?
+
+A Large Language Model is essentially a prediction engine that takes a sequence of words as input and aims to predict the most likely sequence of words to follow. It does this by assigning probabilities to potential next sequences and then selecting one. The model continues to generate text until it meets a specified stopping criterion.
+
+These models learn by training on massive text corpora, which means they will be better suited to some use cases than others. For example, a model trained heavily on GitHub code would understand the probabilities of sequences in source code well. However, it's crucial to remember that the generated sequences, while often seeming plausible, can sometimes be random or not grounded in reality. As models become more advanced, many surprising abilities and applications emerge.
+
+### What is a prompt?
+
+Prompts are the starting points for LLMs. They are the inputs that trigger the model to generate text. Prompt engineering involves not just crafting these prompts but also understanding related concepts such as hidden prompts, tokens and token limits, and the potential for prompt hacking (including phenomena like jailbreaks and leaks).
+
+### Why is prompt engineering needed?
+
+Prompt engineering plays a pivotal role in shaping the responses of LLMs. It allows us to tweak the model to respond more effectively to a broader range of queries. This includes the use of techniques like semantic search, command grammars, and the ReAct (ReActive) model architecture. The performance, context window, and cost of LLMs vary between models and providers, which adds further constraints. For example, the GPT-4 model is more expensive and significantly slower than GPT-3.5-turbo, but it can also be more effective at certain tasks. As in many areas of software engineering, there are trade-offs between cost and performance.
+
+To assist with comparing and tweaking LLMs, Vercel has built an AI Playground that allows you to compare the performance of different models side-by-side. When you're ready, you can generate code with the AI SDK to quickly integrate your chosen prompt and model into your own applications.
+
+### Example: Build a Slogan Generator
+
+#### Start with an instruction
+
+Imagine you want to build a slogan generator for marketing campaigns. Creating catchy slogans isn't always straightforward!
+
+First, you'll need a prompt that clearly states what you want. Let's start with a basic instruction. Submit this prompt to generate your first completion.
+
+```
+Create a slogan for a coffee shop.
+
+Generate
+
+...
+```
+
+*Not bad!* Now, try making your instruction more specific:
+
+```
+Create a slogan for an organic coffee shop.
+
+Generate
+
+...
+```
+
+Introducing a single descriptive term (“organic”) into our prompt influences the completion. Essentially, crafting your prompt is the means by which you "instruct" or "program" the model.
+
+#### Include examples
+
+Clear instructions are key for quality outcomes, but that might not always be enough. We can enhance the prompt further.
+
+Let's provide a prompt that asks for multiple outputs and includes examples for context:
+
+```
+Create three slogans for a coffee shop with live music.
+
+Generate
+
+...
+```
+
+These slogans are okay, but they could be better — it seems the model overlooked the "live music" part. Let's refine the prompt to guide the model more.
+
+Often, it's beneficial to both **demonstrate and tell** the model your requirements. Incorporating examples in your prompt can convey patterns or nuances. Try this prompt that includes a couple of examples:
+
+```
+Create three slogans for a business with unique features.
+
+Business: Bookstore with cats  
+Slogans: "Purr-fect Pages", "Books and Whiskers", "Novels and Nuzzles"  
+
+Business: Gym with rock climbing  
+Slogans: "Peak Performance", "Reach New Heights", "Climb Your Way Fit"  
+
+Business: Coffee shop with live music  
+Slogans:
+```
+
+```
+Generate
+
+...
+```
+
+Great! By providing example input-output pairs for similar cases, we helped the model generate the kind of slogans we were aiming for.
+
+#### Tweak your settings
+
+Aside from designing prompts, you can influence completions by tweaking model settings. A crucial setting is the **temperature**.
+
+You might have noticed that the same prompt, when repeated, yielded the same or very similar completions. This happens when your temperature is set to 0 (fully deterministic output).
+
+Try re-submitting the identical prompt a few times with the temperature set to 1 (maximum randomness):
+
+```
+Create three slogans for a business with unique features.
+
+Business: Bookstore with cats  
+Slogans: "Purr-fect Pages", "Books and Whiskers", "Novels and Nuzzles"  
+
+Business: Gym with rock climbing  
+Slogans: "Peak Performance", "Reach New Heights", "Climb Your Way Fit"  
+
+Business: Coffee shop with live music  
+Slogans:
+
+Generate
+
+...
+```
+
+Notice the difference? With a higher temperature, the same prompt can yield varied completions each time.
+
+Keep in mind that the model predicts text based on likelihood. Temperature (a value from 0 to 1) governs the model's "creativity" or risk-taking. A lower temperature (close to 0) makes outputs more precise and deterministic (less randomness), while a higher temperature (closer to 1) produces a broader range of possible completions (more randomness).
+
+For our slogan generator, since we want a diverse pool of suggestions, a moderate temperature (e.g. 0.6) is often a good choice.
+
+### Recommended Resources
+
+Prompt engineering is evolving rapidly, with new methods and research papers surfacing every week. Here are some resources that are useful for learning and experimenting with prompt engineering:
+
+* **The Vercel AI Playground**
+* **Brex Prompt Engineering** (GitHub repository)
+* **Prompt Engineering Guide by DAIR AI**
+
+---
+
+

@@ -1,0 +1,218 @@
+---
+description: Best practices for implementing frontend data pipelines using the store->service->hook pattern
+globs: 
+alwaysApply: false
+---
+# Data Pipeline Pattern Rule
+  triggers:
+    - Creating new data fetching/manipulation features
+    - Reviewing or refactoring existing data flows
+    - Questions about state management architecture
+    - Implementing store/service/hook combinations
+    - Debugging issues with data flow or state management
+  example_queries:
+    - "How should I structure this new data feature?"
+    - "Is this the right way to implement this store/hook?"
+    - "How do I handle credentials in this flow?"
+    - "Where should this business logic go?"
+  related_files:
+    - "**/*Store.ts"
+    - "**/*service.ts"
+    - "**/use*.ts"
+    - "**/types/**/*.ts"
+    
+# Data Pipeline Pattern Rule
+
+## Pattern Overview
+```mermaid
+graph LR
+    FE[Frontend Component] --> Hook[Hook Layer]
+    Hook --> Store[Store Layer]
+    Hook --> ClientService[Client Service Layer]
+    ClientService --> InternalAPI[Internal API Route]
+    InternalAPI --> ServerService[Server Service Layer]
+    ServerService --> ExternalAPI[External API/KIPU]
+    Store --> FE
+```
+
+## Layer Responsibilities
+
+### 1. Store Layer (State Management)
+```typescript
+// Example: patientStore.ts
+export interface ExampleStore {
+  data: DataType[];
+  selectedItem: DataType | null;
+  isLoading: boolean;
+  error: string | null;
+
+  // Actions
+  setData: (data: DataType[]) => void;
+  selectItem: (item: DataType | null) => void;
+  setIsLoading: (isLoading: boolean) => void;
+  setError: (error: string | null) => void;
+}
+```
+**Requirements:**
+- ✅ Pure state management only
+- ✅ No business logic
+- ✅ Typed interfaces
+- ✅ Simple setters/getters
+- ✅ UI state handling (loading, errors)
+- ❌ NO API calls
+- ❌ NO side effects
+
+### 2. Client Service Layer (API Communication)
+```typescript
+// Example: medical-records-service.ts (CLIENT)
+export async function fetchMedicalRecords(patientId: string): Promise<ApiResponse<DataType>> {
+  const response = await fetch(`/api/patients/${patientId}/medical_records`);
+  if (!response.ok) throw new Error('Failed to fetch');
+  return response.json();
+}
+```
+**Requirements:**
+- ✅ Internal API communication only
+- ✅ Type safety
+- ✅ Error handling
+- ✅ Response transformation
+- ❌ NO external API calls
+- ❌ NO credential management
+- ❌ NO store dependencies
+
+### 3. Internal API Route (Backend Entry)
+```typescript
+// Example: route.ts
+export async function GET(req: Request, { params }) {
+  const { user } = await auth();
+  const credentials = await getKipuCredentials(user);
+  const data = await serverService.fetchFromKipu(params.id, credentials);
+  return Response.json({ data });
+}
+```
+**Requirements:**
+- ✅ Authentication
+- ✅ Credential management
+- ✅ Error handling
+- ✅ Calls server service layer
+- ❌ NO direct external API calls
+- ❌ NO business logic
+
+### 4. Server Service Layer (External API Communication)
+```typescript
+// Example: medical-records-service.ts (SERVER)
+export async function fetchFromKipu(id: string, credentials: KipuCredentials) {
+  // Direct KIPU API calls
+  // Data transformation
+  // Error handling
+  return transformedData;
+}
+```
+**Requirements:**
+- ✅ External API communication
+- ✅ Credential usage
+- ✅ Data transformation
+- ✅ Error handling
+- ✅ Business logic
+- ❌ NO UI concerns
+
+### 5. Hook Layer (Integration)
+```typescript
+export const useFetchData = (params: Params) => {
+  const setData = useStore(state => state.setData);
+  const setIsLoading = useStore(state => state.setIsLoading);
+  
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await clientService.fetchData(params);
+      setData(data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [params]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+};
+```
+**Requirements:**
+- ✅ Bridges UI and client service
+- ✅ Store updates
+- ✅ Loading/error management
+- ❌ NO API calls
+- ❌ NO credential handling
+
+## Data Flow
+```typescript
+Frontend Component
+  → Hook (manages UI state)
+    → Client Service (calls internal API)
+      → Internal API Route (handles auth)
+        → Server Service (calls external API)
+          → External API/KIPU
+```
+
+## Authentication/Credentials
+- MUST be handled in Internal API route
+- Server Service layer receives credentials from API route
+- NEVER exposed to frontend
+- Centralized management in backend only
+
+## Implementation Steps
+
+1. Define types in `/types` directory
+2. Create server service layer for external API communication
+3. Create API routes that use server service
+4. Create client service layer for internal API calls
+5. Set up store for UI state
+6. Create hook to bridge client service and store
+7. Use hook and store in components
+
+## Testing Boundaries
+
+### Store Tests
+- Test state updates
+- Test selector behavior
+
+### Client Service Tests
+- Test API call handling
+- Test error scenarios
+- Mock fetch calls
+
+### Server Service Tests
+- Test external API integration
+- Test credential handling
+- Test data transformation
+
+### Hook Tests
+- Test effect triggers
+- Test store updates
+- Mock client service
+
+### API Route Tests
+- Test authentication
+- Test error handling
+- Mock server service
+
+## Common Anti-Patterns to Avoid
+
+1. ❌ Calling external APIs directly from frontend
+2. ❌ Passing credentials through frontend
+3. ❌ Mixing client and server service responsibilities
+4. ❌ Direct service calls from components
+5. ❌ Business logic in stores
+6. ❌ UI state in services
+
+## Benefits
+
+- 🔒 Secure credential handling
+- 🎯 Clear separation of concerns
+- 📈 Predictable data flow
+- 🧪 Easy testing boundaries
+- 🔧 Maintainable codebase
+- 📦 Reusable patterns
+- 🚀 Scalable architecture 

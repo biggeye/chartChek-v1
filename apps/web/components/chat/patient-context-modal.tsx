@@ -15,7 +15,6 @@ import { useContextProcessorStore } from "~/store/chat/contextProcessorStore"
 import { ScrollArea } from "@kit/ui/scroll-area"
 import { KipuPatientEvaluation, PatientBasicInfo } from "types/kipu/kipuAdapter"
 import { Checkbox } from "@kit/ui/checkbox"; 
-import { useFetchPatients } from "~/hooks/usePatients"
  
 interface PatientContextModalProps {
   onClose: () => void;
@@ -34,11 +33,7 @@ export function PatientContextModal({ onClose }: PatientContextModalProps) {
 
   const patients = usePatientStore((state: PatientStore) => state.patients); 
   const { currentFacilityId } = useFacilityStore(); 
-  
-  // Call hook unconditionally - it handles fetching based on currentFacilityId
-  useFetchPatients(currentFacilityId);
-  
-  // Use the dedicated hook for evaluations state and fetch trigger
+
   const { 
     patientEvaluations, 
     isLoadingEvaluations, 

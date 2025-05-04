@@ -17,7 +17,7 @@ import {
 import { MoreVertical } from 'lucide-react';
 import { ScrollArea } from '@kit/ui/scroll-area';
 
-type ActiveTabType = 'overview' | 'evaluations' | 'appointments' | 'vitals' | 'orders' | 'treatmentPlan';
+type ActiveTabType = 'overview' | 'evaluations' | 'appointments' | 'vitals' | 'orders' | 'treatmentPlan' | 'utilizationReview';
 
 export default function PatientLayout({ children }: { children: React.ReactNode }) {
   // Get the patient ID from the route params and current pathname
@@ -38,6 +38,7 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
     { name: 'Overview', href: `/product/patients/${patientId}`, current: activeTab === 'overview' },
     { name: 'Treatment Plan', href: `/product/patients/${patientId}/treatment`, current: activeTab === 'treatmentPlan' },
     { name: 'Evaluations', href: `/product/patients/${patientId}/evaluations`, current: activeTab === 'evaluations' },
+    { name: 'Utilization Review', href: `/product/patients/${patientId}/ur`, current: activeTab === 'utilizationReview' },
     { name: 'Vitals', href: `/product/patients/${patientId}/vitals`, current: activeTab === 'vitals' },
   ];
 
@@ -126,15 +127,13 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
         <ScrollArea className="h-full w-full overflow-y-auto mb-10">
           <div className="flex-1 md:px-10 py-4">
             {isLoadingPatients || isLoadingEvaluations ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1">
                 <div className="space-y-6">
-                  <div className="animate-pulse bg-gray-100 rounded-lg h-64"></div>
-                  <div className="animate-pulse bg-gray-100 rounded-lg h-64"></div>
+                  <div className="animate-pulse bg-gray-100 rounded-lg h-10"></div>
+                  <div className="animate-pulse bg-gray-100 rounded-lg h-25"></div>
+                  <div className="animate-pulse bg-gray-100 rounded-lg h-25"></div>
                 </div>
-                <div className="space-y-6">
-                  <div className="animate-pulse bg-gray-100 rounded-lg h-64"></div>
-                  <div className="animate-pulse bg-gray-100 rounded-lg h-64"></div>
-                </div>
+               
               </div>
             ) : patientError || evaluationsError ? (
               <div className="flex items-center justify-center h-64">

@@ -9,32 +9,58 @@ interface ParsedEvaluationResult {
 
 // --- Inline Interfaces for Record Types (Migration Target) ---
 // TODO: Migrate these to dedicated types in /types/kipu/ if confirmed stable
-interface MatrixRecord { // Based on KipuFieldTypes.MATRIX usage
-  label?: string;
+
+// Base record interface that all record types extend
+interface BaseRecord {
+  id?: number;
   name?: string;
-  value?: string | null;
-  comments?: string;
-  option?: string;
-  index?: number;
-  columnNames?: { key: string; value: string }[];
-  [key: string]: any;
+  description?: string;
+  value?: string;
+  status?: string;
 }
 
-interface DrugHistoryRecord { // Based on KipuFieldTypes.DRUG_HISTORY usage
+// Matrix record structure for evaluation items
+interface MatrixRecord extends BaseRecord {
+  label?: string;
+  comments?: string;
+  option?: string;
+  columnNames?: Array<{
+    key: string;
+    value: string;
+  }>;
+  [key: string]: any; // For dynamic column values
+}
+
+// Drug history record structure
+interface DrugHistoryRecord extends BaseRecord {
   drugName?: string;
   status?: string;
 }
 
-interface DiagnosisRecord { // Based on KipuFieldTypes.DIAGNOSIS usage
+// Diagnosis record structure
+interface DiagnosisRecord extends BaseRecord {
   diagnosisDescription?: string;
   code?: string;
   status?: string;
 }
 
-interface ProblemListRecord { // Based on KipuFieldTypes.PROBLEM_LIST usage
+// Problem list record structure
+interface ProblemListRecord extends BaseRecord {
   problemDescription?: string;
   status?: string;
 }
+
+// Assessment record structure (for CIWA-AR, CIWA-B, COWS)
+interface AssessmentRecord extends BaseRecord {
+  label?: string;
+  value?: string;
+  description?: string;
+  score?: number;
+}
+
+// Union type for all possible record types
+type EvaluationRecord = MatrixRecord | DrugHistoryRecord | DiagnosisRecord | ProblemListRecord | AssessmentRecord;
+
 // --- End Inline Interfaces ---
 
 export class PatientEvaluationParserService {
@@ -134,68 +160,80 @@ export class PatientEvaluationParserService {
 
       // For matrix fields, we attempt to extract structured data.
       case KipuFieldTypes.matrix: {
-        if (
-          item.records &&
-          Array.isArray(item.records) &&
-          item.records.length > 0
-        ) {
-          // Check if this is a substance abuse matrix or similar structure with columnNames
-          if (item.records[0].columnNames && Array.isArray(item.records[0].columnNames) && item.records[0].columnNames.length > 0) {
+        if (item.records && Array.isArray(item.records) && item.records.length > 0) {
+          // Check if this is a matrix with column names (e.g., substance abuse matrix)
+          const firstRecord = item.records[0] as MatrixRecord;
+          if (firstRecord && firstRecord.columnNames && Array.isArray(firstRecord.columnNames)) {
             const matrixRows = item.records.map((record: MatrixRecord) => {
               // Get the substance or row label
               const rowLabel = record.label || record.name || "Item";
               
               // Skip empty rows (where all values are empty or NA)
-              const hasValues = record.columnNames && record.columnNames.some((col: { key: string; value: string }) => 
-                col.value && col.value.trim() !== "" && col.value.trim().toLowerCase() !== "na"
-              );
+              const columnNames = record.columnNames;
+              if (!columnNames || !Array.isArray(columnNames)) {
+                return null;
+              }
+
+              const hasValues = columnNames.some(col => {
+                const key = col?.key;
+                if (typeof key !== 'string') return false;
+                const value = record[key as keyof typeof record];
+                return value && String(value).trim() !== "" && String(value).trim().toLowerCase() !== "na";
+              });
               
               if (!hasValues) {
                 return null;
               }
               
               // Format the column data
-              let details: string[] = [];
-              if (record.columnNames && Array.isArray(record.columnNames)) {
-                record.columnNames.forEach(column => {
-                  const key = column.key;
-                  const value = record[key]; // Access value using the key from columnNames
-                  if (value) { // Only add if there's a value
-                    details.push(`${column.value}: ${this.stripHtml(String(value))}`);
-                  }
-                });
-              }
+              const details: string[] = [];
+              columnNames.forEach(col => {
+                const key = col?.key;
+                if (typeof key !== 'string') return;
+                const value = record[key as keyof typeof record];
+                if (value && String(value).trim() !== "" && String(value).trim().toLowerCase() !== "na") {
+                  details.push(`${col.value}: ${this.stripHtml(String(value))}`);
+                }
+              });
               
               if (details.length === 0) {
                 return null;
               }
               
-              return `${rowLabel}: ${details.join(', ')}`;
+              return `${rowLabel}: ${details.join(", ")}`;
             }).filter(Boolean); // Remove null entries
             
             if (matrixRows.length > 0) {
               explanation = `${title}:\n- ${matrixRows.join("\n- ")}`;
             }
           } else {
-            // Handle the original matrix format
+            // Handle standard matrix format (e.g., treatment plans, medications)
             const matrixExplanations = item.records
-              .filter((record: MatrixRecord) =>
-                record.value || record.comments || record.option
-              )
               .map((record: MatrixRecord) => {
-                let recordExp = "";
+                const parts: string[] = [];
+                
                 if (record.label) {
-                  recordExp += `${record.label}:`;
+                  parts.push(record.label);
                 }
-                recordExp += record.value ? ` ${record.value}` : "";
-                recordExp += record.comments ? ` (Comments: ${record.comments})` : "";
-                recordExp += record.option ? ` Option: ${record.option}` : "";
-                return recordExp.trim();
+                if (record.value) {
+                  parts.push(this.stripHtml(record.value));
+                }
+                if (record.description) {
+                  parts.push(`Description: ${this.stripHtml(record.description)}`);
+                }
+                if (record.comments) {
+                  parts.push(`Comments: ${this.stripHtml(record.comments)}`);
+                }
+                if (record.option) {
+                  parts.push(`Option: ${this.stripHtml(record.option)}`);
+                }
+                
+                return parts.join(" - ");
               })
-              .join("\n");
+              .filter(exp => exp.trim() !== ""); // Remove empty explanations
             
-            if (matrixExplanations) {
-              explanation = `${title}:\n- ${matrixExplanations}`;
+            if (matrixExplanations.length > 0) {
+              explanation = `${title}:\n- ${matrixExplanations.join("\n- ")}`;
             }
           }
         }
@@ -229,21 +267,36 @@ export class PatientEvaluationParserService {
         break;
       }
 
-      // For diagnosis code fields, we extract the diagnosis.
+      // For drug history fields, we extract drug name and status
+      case KipuFieldTypes.patient_brought_in_medication: {
+        if (item.records && Array.isArray(item.records) && item.records.length > 0) {
+          const drugHistories = item.records
+            .map((record: DrugHistoryRecord) => {
+              if (record.drugName) {
+                return `${record.drugName}${record.status ? ` (${record.status})` : ''}`;
+              }
+              return null;
+            })
+            .filter(Boolean);
+          if (drugHistories.length > 0) {
+            explanation = `${title}:\n- ${drugHistories.join("\n- ")}`;
+          }
+        }
+        break;
+      }
+
+      // For diagnosis fields, we extract diagnosis description and code
       case KipuFieldTypes.patient_diagnosis_code: {
-        if (
-          item.records &&
-          Array.isArray(item.records) &&
-          item.records.length > 0
-        ) {
+        if (item.records && Array.isArray(item.records) && item.records.length > 0) {
           const diagnoses = item.records
-            .map(
-              (diag) =>
-                `${diag.code || ""} - ${
-                  diag.description || diag.name || diag.value || ""
-                }`
-            )
-            .filter((diag) => diag && diag !== " - ");
+            .map((record: DiagnosisRecord) => {
+              const parts = [];
+              if (record.diagnosisDescription) parts.push(record.diagnosisDescription);
+              if (record.code) parts.push(`Code: ${record.code}`);
+              if (record.status) parts.push(`Status: ${record.status}`);
+              return parts.length > 0 ? parts.join(" - ") : null;
+            })
+            .filter(Boolean);
           if (diagnoses.length > 0) {
             explanation = `${title}:\n- ${diagnoses.join("\n- ")}`;
           }
@@ -251,18 +304,40 @@ export class PatientEvaluationParserService {
         break;
       }
 
-      // For problem list fields, we extract the problems.
+      // For problem list fields, we extract problem description and status
       case KipuFieldTypes.problem_list: {
-        if (
-          item.records &&
-          Array.isArray(item.records) &&
-          item.records.length > 0
-        ) {
+        if (item.records && Array.isArray(item.records) && item.records.length > 0) {
           const problems = item.records
-            .map((prob) => prob.description || prob.name || prob.value || "")
-            .filter((prob) => prob);
+            .map((record: ProblemListRecord) => {
+              if (record.problemDescription) {
+                return `${record.problemDescription}${record.status ? ` (${record.status})` : ''}`;
+              }
+              return null;
+            })
+            .filter(Boolean);
           if (problems.length > 0) {
             explanation = `${title}:\n- ${problems.join("\n- ")}`;
+          }
+        }
+        break;
+      }
+
+      // For CIWA-AR, CIWA-B, and COWS assessments, we need special handling
+      case KipuFieldTypes.patient_ciwa_ar:
+      case KipuFieldTypes.patient_ciwa_b:
+      case KipuFieldTypes.patient_cows: {
+        if (item.records && Array.isArray(item.records) && item.records.length > 0) {
+          const assessmentItems = item.records
+            .map((record: any) => {
+              const parts = [];
+              if (record.name || record.label) parts.push(record.name || record.label);
+              if (record.value) parts.push(`Score: ${record.value}`);
+              if (record.description) parts.push(record.description);
+              return parts.length > 0 ? parts.join(" - ") : null;
+            })
+            .filter(Boolean);
+          if (assessmentItems.length > 0) {
+            explanation = `${title}:\n- ${assessmentItems.join("\n- ")}`;
           }
         }
         break;
@@ -274,21 +349,17 @@ export class PatientEvaluationParserService {
         break;
       }
 
-      // Fallback: attempt to extract any available content.
+      // Default case for any unhandled field types
       default: {
-        const defaultContent = this.extractContent(item);
-        if (defaultContent) {
-          if (!isNaN(Number(defaultContent))) {
-            explanation = `${title}: ${defaultContent}`;
-          } else {
-            explanation = `${title}: ${this.stripHtml(defaultContent)}`;
-          }
+        const content = this.extractContent(item);
+        if (content) {
+          explanation = `${title}: ${this.stripHtml(content)}`;
         }
         break;
       }
     }
 
-    return explanation ? explanation.trim() : null;
+    return explanation || null;
   }
 
   /**

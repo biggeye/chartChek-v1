@@ -20,7 +20,7 @@ export default function SettingsBreadcrumb({
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
             <li>
-              <Link href="/settings" className="text-muted-foreground hover:text-primary font-medium transition-colors">
+              <Link href="/product/settings" className="text-muted-foreground hover:text-primary font-medium transition-colors">
                 Settings
               </Link>
             </li>

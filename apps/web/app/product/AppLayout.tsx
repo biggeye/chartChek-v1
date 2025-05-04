@@ -1,14 +1,14 @@
 'use client'
 import dynamic from 'next/dynamic';
-import { useState, useEffect, useRef, Fragment } from 'react'
+import { useState, useEffect, useRef, Fragment, useCallback, useMemo } from 'react'
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { cn } from '@kit/ui/utils';
 import { signOutAction } from '../../lib/actions';
 import { ThemeSwitcher } from '~/components/theme-switcher';
-import { initializeStoreSubscriptions } from '~/store/storeInitializers';
 import { useSidebarStore } from '~/store/sidebarStore';
-
+import { usePatientStore } from '~/store/patient/patientStore';
+import { FileLockIcon } from 'lucide-react';
 import Image from 'next/image';
 import { DebugPanel } from '~/components/dev/DebugPanel';
 import { Dialog, DialogBackdrop, DialogPanel, TransitionChild, Menu, MenuItem, MenuItems, Transition, MenuButton } from '@headlessui/react'
@@ -28,16 +28,21 @@ import {
   UserCircleIcon,
   ChatBubbleBottomCenterIcon
 } from '@heroicons/react/24/outline'
-import { FacilitySelector } from '~/components/facility-selector';
 import { Avatar, AvatarFallback, AvatarImage } from "@kit/ui/avatar";
 import { AppLogo } from '~/components/app-logo';
+import { Loader } from '~/components/loading';
+import { useFetchPatientsOnFacilityChange } from '~/hooks/usePatients';
+
+import { FacilitySelector } from '~/components/facility-selector';
+import Loading from '~/admin/loading';
+import { ChatHistory } from '~/components/chat/chat-history';
 
 const navigation = [
   { name: 'Dashboard', href: '#', icon: HomeIcon },
   { name: 'Chat', href: '/product/chat', icon: ChatBubbleBottomCenterIcon },
   { name: 'Patients', href: '/product/patients', icon: UsersIcon },
   { name: 'Documents', href: '/product/documents', icon: FolderIcon },
-  { name: 'Statistics', href: '/product/dashboard/stats', icon: ChartPieIcon },
+  { name: 'Records', href: '/product/records', icon: FileLockIcon },
 ]
 
 function classNames(...classes: (string | boolean | undefined)[]) {
@@ -45,22 +50,66 @@ function classNames(...classes: (string | boolean | undefined)[]) {
 }
 
 // Define Props interface
-interface TestLayoutProps {
+interface AppLayoutProps {
   children: React.ReactNode;
   account_id: string;
   username: string;
   avatarUrl: string | null;
 }
 
-export default function AppLayout({ children, account_id, username, avatarUrl }: TestLayoutProps) {
-
-
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+export default function AppLayout({
+  children,
+  account_id,
+  username,
+  avatarUrl
+}: AppLayoutProps) {
+  const isLoadingPatients = usePatientStore(useCallback(state => state.isLoadingPatients, []));
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showChatHistory, setShowChatHistory] = useState(false);
   const { isDesktopSidebarCollapsed, setIsDesktopSidebarCollapsed } = useSidebarStore();
+
   const pathname = usePathname();
+
+  const PatientLoader = useMemo(() => {
+    const PatientsComponent = () => {
+      useFetchPatientsOnFacilityChange();
+      return null;
+    };
+    // Only return the component if not loading facilities
+    return !isLoadingPatients ? <PatientsComponent /> : null;
+  }, []);
+
 
   return (
     <>
+      {/* Render the PatientLoader component */}
+      {PatientLoader}
+
+      {/* Chat History Dialog for mobile */}
+      <Dialog open={showChatHistory} onClose={() => setShowChatHistory(false)} className="relative z-50">
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm transition-opacity duration-300 ease-linear data-closed:opacity-0"
+        />
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-background p-6 text-left align-middle shadow-xl transition-all">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Chat History</h3>
+                <button
+                  type="button"
+                  onClick={() => setShowChatHistory(false)}
+                  className="rounded-full p-1 text-foreground-muted hover:bg-muted transition-colors"
+                >
+                  <XMarkIcon className="h-5 w-5" />
+                </button>
+              </div>
+              <ChatHistory isMobileMenu onMobileMenuClose={() => setShowChatHistory(false)} />
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+
       <div>
         <Dialog open={sidebarOpen} onClose={setSidebarOpen} className="relative z-50 lg:hidden">
           <DialogBackdrop
@@ -71,7 +120,7 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
           <div className="fixed inset-0 flex">
             <DialogPanel
               transition
-              className="relative mr-16 flex w-full max-w-xs flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full"
+              className="relative mr-16 flex w-full max-w-xs flex-1 transform transition duration-300 ease-in-out data-closed:-translate-x-full border-r border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/75"
             >
               <TransitionChild>
                 <div className="absolute top-0 left-full flex w-16 justify-center pt-5 duration-300 ease-in-out data-closed:opacity-0">
@@ -83,8 +132,8 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
                 </div>
               </TransitionChild>
               {/* Sidebar component, swap this element with another sidebar if you like */}
-              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-background px-6 pb-2">
-                <div className="flex h-16 shrink-0 items-center"> 
+              <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-accent/20 px-6 pb-2">
+                <div className="flex h-16 shrink-0 items-center">
                   <AppLogo className="h-8 w-auto" />
                 </div>
                 <nav className="flex flex-1 flex-col">
@@ -98,6 +147,7 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
                             <li key={item.name}>
                               <Link
                                 href={item.href}
+                                onClick={() => setSidebarOpen(false)}
                                 className={classNames(
                                   isActive
                                     ? 'bg-mint_green-600 text-primary dark:bg-indigo_dye-400 dark:text-primary'
@@ -122,7 +172,7 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
                     </li>
                     <li>
                       <div className="text-xs/6 font-semibold text-muted-foreground dark:text-muted-foreground">Facility</div>
-                      <FacilitySelector />
+                      <FacilitySelector onSelect={() => setSidebarOpen(false)} />
                     </li>
                   </ul>
                   <Avatar>
@@ -160,7 +210,6 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
               leaveTo="transform opacity-0 scale-95"
             >
               <MenuItems className="absolute right-0 z-10 mt-2.5 w-48 origin-top-right rounded-md bg-popover py-2 shadow-lg ring-1 ring-foreground/5 focus:outline-none dark:bg-popover dark:ring-foreground/10">
-
                 <MenuItem>
                   {({ focus }) => (
                     <Link
@@ -172,6 +221,22 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
                     >
                       Your Profile
                     </Link>
+                  )}
+                </MenuItem>
+                <MenuItem>
+                  {({ focus }) => (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowChatHistory(true);
+                      }}
+                      className={cn(
+                        focus ? 'bg-accent dark:bg-accent' : '',
+                        'block w-full px-3 py-1 text-left text-sm leading-6 text-popover-foreground dark:text-popover-foreground'
+                      )}
+                    >
+                      Chat History
+                    </button>
                   )}
                 </MenuItem>
                 <div className="my-1 h-px bg-border dark:bg-border" />
@@ -210,8 +275,6 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
             </Transition>
           </Menu>
         </div>
-
-
         <div
           className={cn(
             'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-all duration-300 ease-in-out relative', // Added relative positioning
@@ -236,7 +299,7 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
 
                       return (
                         <li key={item.name}>
-                          <Link 
+                          <Link
                             href={item.href}
                             className={classNames(
                               isActive
@@ -300,15 +363,13 @@ export default function AppLayout({ children, account_id, username, avatarUrl }:
             </button>
           )}
         </div>
-
-        <main className={cn(
-          'transition-all duration-300 ease-in-out bg-background', // Right padding for context sidebar remains constant
-          isDesktopSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'
-        )}>
-          <div className="py-10">
-            <div className="px-4 sm:px-6 lg:px-8">{children}</div>
-          </div>
-        </main>
+  
+          <main className={cn(
+            'transition-all duration-3000 ease-in-out bg-background h-[90vh] pt-5',
+            isDesktopSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'
+          )}>
+            <div className="h-[calc(100%-4rem)] lg:h-full px-4 sm:px-6 lg:px-8">{children}</div>
+          </main>
       </div>
     </>
   )

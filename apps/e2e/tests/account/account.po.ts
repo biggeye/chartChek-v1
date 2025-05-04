@@ -12,7 +12,7 @@ export class AccountPageObject {
   }
 
   async setup() {
-    return this.auth.signUpFlow('/home/settings');
+    return this.auth.signUpFlow('/product/settings');
   }
 
   async updateName(name: string) {
@@ -74,7 +74,7 @@ export class AccountPageObject {
       const response = await this.page
         .waitForResponse((resp) => {
           return (
-            resp.url().includes('home/settings') &&
+            resp.url().includes('product/settings') &&
             resp.request().method() === 'POST'
           );
         })

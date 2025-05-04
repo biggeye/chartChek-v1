@@ -81,35 +81,108 @@ export const useContextProcessorStore = create<ContextProcessorState>()(
       const successfullyProcessedItemsForLocalQueue: { type: 'document', title: string, content: string }[] = [];
 
       try {
-     
-        // 1. Fetch, Adapt, Parse (KIPU Specific Logic)
-        const processedResults = await Promise.allSettled( // Use Promise.allSettled to handle individual failures
+        // First, add patient basic info as context
+        const patientInfo: { type: 'document', title: string, content: string } = {
+          type: 'document',
+          title: `Patient Information - ${patient.firstName} ${patient.lastName}`,
+          content: `
+Patient ID: ${patient.patientId}
+Name: ${patient.firstName} ${patient.lastName}
+Date of Birth: ${patient.dateOfBirth || 'Not provided'}
+Gender: ${patient.gender || 'Not provided'}
+Status: ${patient.status || 'Not provided'}
+MRN: ${patient.mrn || 'Not provided'}
+
+Admission Details:
+- Admission Date: ${patient.admissionDate || 'Not provided'}
+- Level of Care: ${patient.levelOfCare || 'Not provided'}
+- Next Level of Care: ${patient.nextLevelOfCare || 'Not provided'}
+- Next Level of Care Date: ${patient.nextLevelOfCareDate || 'Not provided'}
+- Program: ${patient.program || 'Not provided'}
+
+Location:
+- Building: ${patient.buildingName || 'Not provided'}
+- Room: ${patient.roomName || 'Not provided'}
+- Bed: ${patient.bedName || 'Not provided'}
+
+Insurance Information:
+- Provider: ${patient.insuranceProvider || 'Not provided'}
+- Insurance Plans: ${JSON.stringify(patient.insurances || [], null, 2)}
+
+Clinical Information:
+- Discharge Type: ${patient.dischargeType || 'Not provided'}
+- Sobriety Date: ${patient.sobrietyDate || 'Not provided'}
+- Patient Statuses: ${JSON.stringify(patient.patient_statuses || [], null, 2)}
+- Patient Contacts: ${JSON.stringify(patient.patient_contacts || [], null, 2)}
+`.trim()
+        };
+
+        // Add patient info to the queue first
+        successfullyProcessedItemsForLocalQueue.push(patientInfo);
+
+        // Create context item for patient info
+        const userId = await getCurrentUserId();
+        const currentSessionId = sessionId || useChatStore.getState().currentSessionId;
+
+        try {
+          const patientInfoResponse = await fetch('/api/llm/context/items', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              type: "document" as const,
+              title: patientInfo.title,
+              content: patientInfo.content,
+              metadata: {
+                patientId: patient.patientId,
+                source: "patient_info",
+                patientName: `${patient.firstName} ${patient.lastName}`,
+                ...(currentSessionId && { sessionId: currentSessionId })
+              },
+              userId: userId,
+            }),
+          });
+
+          if (!patientInfoResponse.ok) {
+            console.warn('Failed to add patient info to context, but continuing with evaluations');
+          }
+        } catch (error) {
+          console.warn('Error adding patient info to context, but continuing with evaluations:', error);
+        }
+
+        // Now process evaluations as before
+        const processedResults = await Promise.allSettled(
           evaluationIds.map(async (evaluationId) => {
-          
-            // Retrieve the evaluation from the already fetched list in the evaluations store
-            const allEvaluations = useEvaluationsStore.getState().patientEvaluations;
-       
-            // Fetch detailed evaluation data
-            const rawEvaluation = await fetchEvaluationDetails(evaluationId);
-            console.log(`Detailed evaluation data for ID ${evaluationId}:`, rawEvaluation);
+            try {
+              // Directly fetch the evaluation details - we know this works
+              const rawEvaluation = await fetchEvaluationDetails(evaluationId);
+              
+              if (!rawEvaluation) {
+                throw new Error(`Failed to get evaluation data for ID ${evaluationId}`);
+              }
 
-            const adaptedEvaluation = adaptKipuEvaluation(rawEvaluation);
-            console.log(
-              `[ContextProcessor] Adapted evaluation ${evaluationId}:`,
-              adaptedEvaluation
-            );
-            const { title, content } = parserService.parseEvaluation(adaptedEvaluation);
-            console.log(
-              `[ContextProcessor] Parsed evaluation ${evaluationId}: Title - ${title}, Content length - ${content.length}`
-            );
+              const adaptedEvaluation = adaptKipuEvaluation(rawEvaluation);
+              console.log(
+                `[ContextProcessor] Adapted evaluation ${evaluationId}:`,
+                JSON.stringify(adaptedEvaluation, null, 2)
+              );
+              const { title, content } = parserService.parseEvaluation(adaptedEvaluation);
+              console.log(
+                `[ContextProcessor] Parsed evaluation ${evaluationId}: Title - ${title}, Content length - ${content.length}`
+              );
 
-            return {
-              id: evaluationId,
-              title,
-              content,
-              patientName: `${patient.firstName} ${patient.lastName}`,
-              patientId: patient.patientId,
-            };
+              return {
+                id: evaluationId,
+                title,
+                content,
+                patientName: `${patient.firstName} ${patient.lastName}`,
+                patientId: patient.patientId,
+              };
+            } catch (error) {
+              console.error(`Error processing evaluation ${evaluationId}:`, error);
+              throw error;
+            }
           })
         );
 
@@ -128,15 +201,11 @@ export const useContextProcessorStore = create<ContextProcessorState>()(
         }
         if (fetchParseErrors.length > 0) {
           console.warn(`[ContextProcessor] Some KIPU evaluations failed fetch/parse: ${fetchParseErrors.join(', ')}`);
-          // Optionally bubble this warning up, but proceed with valid ones
         }
 
         console.log(`[ContextProcessor] Successfully fetched/parsed ${validResults.length} KIPU evaluations. Proceeding to API calls.`);
 
         // 2. API Calls: Create Context Item and Attach (Generic Logic)
-        const userId = await getCurrentUserId();
-        const currentSessionId = sessionId || useChatStore.getState().getCurrentSession()?.id; // Use provided or get from chat store
-
         const apiResults = await Promise.allSettled(
           validResults.map(async (result) => {
             // --- Metadata specific to KIPU evaluations ---

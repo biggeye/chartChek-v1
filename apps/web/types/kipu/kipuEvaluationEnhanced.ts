@@ -3,29 +3,244 @@
  * These interfaces provide more comprehensive type coverage for patient evaluations
  */
 
-import { KipuFieldTypes } from './kipuAdapter';
+import { KipuFieldTypes, KipuPatientEvaluation, KipuPatientEvaluationItem } from './kipuAdapter';
 import { snakeToCamel } from '~/utils/case-converters';
 
 /**
- * Enhanced Patient Evaluation Item interface that captures all possible fields
- * from the Kipu API schema
+ * Base record interface that all record types extend
  */
-export interface KipuPatientEvaluationItemEnhanced {
-  id: number;
-  name: string;
-  evaluationName?: string;
-  evaluationItemId: number;
-  createdAt: string; // ISO datetime string
-  updatedAt: string; // ISO datetime string
-  fieldType: KipuFieldTypes;
-  label: string;
-  optional: boolean;
-  dividerBelow: boolean;
+export interface BaseRecord {
+  id?: number;
+  name?: string;
   description?: string;
+  value?: string;
+  status?: string;
+}
+
+/**
+ * Matrix record structure for evaluation items
+ */
+export interface MatrixRecord extends BaseRecord {
+  label?: string;
+  comments?: string;
+  option?: string;
+  columnNames?: Array<{
+    key: string;
+    value: string;
+  }>;
+  [key: string]: any; // For dynamic column values
+}
+
+/**
+ * Drug history record structure
+ */
+export interface DrugHistoryRecord extends BaseRecord {
+  drugName?: string;
+  status?: string;
+  startDate?: string;
+  endDate?: string;
+  frequency?: string;
+  route?: string;
+  dosage?: string;
+}
+
+/**
+ * Diagnosis record structure
+ */
+export interface DiagnosisRecord extends BaseRecord {
+  diagnosisDescription?: string;
+  code?: string;
+  status?: string;
+  dateIdentified?: string;
+  provider?: string;
+  severity?: string;
+}
+
+/**
+ * Problem list record structure
+ */
+export interface ProblemListRecord extends BaseRecord {
+  problemDescription?: string;
+  status?: string;
+  dateIdentified?: string;
+  severity?: string;
+  provider?: string;
+}
+
+/**
+ * Drug of choice record structure
+ */
+export interface DrugOfChoiceRecord extends BaseRecord {
+  drugName?: string;
+  frequency?: string;
+  lastUsed?: string;
+  yearsUsed?: number;
+  ageFirstUsed?: number;
+  routeOfAdministration?: string;
+}
+
+/**
+ * Treatment plan record structure
+ */
+export interface TreatmentPlanRecord extends BaseRecord {
+  goal?: string;
+  objective?: string;
+  intervention?: string;
+  targetDate?: string;
+  progress?: string;
+  status?: string;
+}
+
+/**
+ * Medication record structure
+ */
+export interface MedicationRecord extends BaseRecord {
+  medicationName?: string;
+  dosage?: string;
+  frequency?: string;
+  route?: string;
+  startDate?: string;
+  endDate?: string;
+  prescriber?: string;
+  status?: string;
+}
+
+/**
+ * Problem record structure
+ */
+export interface ProblemRecord {
+  id?: number;
+  description?: string;
+  status?: string;
+  severity?: string;
+  dateIdentified?: string;
+  provider?: string;
+}
+
+/**
+ * Patient attendance record structure
+ */
+export interface AttendanceRecord {
+  id?: number;
+  date?: string;
+  type?: string;
+  status?: string;
+  provider?: string;
+  notes?: string;
+}
+
+/**
+ * Patient order record structure
+ */
+export interface OrderRecord {
+  id?: number;
+  orderDate?: string;
+  type?: string;
+  status?: string;
+  provider?: string;
+  details?: string;
+}
+
+/**
+ * Glucose log record structure
+ */
+export interface GlucoseLogRecord {
+  id?: number;
+  date?: string;
+  value?: number;
+  units?: string;
+  notes?: string;
+}
+
+/**
+ * Evaluation note record structure
+ */
+export interface EvaluationNoteRecord {
+  id?: number;
+  date?: string;
+  note?: string;
+  provider?: string;
+  type?: string;
+}
+
+/**
+ * Treatment plan record structure with grouping
+ */
+export interface GroupedTreatmentPlanRecord extends TreatmentPlanRecord {
+  groupId?: string;
+  groupName?: string;
+  order?: number;
+}
+
+/**
+ * Inventory record structure
+ */
+export interface InventoryRecord {
+  id?: number;
+  item?: string;
+  quantity?: number;
+  status?: string;
+  location?: string;
+  notes?: string;
+}
+
+/**
+ * Electronic device record structure
+ */
+export interface ElectronicDeviceRecord {
+  id?: number;
+  deviceType?: string;
+  make?: string;
+  model?: string;
+  serialNumber?: string;
+  status?: string;
+}
+
+/**
+ * Note record structure
+ */
+export interface NoteRecord {
+  id?: number;
+  date?: string;
+  content?: string;
+  type?: string;
+  provider?: string;
+}
+
+/**
+ * Assessment record structure (for CIWA-AR, CIWA-B, COWS)
+ */
+export interface AssessmentRecord extends BaseRecord {
+  label?: string;
+  value?: string;
+  description?: string;
+  score?: number;
+}
+
+/**
+ * Union type of all possible record types
+ */
+export type EvaluationRecord = 
+  | MatrixRecord 
+  | DrugHistoryRecord 
+  | DiagnosisRecord 
+  | ProblemListRecord 
+  | DrugOfChoiceRecord 
+  | TreatmentPlanRecord 
+  | MedicationRecord
+  | AssessmentRecord;
+
+/**
+ * Enhanced Patient Evaluation Item interface that extends the base KipuPatientEvaluationItem
+ * while adding more comprehensive type coverage
+ */
+export interface KipuPatientEvaluationItemEnhanced extends KipuPatientEvaluationItem {
+  // Additional fields not in base type
+  evaluationName?: string;
   
   // Value fields - can be different types based on the field_type
   value?: string | boolean | number | null;
-  date?: string | null; // Can be a date string or null
+  date?: string | null;
   
   // Time-related fields
   timestamp?: string | null;
@@ -34,7 +249,6 @@ export interface KipuPatientEvaluationItemEnhanced {
   duration?: string | null;
   
   // Common fields
-  recordNames?: string;
   bedName?: string;
   bmi?: string;
   primaryTherapist?: string;
@@ -72,6 +286,9 @@ export interface KipuPatientEvaluationItemEnhanced {
   dateOfChange?: string | null;
   transitionToLevelOfCare?: string | null;
   
+  // Records field - properly typed with union type
+  records?: EvaluationRecord[];
+  
   // Orthostatic vitals
   bloodPressureSystolicLying?: string;
   bloodPressureDiastolicLying?: string;
@@ -83,7 +300,7 @@ export interface KipuPatientEvaluationItemEnhanced {
   pulseSitting?: string;
   pulseStanding?: string;
   
-  // CIWA-AR fields (Clinical Institute Withdrawal Assessment for Alcohol, Revised)
+  // CIWA-AR fields
   ciwaArIntervalLabel?: string;
   ciwaArInterval?: string | null;
   ciwaArAgitationLabel?: string;
@@ -106,9 +323,9 @@ export interface KipuPatientEvaluationItemEnhanced {
   ciwaArTremor?: string | null;
   ciwaArVisualDisturbancesLabel?: string;
   ciwaArVisualDisturbances?: string | null;
-  score?: number;
+  score?: string | null;
   
-  // CIWA-B fields (Clinical Institute Withdrawal Assessment for Benzodiazepines)
+  // CIWA-B fields
   ciwaBIntervalLabel?: string;
   ciwaBIrritableLabel?: string;
   ciwaBFatiguedLabel?: string;
@@ -150,7 +367,7 @@ export interface KipuPatientEvaluationItemEnhanced {
   ciwaBTremors?: string | null;
   ciwaBFeelPalms?: string | null;
   
-  // COWS fields (Clinical Opiate Withdrawal Scale)
+  // COWS fields
   cowIntervalLabel?: string;
   cowPulseRateLabel?: string;
   cowSweatingLabel?: string;
@@ -182,126 +399,89 @@ export interface KipuPatientEvaluationItemEnhanced {
   occupation?: string;
   medications?: string;
   
-  // Complex nested data
+  // Complex nested data with proper typing
   totalProblems?: number;
-  problems?: Array<any>;
+  problems?: ProblemRecord[];
   attendancesLastUpdated?: string;
-  patientAttendances?: Array<any>;
-  patientOrders?: Array<any>;
-  glucoseLogs?: Array<any>;
-  evaluations?: Array<any>;
-  evalNotes?: Array<any>;
-  titles?: Array<any>;
-  evalTreatmentPlans?: Array<any>;
-  groupedTreatmentPlans?: Array<any>;
-  inventories?: Array<any>;
-  drugsOfChoice?: Array<any>;
-  electronicDevices?: Array<any>;
-  broughtInMedications?: Array<any>;
-  allergies?: Array<any>;
-  records?: Array<any> | Array<{
-    label: string;
-    columnNames?: Array<{
-      key: string;
-      value: string;
-    }>;
-    name?: string;
-    description?: string;
-    value?: string;
-  }>;
-  notes?: Array<any>;
+  patientAttendances?: AttendanceRecord[];
+  patientOrders?: OrderRecord[];
+  glucoseLogs?: GlucoseLogRecord[];
+  evaluations?: KipuPatientEvaluationItemEnhanced[];
+  evalNotes?: EvaluationNoteRecord[];
+  titles?: string[];
+  evalTreatmentPlans?: TreatmentPlanRecord[];
+  groupedTreatmentPlans?: GroupedTreatmentPlanRecord[];
+  inventories?: InventoryRecord[];
+  drugsOfChoice?: DrugOfChoiceRecord[];
+  electronicDevices?: ElectronicDeviceRecord[];
+  broughtInMedications?: MedicationRecord[];
+  allergies?: DiagnosisRecord[];
+  notes?: NoteRecord[];
 }
 
 /**
- * Enhanced Patient Evaluation interface that captures all fields
- * from the Kipu API schema
+ * Enhanced Patient Evaluation interface that extends the base KipuPatientEvaluation
  */
-export interface KipuPatientEvaluationEnhanced {
-  id: string | number;
-  name: string;
-  status: string;
-  patientCasefileId: string; // Must follow the regex pattern: ^[0-9]+\\:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$
-  evaluationId: number;
-  patientProcessId?: number;
-  createdAt: string; // ISO datetime string
-  createdBy: string;
-  updatedAt: string; // ISO datetime string
-  updatedBy: string;
-  requireSignature: boolean;
-  requirePatientSignature: boolean;
-  billable: boolean;
-  evaluationType: string;
-  evaluationContent: string;
-  ancillary: boolean;
-  renderingProvider: boolean;
-  billableClaimFormat: string;
-  requireGuarantorSignature: boolean;
-  requireGuardianSignature: boolean;
-  isCrm: boolean;
-  availableOnPortal: boolean;
-  placeOfService: string;
-  billingCodes: string;
-  signatureUserTitles: string;
-  reviewSignatureUserTitles: string;
-  masterTreatmentPlanCategory: string;
-  forceAllStaffUsersTitles: boolean;
-  forceAllReviewUsersTitles: boolean;
-  evaluationVersionId: number;
-  locked: boolean;
-  isRequired: boolean;
+export interface KipuPatientEvaluationEnhanced extends KipuPatientEvaluation {
+  // Override the items array with enhanced type
   patientEvaluationItems: KipuPatientEvaluationItemEnhanced[];
 }
 
 /**
  * Adapter function to convert snake_case API response to camelCase
- * for use with our enhanced interfaces
+ * and enhance with additional type information
  */
 export function adaptKipuEvaluation(rawData: any): KipuPatientEvaluationEnhanced {
-  // Handle the case where the API returns data wrapped in a "patient_evaluation" object
-  const source = rawData.patient_evaluation || rawData;
+  // First adapt to base type - handle various data structures
+  // If the data is already unwrapped (direct from API), use it as is
+  const baseEvaluation = rawData.data?.patient_evaluation || rawData.patient_evaluation || rawData;
   
-  // Use the snakeToCamel utility to convert all keys
-  const camelCaseData = snakeToCamel(source);
+  // If the data is already in camelCase (from API), use it as is, otherwise convert
+  const camelCaseData = typeof baseEvaluation === 'object' && 'patientEvaluationItems' in baseEvaluation
+    ? baseEvaluation
+    : snakeToCamel(baseEvaluation);
   
+  // Create the enhanced evaluation
   const result: KipuPatientEvaluationEnhanced = {
-    id: camelCaseData.id,
-    name: camelCaseData.name,
-    status: camelCaseData.status,
-    patientCasefileId: camelCaseData.patientCasefileId,
-    evaluationId: camelCaseData.evaluationId,
-    patientProcessId: camelCaseData.patientProcessId,
-    createdAt: camelCaseData.createdAt,
-    createdBy: camelCaseData.createdBy,
-    updatedAt: camelCaseData.updatedAt,
-    updatedBy: camelCaseData.updatedBy,
-    requireSignature: camelCaseData.requireSignature,
-    requirePatientSignature: camelCaseData.requirePatientSignature,
-    billable: camelCaseData.billable,
-    evaluationType: camelCaseData.evaluationType,
-    evaluationContent: camelCaseData.evaluationContent,
-    ancillary: camelCaseData.ancillary,
-    renderingProvider: camelCaseData.renderingProvider,
-    billableClaimFormat: camelCaseData.billableClaimFormat,
-    requireGuarantorSignature: camelCaseData.requireGuarantorSignature,
-    requireGuardianSignature: camelCaseData.requireGuardianSignature,
-    isCrm: camelCaseData.isCrm,
-    availableOnPortal: camelCaseData.availableOnPortal,
-    placeOfService: camelCaseData.placeOfService,
-    billingCodes: camelCaseData.billingCodes,
-    signatureUserTitles: camelCaseData.signatureUserTitles,
-    reviewSignatureUserTitles: camelCaseData.reviewSignatureUserTitles,
-    masterTreatmentPlanCategory: camelCaseData.masterTreatmentPlanCategory,
-    forceAllStaffUsersTitles: camelCaseData.forceAllStaffUsersTitles,
-    forceAllReviewUsersTitles: camelCaseData.forceAllReviewUsersTitles,
-    evaluationVersionId: camelCaseData.evaluationVersionId,
-    locked: camelCaseData.locked,
-    isRequired: camelCaseData.isRequired,
+    ...camelCaseData,
     patientEvaluationItems: []
   };
   
-  // Convert patient_evaluation_items
-  if (camelCaseData.patientEvaluationItems && Array.isArray(camelCaseData.patientEvaluationItems)) {
-    result.patientEvaluationItems = camelCaseData.patientEvaluationItems.map((item: any) => adaptKipuEvaluationItem(item));
+  // Convert patient_evaluation_items - preserve the original records
+  const items = camelCaseData.patientEvaluationItems || camelCaseData.items || [];
+  if (Array.isArray(items)) {
+    result.patientEvaluationItems = items.map((item: any) => {
+      // If the item already has records in the correct format, preserve them
+      const originalRecords = Array.isArray(item.records) ? item.records : [];
+      
+      // Adapt the item
+      const adaptedItem = adaptKipuEvaluationItem({
+        ...item,
+        // Temporarily remove records to prevent double conversion
+        records: undefined
+      });
+      
+      // Restore the original records if they exist, otherwise adapt them
+      if (originalRecords.length > 0) {
+        adaptedItem.records = originalRecords.map((record: any) => {
+          // If the record is already in camelCase, use it as is
+          if (typeof record === 'object' && 'description' in record) {
+            return record;
+          }
+          const camelRecord = snakeToCamel(record);
+          return {
+            id: camelRecord.id,
+            name: camelRecord.name,
+            description: camelRecord.description,
+            value: camelRecord.value,
+            status: camelRecord.status,
+            ...camelRecord // Preserve all other fields
+          };
+        });
+      }
+      
+      return adaptedItem;
+    });
   }
   
   return result;
@@ -309,199 +489,133 @@ export function adaptKipuEvaluation(rawData: any): KipuPatientEvaluationEnhanced
 
 /**
  * Adapter function to convert snake_case API response to camelCase
- * for individual evaluation items
+ * and enhance with additional type information for individual items
  */
 export function adaptKipuEvaluationItem(rawItem: any): KipuPatientEvaluationItemEnhanced {
   // Use the snakeToCamel utility to convert all keys
   const camelCaseItem = snakeToCamel(rawItem);
   
-  return {
-    id: camelCaseItem.id,
-    name: camelCaseItem.name,
-    evaluationName: camelCaseItem.evaluationName,
-    evaluationItemId: camelCaseItem.evaluationItemId,
-    createdAt: camelCaseItem.createdAt,
-    updatedAt: camelCaseItem.updatedAt,
-    fieldType: camelCaseItem.fieldType,
-    label: camelCaseItem.label,
-    optional: camelCaseItem.optional,
-    dividerBelow: camelCaseItem.dividerBelow,
-    description: camelCaseItem.description,
-    
-    // Value fields can be different types
-    value: camelCaseItem.value,
-    date: camelCaseItem.date,
-    
-    // Time-related fields
-    timestamp: camelCaseItem.timestamp,
-    startTime: camelCaseItem.startTime,
-    endTime: camelCaseItem.endTime,
-    duration: camelCaseItem.duration,
-    
-    // Common fields
-    recordNames: camelCaseItem.recordNames,
-    bedName: camelCaseItem.bedName,
-    bmi: camelCaseItem.bmi,
-    primaryTherapist: camelCaseItem.primaryTherapist,
-    assignedOn: camelCaseItem.assignedOn,
-    key: camelCaseItem.key,
-    diagCode: camelCaseItem.diagCode,
-    diets: camelCaseItem.diets,
-    otherRestrictions: camelCaseItem.otherRestrictions,
-    dischargeType: camelCaseItem.dischargeType,
-    employer: camelCaseItem.employer,
-    race: camelCaseItem.race,
-    ethnicity: camelCaseItem.ethnicity,
-    optionText: camelCaseItem.optionText,
-    points: camelCaseItem.points,
-    
-    // Height and weight
-    height: camelCaseItem.height,
-    weight: camelCaseItem.weight,
-    heightUnits: camelCaseItem.heightUnits,
-    weightUnits: camelCaseItem.weightUnits,
-    
-    // Vital signs
-    bloodPressure: camelCaseItem.bloodPressure,
-    respirations: camelCaseItem.respirations,
-    temperature: camelCaseItem.temperature,
-    pulse: camelCaseItem.pulse,
-    o2Saturation: camelCaseItem.o2Saturation,
-    
-    // Level of care
-    locLabel: camelCaseItem.locLabel,
-    locValue: camelCaseItem.locValue,
-    dateOfChange: camelCaseItem.dateOfChange,
-    transitionToLevelOfCare: camelCaseItem.transitionToLevelOfCare,
-    
-    // Orthostatic vitals
-    bloodPressureSystolicLying: camelCaseItem.bloodPressureSystolicLying,
-    bloodPressureDiastolicLying: camelCaseItem.bloodPressureDiastolicLying,
-    bloodPressureSystolicSitting: camelCaseItem.bloodPressureSystolicSitting,
-    bloodPressureDiastolicSitting: camelCaseItem.bloodPressureDiastolicSitting,
-    bloodPressureSystolicStanding: camelCaseItem.bloodPressureSystolicStanding,
-    bloodPressureDiastolicStanding: camelCaseItem.bloodPressureDiastolicStanding,
-    pulseLying: camelCaseItem.pulseLying,
-    pulseSitting: camelCaseItem.pulseSitting,
-    pulseStanding: camelCaseItem.pulseStanding,
-    
-    // CIWA-AR fields
-    ciwaArIntervalLabel: camelCaseItem.ciwaArIntervalLabel,
-    ciwaArInterval: camelCaseItem.ciwaArInterval,
-    ciwaArAgitationLabel: camelCaseItem.ciwaArAgitationLabel,
-    ciwaArAgitation: camelCaseItem.ciwaArAgitation,
-    ciwaArAnxietyLabel: camelCaseItem.ciwaArAnxietyLabel,
-    ciwaArAnxiety: camelCaseItem.ciwaArAnxiety,
-    ciwaArAuditoryDisturbancesLabel: camelCaseItem.ciwaArAuditoryDisturbancesLabel,
-    ciwaArAuditoryDisturbances: camelCaseItem.ciwaArAuditoryDisturbances,
-    ciwaArCloudingOfSensoriumLabel: camelCaseItem.ciwaArCloudingOfSensoriumLabel,
-    ciwaArCloudingOfSensorium: camelCaseItem.ciwaArCloudingOfSensorium,
-    ciwaArHeadacheLabel: camelCaseItem.ciwaArHeadacheLabel,
-    ciwaArHeadache: camelCaseItem.ciwaArHeadache,
-    ciwaArNauseaLabel: camelCaseItem.ciwaArNauseaLabel,
-    ciwaArNausea: camelCaseItem.ciwaArNausea,
-    ciwaArParoxysmalSweatsLabel: camelCaseItem.ciwaArParoxysmalSweatsLabel,
-    ciwaArParoxysmalSweats: camelCaseItem.ciwaArParoxysmalSweats,
-    ciwaArTactileDisturbancesLabel: camelCaseItem.ciwaArTactileDisturbancesLabel,
-    ciwaArTactileDisturbances: camelCaseItem.ciwaArTactileDisturbances,
-    ciwaArTremorLabel: camelCaseItem.ciwaArTremorLabel,
-    ciwaArTremor: camelCaseItem.ciwaArTremor,
-    ciwaArVisualDisturbancesLabel: camelCaseItem.ciwaArVisualDisturbancesLabel,
-    ciwaArVisualDisturbances: camelCaseItem.ciwaArVisualDisturbances,
-    score: camelCaseItem.score,
-    
-    // CIWA-B fields
-    ciwaBIntervalLabel: camelCaseItem.ciwaBIntervalLabel,
-    ciwaBIrritableLabel: camelCaseItem.ciwaBIrritableLabel,
-    ciwaBFatiguedLabel: camelCaseItem.ciwaBFatiguedLabel,
-    ciwaBTensedLabel: camelCaseItem.ciwaBTensedLabel,
-    ciwaBDifficultyConcentratingLabel: camelCaseItem.ciwaBDifficultyConcentratingLabel,
-    ciwaBLossOfAppetiteLabel: camelCaseItem.ciwaBLossOfAppetiteLabel,
-    ciwaBNumbnessLabel: camelCaseItem.ciwaBNumbnessLabel,
-    ciwaBHeartRacingLabel: camelCaseItem.ciwaBHeartRacingLabel,
-    ciwaBHeadFullAchyLabel: camelCaseItem.ciwaBHeadFullAchyLabel,
-    ciwaBMuscleAcheLabel: camelCaseItem.ciwaBMuscleAcheLabel,
-    ciwaBAnxietyLabel: camelCaseItem.ciwaBAnxietyLabel,
-    ciwaBUpsetLabel: camelCaseItem.ciwaBUpsetLabel,
-    ciwaBRestfulSleepLabel: camelCaseItem.ciwaBRestfulSleepLabel,
-    ciwaBEnoughSleepLabel: camelCaseItem.ciwaBEnoughSleepLabel,
-    ciwaBVisualDisturbancesLabel: camelCaseItem.ciwaBVisualDisturbancesLabel,
-    ciwaBFearfulLabel: camelCaseItem.ciwaBFearfulLabel,
-    ciwaBPossibleMisfortunesLabel: camelCaseItem.ciwaBPossibleMisfortunesLabel,
-    ciwaBSweatingAgitationLabel: camelCaseItem.ciwaBSweatingAgitationLabel,
-    ciwaBTremorsLabel: camelCaseItem.ciwaBTremorsLabel,
-    ciwaBFeelPalmsLabel: camelCaseItem.ciwaBFeelPalmsLabel,
-    ciwaBInterval: camelCaseItem.ciwaBInterval,
-    ciwaBIrritable: camelCaseItem.ciwaBIrritable,
-    ciwaBFatigued: camelCaseItem.ciwaBFatigued,
-    ciwaBTensed: camelCaseItem.ciwaBTensed,
-    ciwaBDifficultyConcentrating: camelCaseItem.ciwaBDifficultyConcentrating,
-    ciwaBLossOfAppetite: camelCaseItem.ciwaBLossOfAppetite,
-    ciwaBNumbness: camelCaseItem.ciwaBNumbness,
-    ciwaBHeartRacing: camelCaseItem.ciwaBHeartRacing,
-    ciwaBHeadFullAchy: camelCaseItem.ciwaBHeadFullAchy,
-    ciwaBMuscleAche: camelCaseItem.ciwaBMuscleAche,
-    ciwaBAnxiety: camelCaseItem.ciwaBAnxiety,
-    ciwaBUpset: camelCaseItem.ciwaBUpset,
-    ciwaBRestfulSleep: camelCaseItem.ciwaBRestfulSleep,
-    ciwaBEnoughSleep: camelCaseItem.ciwaBEnoughSleep,
-    ciwaBVisualDisturbances: camelCaseItem.ciwaBVisualDisturbances,
-    ciwaBFearful: camelCaseItem.ciwaBFearful,
-    ciwaBPossibleMisfortunes: camelCaseItem.ciwaBPossibleMisfortunes,
-    ciwaBSweatingAgitation: camelCaseItem.ciwaBSweatingAgitation,
-    ciwaBTremors: camelCaseItem.ciwaBTremors,
-    ciwaBFeelPalms: camelCaseItem.ciwaBFeelPalms,
-    
-    // COWS fields
-    cowIntervalLabel: camelCaseItem.cowIntervalLabel,
-    cowPulseRateLabel: camelCaseItem.cowPulseRateLabel,
-    cowSweatingLabel: camelCaseItem.cowSweatingLabel,
-    cowRestlessnessLabel: camelCaseItem.cowRestlessnessLabel,
-    cowPupilSizeLabel: camelCaseItem.cowPupilSizeLabel,
-    cowBoneJointAcheLabel: camelCaseItem.cowBoneJointAcheLabel,
-    cowRunnyNoseLabel: camelCaseItem.cowRunnyNoseLabel,
-    cowGiUpsetLabel: camelCaseItem.cowGiUpsetLabel,
-    cowTremorLabel: camelCaseItem.cowTremorLabel,
-    cowYawningLabel: camelCaseItem.cowYawningLabel,
-    cowAnxietyIrritabilityLabel: camelCaseItem.cowAnxietyIrritabilityLabel,
-    cowGoosefleshSkinLabel: camelCaseItem.cowGoosefleshSkinLabel,
-    cowInterval: camelCaseItem.cowInterval,
-    cowPulseRate: camelCaseItem.cowPulseRate,
-    cowSweating: camelCaseItem.cowSweating,
-    cowRestlessness: camelCaseItem.cowRestlessness,
-    cowPupilSize: camelCaseItem.cowPupilSize,
-    cowBoneJointAche: camelCaseItem.cowBoneJointAche,
-    cowRunnyNose: camelCaseItem.cowRunnyNose,
-    cowGiUpset: camelCaseItem.cowGiUpset,
-    cowTremor: camelCaseItem.cowTremor,
-    cowYawning: camelCaseItem.cowYawning,
-    cowAnxietyIrritability: camelCaseItem.cowAnxietyIrritability,
-    cowGoosefleshSkin: camelCaseItem.cowGoosefleshSkin,
-    
-    // Patient info fields
-    maritalStatus: camelCaseItem.maritalStatus,
-    locker: camelCaseItem.locker,
-    occupation: camelCaseItem.occupation,
-    medications: camelCaseItem.medications,
-    
-    // Complex nested data
-    totalProblems: camelCaseItem.totalProblems,
-    problems: camelCaseItem.problems,
-    attendancesLastUpdated: camelCaseItem.attendancesLastUpdated,
-    patientAttendances: camelCaseItem.patientAttendances,
-    patientOrders: camelCaseItem.patientOrders,
-    glucoseLogs: camelCaseItem.glucoseLogs,
-    evaluations: camelCaseItem.evaluations,
-    evalNotes: camelCaseItem.evalNotes,
-    titles: camelCaseItem.titles,
-    evalTreatmentPlans: camelCaseItem.evalTreatmentPlans,
-    groupedTreatmentPlans: camelCaseItem.groupedTreatmentPlans,
-    inventories: camelCaseItem.inventories,
-    drugsOfChoice: camelCaseItem.drugsOfChoice,
-    electronicDevices: camelCaseItem.electronicDevices,
-    broughtInMedications: camelCaseItem.broughtInMedications,
-    allergies: camelCaseItem.allergies,
-    records: camelCaseItem.records || [],
-    notes: camelCaseItem.notes
+  // Handle records based on field type
+  let records: EvaluationRecord[] | undefined;
+  if (camelCaseItem.records && Array.isArray(camelCaseItem.records)) {
+    records = camelCaseItem.records.map((record: any) => {
+      const camelRecord = snakeToCamel(record);
+      const baseRecord: BaseRecord = {
+        id: camelRecord.id,
+        name: camelRecord.name,
+        description: camelRecord.description,
+        value: camelRecord.value,
+        status: camelRecord.status,
+      };
+
+      // Determine record type based on field type
+      switch (camelCaseItem.fieldType) {
+        case KipuFieldTypes.matrix:
+          return {
+            ...baseRecord,
+            label: camelRecord.label,
+            comments: camelRecord.comments,
+            option: camelRecord.option,
+            columnNames: Array.isArray(camelRecord.columnNames) 
+              ? camelRecord.columnNames.map((col: any) => ({
+                  key: col.key,
+                  value: col.value
+                }))
+              : undefined,
+            ...camelRecord, // Include any additional dynamic fields
+          } as MatrixRecord;
+
+        case KipuFieldTypes.patient_brought_in_medication:
+          // Handle both drug history and medication records with the same field type
+          if (camelRecord.drugName) {
+            return {
+              ...baseRecord,
+              drugName: camelRecord.drugName,
+              startDate: camelRecord.startDate,
+              endDate: camelRecord.endDate,
+              frequency: camelRecord.frequency,
+              route: camelRecord.route,
+              dosage: camelRecord.dosage,
+            } as DrugHistoryRecord;
+          } else {
+            return {
+              ...baseRecord,
+              medicationName: camelRecord.medicationName,
+              dosage: camelRecord.dosage,
+              frequency: camelRecord.frequency,
+              route: camelRecord.route,
+              startDate: camelRecord.startDate,
+              endDate: camelRecord.endDate,
+              prescriber: camelRecord.prescriber,
+            } as MedicationRecord;
+          }
+
+        case KipuFieldTypes.patient_allergies:
+          return {
+            ...baseRecord,
+            diagnosisDescription: camelRecord.diagnosisDescription,
+            code: camelRecord.code,
+            dateIdentified: camelRecord.dateIdentified,
+            provider: camelRecord.provider,
+            severity: camelRecord.severity,
+          } as DiagnosisRecord;
+
+        case KipuFieldTypes.patient_diagnosis_code:
+          return {
+            ...baseRecord,
+            problemDescription: camelRecord.problemDescription,
+            dateIdentified: camelRecord.dateIdentified,
+            severity: camelRecord.severity,
+            provider: camelRecord.provider,
+          } as ProblemListRecord;
+
+        case KipuFieldTypes.patient_drug_of_choice:
+          return {
+            ...baseRecord,
+            drugName: camelRecord.drugName,
+            frequency: camelRecord.frequency,
+            lastUsed: camelRecord.lastUsed,
+            yearsUsed: camelRecord.yearsUsed,
+            ageFirstUsed: camelRecord.ageFirstUsed,
+            routeOfAdministration: camelRecord.routeOfAdministration,
+          } as DrugOfChoiceRecord;
+
+        case KipuFieldTypes.evaluation_name:
+          return {
+            ...baseRecord,
+            goal: camelRecord.goal,
+            objective: camelRecord.objective,
+            intervention: camelRecord.intervention,
+            targetDate: camelRecord.targetDate,
+            progress: camelRecord.progress,
+          } as TreatmentPlanRecord;
+
+        case KipuFieldTypes.patient_ciwa_ar:
+        case KipuFieldTypes.patient_ciwa_b:
+        case KipuFieldTypes.patient_cows:
+          return {
+            ...baseRecord,
+            label: camelRecord.label,
+            value: camelRecord.value,
+            description: camelRecord.description,
+            score: camelRecord.score,
+          } as AssessmentRecord;
+
+        default:
+          // For unknown field types, return the base record with all additional fields
+          return {
+            ...baseRecord,
+            ...camelRecord,
+          } as BaseRecord;
+      }
+    });
+  }
+
+  // Create the enhanced item
+  const adaptedItem: KipuPatientEvaluationItemEnhanced = {
+    ...camelCaseItem, // Include all base fields
+    records, // Add the enhanced records
   };
+
+  return adaptedItem;
 }

@@ -1,0 +1,880 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+[chat-history.tsx](mdc:apps/web/components/chat/chat-history.tsx)
+[chat.ts](mdc:apps/web/types/chat.ts)
+[chatStore.ts](mdc:apps/web/store/chat/chatStore.ts)
+[context-queue.tsx](mdc:apps/web/components/chat/context-queue.tsx)](mdc:apps/web/components/chat/context-queue.tsx)
+[contextQueueStore.ts](mdc:apps/web/store/chat/contextQueueStore.ts)
+[tools.ts](mdc:apps/web/app/product/chat/tools.ts)
+[rag-middleware.ts](mdc:apps/web/lib/ai/rag-middleware.ts)
+[patient-context-modal-anim.tsx](mdc:apps/web/components/chat/patient-context-modal-anim.tsx)](mdc:apps/web/components/chat/patient-context-modal-anim.tsx)
+[message-input.tsx](mdc:apps/web/components/chat/message-input.tsx)
+[message-list.tsx](mdc:apps/web/components/chat/message-list.tsx)
+[language-model-middleware.mdc](mdc:.cursor/rules/language-model-middleware.mdc)
+[KipuToolRenderer.tsx](mdc:apps/web/components/chat/kipu/KipuToolRenderer.tsx)
+[vercel-ai-sdk.mdc](mdc:.cursor/rules/vercel-ai-sdk.mdc)
+[ChatPanel.tsx](mdc:apps/web/app/product/chat/ChatPanel.tsx)
+
+
+# Vercel AI SDK UI and Stream Helpers Reference
+
+## AI SDK UI Hooks and Functions
+
+### useChat()
+
+Allows you to easily create a conversational user interface for your chatbot application. It enables the streaming of chat messages from your AI provider, manages the state for chat input, and updates the UI automatically as new messages are received.
+
+#### Import
+
+React | Svelte | Vue | Solid
+
+```ts
+import { useChat } from '@ai-sdk/react'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **api?** (`string = '/api/chat'`): The API endpoint that is called to generate chat responses. It can be a relative path (starting with `/`) or an absolute URL.
+
+* **id?** (`string`): A unique identifier for the chat. If not provided, a random one will be generated. When provided, the `useChat` hook with the same `id` will have shared states across components. This is useful when you have multiple components showing the same chat stream.
+
+* **initialInput?** (`string = ''`): An optional string for the initial prompt input.
+
+* **initialMessages?** (`Messages[] = []`): An optional array of initial chat messages.
+
+* **onToolCall?** (`({ toolCall: ToolCall }) => void | unknown | Promise<unknown>`): Optional callback function that is invoked when a tool call is received. Intended for automatic client-side tool execution. You can optionally return a result for the tool call, either synchronously or asynchronously.
+
+* **onResponse?** (`(response: Response) => void`): An optional callback that will be called with the response from the API endpoint. Useful for throwing customized errors or logging.
+
+* **onFinish?** (`(message: Message, options: OnFinishOptions) => void`): An optional callback function that is called when the completion stream ends.
+
+  * **OnFinishOptions:**
+
+    * **usage:** `CompletionTokenUsage` – The token usage for the completion.
+    * **promptTokens:** `number` – The total number of tokens in the prompt.
+    * **completionTokens:** `number` – The total number of tokens in the completion.
+    * **totalTokens:** `number` – The total number of tokens generated.
+    * **finishReason:** `'stop' | 'length' | 'content-filter' | 'tool-calls' | 'error' | 'other' | 'unknown'` – The reason why the generation ended.
+
+* **onError?** (`(error: Error) => void`): A callback that will be called when the chat stream encounters an error. Optional.
+
+* **generateId?** (`() => string`): A custom ID generator for message IDs and the chat ID. Optional.
+
+* **headers?** (`Record<string, string> | Headers`): Additional headers to be passed to the API endpoint. Optional.
+
+* **body?** (`any`): Additional body object to be passed to the API endpoint. Optional.
+
+* **credentials?** (`'omit' | 'same-origin' | 'include'`): An optional literal that sets the mode of credentials to be used on the request. Defaults to `same-origin`.
+
+* **sendExtraMessageFields?** (`boolean`): An optional boolean that determines whether to send extra fields you've added to `messages`. Defaults to `false` and only the `content` and `role` fields will be sent to the API endpoint. If set to `true`, the `name`, `data`, and `annotations` fields will also be sent.
+
+* **maxSteps?** (`number`): Maximum number of backend calls to generate a response. A maximum number is required to prevent infinite loops in case of misconfigured tools. By default, it is set to 1.
+
+* **streamProtocol?** (`'text' | 'data'`): An optional literal that sets the type of stream to be used. Defaults to `data`. If set to `text`, the stream will be treated as a text stream.
+
+* **fetch?** (`FetchFunction`): Optional. A custom fetch function to be used for the API call. Defaults to the global `fetch` function.
+
+* **experimental\_prepareRequestBody?** (`(options: { messages: UIMessage[]; requestData?: JSONValue; requestBody?: object; id: string }) => unknown`): Experimental (React, Solid & Vue only). When a function is provided, it will be used to prepare the request body for the chat API. This can be useful for customizing the request body based on the messages and data in the chat.
+
+* **experimental\_throttle?** (`number`): React only. Custom throttle wait time in milliseconds for the message and data updates. When specified, updates will be throttled using this interval. Defaults to undefined (no throttling).
+
+**Returns:**
+
+* **messages:** `UIMessage[]` – The current array of chat messages.
+
+  Each **UIMessage** in the array has the following properties:
+
+  * **id:** `string` – The unique identifier of the message.
+  * **role:** `'system' | 'user' | 'assistant' | 'data'` – The role of the message.
+  * **createdAt?** `Date` – The creation date of the message.
+  * **content:** `string` – The content of the message.
+  * **annotations?** `Array<JSONValue>` – Additional annotations sent along with the message.
+  * **parts:** `Array<TextUIPart | ReasoningUIPart | ToolInvocationUIPart | SourceUIPart | StepStartUIPart>` – An array of message parts that are associated with the message.
+
+  Where each part type is defined as:
+
+  * **TextUIPart:**
+
+    * **type:** `"text"`
+    * **text:** `string` – The text content of the part.
+  * **ReasoningUIPart:**
+
+    * **type:** `"reasoning"`
+    * **reasoning:** `string` – The reasoning content of the part.
+  * **ToolInvocationUIPart:**
+
+    * **type:** `"tool-invocation"`
+    * **toolInvocation:** `ToolInvocation` – See below for ToolInvocation details.
+
+      A **ToolInvocation** has multiple states:
+
+      * **state:** `'partial-call'` – The state of the tool call when it was partially created.
+      * **toolCallId:** `string` – ID of the tool call. Used to match the tool call with the tool result.
+      * **toolName:** `string` – Name of the tool that is being called.
+      * **args:** `any` – Partial arguments of the tool call (JSON-serializable).
+      * **state:** `'call'` – The state when the tool call was fully created.
+      * **toolCallId:** `string` (again)
+      * **toolName:** `string` (again)
+      * **args:** `any` – Full arguments of the tool call (JSON-serializable, matches the tool’s input schema).
+      * **state:** `'result'` – The state when the result is available.
+      * **toolCallId:** `string` (again)
+      * **toolName:** `string` (again)
+      * **args:** `any` (again)
+      * **result:** `any` – The result of the tool call.
+  * **SourceUIPart:**
+
+    * **type:** `"source"`
+    * **source:** `Source` – A source object with details:
+
+      * **sourceType:** `'url'`
+      * **id:** `string` – ID of the source.
+      * **url:** `string` – URL of the source.
+      * **title?** `string` – The title of the source.
+  * **StepStartUIPart:**
+
+    * **type:** `"step-start"`
+    * **experimental\_attachments?** `Array<Attachment>` – Additional attachments sent along with the message.
+
+      An **Attachment** has:
+
+      * **name?** `string` – The name of the attachment, usually the file name.
+      * **contentType?** `string` – A string indicating the media type of the file.
+      * **url:** `string` – The URL of the attachment (either a link or a Data URL).
+
+* **error:** `Error | undefined` – An error object returned by SWR (from state), if any.
+
+* **append:** `(message: Message | CreateMessage, options?: ChatRequestOptions) => Promise<string | undefined>` – Function to append a message to the chat, triggering an API call for the AI response. It returns a promise that resolves to the full response message content when the API call is successfully finished, or throws an error when the API call fails.
+
+  **ChatRequestOptions:**
+
+  * **headers:** `Record<string, string> | Headers` – Additional headers to be passed to the API endpoint.
+  * **body:** `object` – Additional body JSON properties that should be sent to the API endpoint.
+  * **data:** `JSONValue` – Additional data to be sent to the API endpoint.
+  * **experimental\_attachments?** `FileList | Array<Attachment>` – An array of attachments to be sent to the API endpoint. (A **FileList** is a list of files from an `<input type="file">` or drag-and-drop; an **Attachment** has the fields described above.)
+
+* **reload:** `(options?: ChatRequestOptions) => Promise<string | undefined>` – Function to reload the last AI chat response for the given chat history. If the last message isn't from the assistant, it will request the API to generate a new response. Accepts the same ChatRequestOptions as `append`.
+
+* **stop:** `() => void` – Function to abort the current API request.
+
+* **experimental\_resume:** `() => void` – Function to resume an ongoing chat generation stream (if paused).
+
+* **setMessages:** `(messages: Message[] | ((messages: Message[]) => Message[])) => void` – Function to update the `messages` state locally without triggering an API call.
+
+* **input:** `string` – The current value of the input field.
+
+* **setInput:** `React.Dispatch<React.SetStateAction<string>>` – Function to update the `input` value.
+
+* **handleInputChange:** `(event: any) => void` – Handler for the `onChange` event of the input field to control the input's value.
+
+* **handleSubmit:** `(event?: { preventDefault?: () => void }, options?: ChatRequestOptions) => void` – Form submission handler that automatically resets the input field and appends a user message. You can use the `options` parameter to send additional data, headers, etc., to the server.
+
+  (Accepts the same **ChatRequestOptions** as described above, plus **allowEmptySubmit?** `boolean` which determines whether to allow submitting an empty input to trigger a generation. Defaults to `false`. Also **experimental\_attachments?** for attachments as described above.)
+
+* **status:** `"submitted" | "streaming" | "ready" | "error"` – Status of the chat request: submitted (message sent to API), streaming (receiving response chunks), ready (response complete), or error (request failed).
+
+* **id:** `string` – The unique identifier of the chat (same as provided or generated).
+
+* **data:** `JSONValue[]` – Data returned from StreamData (if using streaming custom data).
+
+* **setData:** `(data: JSONValue[] | undefined | ((data: JSONValue[] | undefined) => JSONValue[] | undefined)) => void` – Function to update the `data` state which contains data from StreamData.
+
+* **addToolResult:** `({ toolCallId: string; result: any }) => void` – Function to add a tool result to the chat. This will update the chat messages with the tool result and call the API route if all tool results for the last message are available.
+
+---
+
+### useCompletion()
+
+Allows you to create text-completion capabilities for your application. It enables the streaming of text completions from your AI provider, manages the state for input, and updates the UI automatically as new messages are received.
+
+#### Import
+
+React | Svelte | Vue | Solid
+
+```ts
+import { useCompletion } from '@ai-sdk/react'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **api:** (`string = '/api/completion'`): The API endpoint that is called to generate text. It can be a relative path (starting with `/`) or an absolute URL.
+
+* **id:** (`string`): A unique identifier for the completion. If not provided, a random one will be generated. When provided, the `useCompletion` hook with the same `id` will have shared states across components. This is useful when you have multiple components showing the same completion stream.
+
+* **initialInput:** (`string`): An optional string for the initial prompt input.
+
+* **initialCompletion:** (`string`): An optional string for the initial completion result.
+
+* **onResponse:** (`(response: Response) => void`): An optional callback function that is called with the response from the API endpoint. Useful for throwing customized errors or logging.
+
+* **onFinish:** (`(prompt: string, completion: string) => void`): An optional callback function that is called when the completion stream ends.
+
+* **onError:** (`(error: Error) => void`): An optional callback that will be called when the stream encounters an error.
+
+* **headers:** (`Record<string, string> | Headers`): An optional object of headers to be passed to the API endpoint.
+
+* **body:** (`any`): An optional additional body object to be passed to the API endpoint.
+
+* **credentials:** (`'omit' | 'same-origin' | 'include'`): An optional literal that sets the mode of credentials to be used on the request. Defaults to same-origin.
+
+* **sendExtraMessageFields:** (`boolean`): An optional boolean that determines whether to send extra fields you've added to `messages`. Defaults to `false` and only the `content` and `role` fields will be sent to the API endpoint.
+
+* **streamProtocol?** (`'text' | 'data'`): An optional literal that sets the type of stream to be used. Defaults to `data`. If set to `text`, the stream will be treated as a text stream.
+
+* **fetch?** (`FetchFunction`): Optional. A custom fetch function to be used for the API call. Defaults to the global fetch function.
+
+* **experimental\_throttle?** (`number`): React only. Custom throttle wait time in milliseconds for the completion and data updates. When specified, throttles how often the UI updates during streaming. Default is undefined (no throttling).
+
+**Returns:**
+
+* **completion:** `string` – The current text completion.
+
+* **complete:** `(prompt: string, options: { headers?: any; body?: any }) => void` – Function to execute text completion based on the provided prompt.
+
+* **error:** `undefined | Error` – The error thrown during the completion process, if any.
+
+* **setCompletion:** `(completion: string) => void` – Function to update the `completion` state.
+
+* **stop:** `() => void` – Function to abort the current API request.
+
+* **input:** `string` – The current value of the input field.
+
+* **setInput:** `React.Dispatch<React.SetStateAction<string>>` – Function to update the `input` value.
+
+* **handleInputChange:** `(event: any) => void` – Handler for the `onChange` event of the input field to control the input's value.
+
+* **handleSubmit:** `(event?: { preventDefault?: () => void }) => void` – Form submission handler that automatically resets the input field and appends a user message.
+
+* **isLoading:** `boolean` – Boolean flag indicating whether a fetch operation is currently in progress.
+
+---
+
+### experimental\_useObject()
+
+> **Note:** `useObject` is an experimental feature and only available in React and SolidJS.
+
+Allows you to consume text streams that represent a JSON object and parse them into a complete object based on a schema. You can use it together with 【88†streamObject】 in the backend.
+
+Example usage:
+
+```ts
+'use client';
+
+import { experimental_useObject as useObject } from '@ai-sdk/react';
+
+export default function Page() {
+  const { object, submit } = useObject({
+    api: '/api/use-object',
+    schema: z.object({ content: z.string() }),
+  });
+
+  return (
+    <div>
+      <button onClick={() => submit('example input')}>Generate</button>
+      {object?.content && <p>{object.content}</p>}
+    </div>
+  );
+}
+```
+
+#### Import
+
+```ts
+import { experimental_useObject as useObject } from '@ai-sdk/react'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **api:** `string` – The API endpoint that is called to generate objects. It should stream JSON that matches the schema as chunked text. It can be a relative path (starting with `/`) or an absolute URL.
+
+* **schema:** `Zod Schema | JSON Schema` – A schema that defines the shape of the complete object. You can either pass in a Zod schema or a JSON schema (using the `jsonSchema` function).
+
+* **id?:** `string` – A unique identifier. If not provided, a random one will be generated. When provided, the `useObject` hook with the same `id` will have shared states across components.
+
+* **initialValue?:** `DeepPartial<RESULT> | undefined` – A value for the initial object. Optional.
+
+* **fetch?:** `FetchFunction` – A custom fetch function to be used for the API call. Defaults to the global fetch function. Optional.
+
+* **headers?:** `Record<string, string> | Headers` – A headers object to be passed to the API endpoint. Optional.
+
+* **credentials?:** `RequestCredentials` – The credentials mode to be used for the fetch request. Possible values are: "omit", "same-origin", "include". Optional.
+
+* **onError?:** `(error: Error) => void` – Callback function to be called when an error is encountered. Optional.
+
+* **onFinish?:** `(result: OnFinishResult) => void` – Called when the streaming response has finished.
+
+  * **OnFinishResult:** *(structure not detailed in this snippet; likely contains final result data)*
+
+* **object:** `T | undefined` – The generated object (typed according to the schema). Can be undefined if the final object does not match the schema.
+
+* **error:** `unknown | undefined` – Optional error object. For example, this could be a `TypeValidationError` if the final object does not match the schema.
+
+**Returns:**
+
+* **submit:** `(input: INPUT) => void` – Calls the API with the provided input as JSON body.
+
+* **object:** `DeepPartial<RESULT> | undefined` – The current value for the generated object. Updated as the API streams JSON chunks.
+
+* **error:** `Error | unknown` – The error object if the API call fails.
+
+* **isLoading:** `boolean` – Boolean flag indicating whether a request is currently in progress.
+
+* **stop:** `() => void` – Function to abort the current API request.
+
+#### Examples
+
+* 【89†Streaming Object Generation with useObject】
+
+---
+
+### convertToCoreMessages()
+
+*The `convertToCoreMessages` function is no longer required.* The AI SDK now automatically converts incoming messages to the `CoreMessage` format.
+
+The `convertToCoreMessages` function is used to transform an array of UI messages from the `useChat` hook into an array of `CoreMessage` objects. These `CoreMessage` objects are compatible with AI core functions like `streamText`.
+
+For example, in a Next.js App Route (`app/api/chat/route.ts`):
+
+```ts
+import { openai } from '@ai-sdk/openai';
+import { convertToCoreMessages, streamText } from 'ai';
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+  const result = streamText({
+    model: openai('gpt-4o'),
+    messages: convertToCoreMessages(messages),
+  });
+  return result.toDataStreamResponse();
+}
+```
+
+#### Import
+
+```ts
+import { convertToCoreMessages } from 'ai'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **messages:** `Message[]` – An array of UI messages from the `useChat` hook to be converted.
+
+* **options:** `{ tools?: ToolSet }` – Optional configuration object. Provide tools to enable multi-modal tool responses.
+
+**Returns:**
+
+An array of 【88†CoreMessage】 objects.
+
+*(Each CoreMessage in the array corresponds to an AI SDK Core message format.)*
+
+#### Multi-modal Tool Responses
+
+The `convertToCoreMessages` function supports tools that can return multi-modal content. This is useful when tools need to return non-text content like images.
+
+For example:
+
+```ts
+import { tool } from 'ai';
+import { z } from 'zod';
+
+const screenshotTool = tool({
+  parameters: z.object({}),
+  execute: async () => 'imgbase64',
+  experimental_toToolResultContent: result => [{ type: 'image', data: result }],
+});
+
+const result = streamText({
+  model: openai('gpt-4'),
+  messages: convertToCoreMessages(messages, {
+    tools: {
+      screenshot: screenshotTool,
+    },
+  }),
+});
+```
+
+Tools can implement the optional `experimental_toToolResultContent` method to transform their results into multi-modal content. The content is an array of content parts, where each part has a `type` (e.g., 'text', 'image') and corresponding data.
+
+---
+
+### appendResponseMessages()
+
+Appends an array of `ResponseMessage` objects (from the AI response) to an existing array of UI messages. It reuses the existing IDs from the response messages, generates new timestamps, and merges tool-call results with the previous assistant message (if any). This is useful for maintaining a unified message history when working with AI responses in a client-side chat application.
+
+#### Import
+
+```ts
+import { appendResponseMessages } from 'ai'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **messages:** `Message[]` – An existing array of UI messages for useChat (usually from state).
+
+* **responseMessages:** `ResponseMessage[]` – The new array of AI messages returned from the AI service to be appended. For example, "assistant" messages get added as new items, while tool-call results (role: "tool") are merged with the previous assistant message.
+
+**Returns:**
+
+An updated array of `Message` objects.
+
+* **Message\[]:** *Array* – A new array of UI messages with the appended AI response messages (and updated tool-call results for the preceding assistant message).
+
+---
+
+### appendClientMessage()
+
+Appends a client `Message` object to an existing array of UI messages. If the last message in the array has the same ID as the new message, it will replace the existing message instead of appending. This is useful for maintaining a unified message history in a client-side chat application, especially when updating existing messages.
+
+#### Import
+
+```ts
+import { appendClientMessage } from 'ai'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **messages:** `Message[]` – An existing array of UI messages for useChat (usually from state).
+
+* **message:** `Message` – The new client message to be appended, or used to replace an existing message with the same ID.
+
+**Returns:**
+
+* **Message\[]:** *Array* – A new array of UI messages with either the appended message or the updated message replacing the previous one with the same ID.
+
+---
+
+### createDataStream
+
+The `createDataStream` function allows you to stream additional data to the client (see 【61†Streaming Data】).
+
+#### Import
+
+```ts
+import { createDataStream } from 'ai'
+```
+
+#### Example
+
+```ts
+const stream = createDataStream({
+  async execute(dataStream) {
+    // Write data
+    dataStream.writeData({ value: 'Hello' });
+
+    // Write annotation
+    dataStream.writeMessageAnnotation({ type: 'status', value: 'processing' });
+
+    // Merge another stream
+    const otherStream = getAnotherStream();
+    dataStream.merge(otherStream);
+  },
+  onError: error => `Custom error: ${error.message}`,
+});
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **execute:** `(dataStream: DataStreamWriter) => Promise<void> | void` – A function that receives a `DataStreamWriter` instance and can use it to write data to the stream.
+
+  **DataStreamWriter** provides methods:
+
+  * **write:** `(data: DataStreamString) => void` – Appends a data part to the stream.
+  * **writeData:** `(value: JSONValue) => void` – Appends a data part to the stream.
+  * **writeMessageAnnotation:** `(value: JSONValue) => void` – Appends a message annotation to the stream.
+  * **writeSource:** `(source: Source) => void` – Appends a source part to the stream.
+  * **merge:** `(stream: ReadableStream<DataStreamString>) => void` – Merges the contents of another stream into this stream.
+
+* **onError:** `((error: unknown) => string) | undefined` – Error handler used by the data stream writer. Intended for forwarding errors when merging streams to prevent duplicated error masking.
+
+* **onError:** `(error: unknown) => string` – A function that handles errors and returns an error message string. By default, it returns "An error occurred."
+
+**Returns:**
+
+A `ReadableStream<DataStreamString>` – A readable stream that emits formatted data stream parts.
+
+---
+
+### createDataStreamResponse
+
+The `createDataStreamResponse` function creates a `Response` object that streams data to the client (see 【61†Streaming Data】).
+
+#### Import
+
+```ts
+import { createDataStreamResponse } from 'ai'
+```
+
+#### Example
+
+```ts
+const response = createDataStreamResponse({
+  status: 200,
+  statusText: 'OK',
+  headers: {
+    'Custom-Header': 'value',
+  },
+  async execute(dataStream) {
+    // Write data
+    dataStream.writeData({ value: 'Hello' });
+    // Write annotation
+    dataStream.writeMessageAnnotation({ type: 'status', value: 'processing' });
+    // Merge another stream
+    const otherStream = getAnotherStream();
+    dataStream.merge(otherStream);
+  },
+  onError: error => `Custom error: ${error.message}`,
+});
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **status:** `number` – The status code for the response.
+
+* **statusText:** `string` – The status text for the response.
+
+* **headers:** `Headers | Record<string, string>` – Additional headers for the response.
+
+* **execute:** `(dataStream: DataStreamWriter) => Promise<void> | void` – A function that receives a `DataStreamWriter` instance and can use it to write data to the stream. *(Provides the same DataStreamWriter methods as described in createDataStream.)*
+
+* **onError:** `((error: unknown) => string) | undefined` – Error handler used by the data stream writer (for merging streams error handling).
+
+* **onError:** `(error: unknown) => string` – A function that handles errors and returns an error message string. By default, it returns "An error occurred."
+
+**Returns:**
+
+`Response` – A Response object that streams formatted data stream parts with the specified status, headers, and content.
+
+---
+
+### pipeDataStreamToResponse
+
+The `pipeDataStreamToResponse` function pipes streaming data to a Node.js `ServerResponse` object (see 【61†Streaming Data】).
+
+#### Import
+
+```ts
+import { pipeDataStreamToResponse } from 'ai'
+```
+
+#### Example
+
+```ts
+pipeDataStreamToResponse(serverResponse, {
+  status: 200,
+  statusText: 'OK',
+  headers: {
+    'Custom-Header': 'value',
+  },
+  async execute(dataStream) {
+    // Write data
+    dataStream.writeData({ value: 'Hello' });
+    // Write annotation
+    dataStream.writeMessageAnnotation({ type: 'status', value: 'processing' });
+    // Merge another stream
+    const otherStream = getAnotherStream();
+    dataStream.merge(otherStream);
+  },
+  onError: error => `Custom error: ${error.message}`,
+});
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **response:** `ServerResponse` – The Node.js ServerResponse object to pipe the data to.
+
+* **status:** `number` – The status code for the response.
+
+* **statusText:** `string` – The status text for the response.
+
+* **headers:** `Headers | Record<string, string>` – Additional headers for the response.
+
+* **execute:** `(dataStream: DataStreamWriter) => Promise<void> | void` – A function that receives a `DataStreamWriter` instance and can use it to write data to the stream. *(Provides the same DataStreamWriter methods as described above.)*
+
+* **onError:** `((error: unknown) => string) | undefined` – Error handler used by the data stream writer for merging streams.
+
+* **onError:** `(error: unknown) => string` – A function that handles errors and returns an error message string. By default, it returns "An error occurred."
+
+*(No explicit return value; this function pipes data to the ServerResponse and ends the response stream.)*
+
+---
+
+### StreamData
+
+> **Deprecated:** The `StreamData` class is deprecated and will be removed in a future version of AI SDK. Please use `createDataStream`, `createDataStreamResponse`, and `pipeDataStreamToResponse` instead.
+
+The `StreamData` class allows you to stream additional data to the client (see 【61†Streaming Data】).
+
+#### Import
+
+**React:**
+
+```ts
+import { StreamData } from 'ai'
+```
+
+#### API Signature
+
+**Constructor:**
+
+```ts
+const data = new StreamData();
+```
+
+**Methods:**
+
+* **append:** Appends a value to the stream data.
+
+  ```ts
+  data.append(value: JSONValue)
+  ```
+
+* **appendMessageAnnotation:** Appends a message annotation to the stream data.
+
+  ```ts
+  data.appendMessageAnnotation(annotation: JSONValue)
+  ```
+
+* **close:** Closes the stream data.
+
+  ```ts
+  data.close();
+  ```
+
+---
+
+## Stream Helpers
+
+### AIStream
+
+**Status:** *Removed in AI SDK 4.0.* Use `streamText.toDataStreamResponse()` instead.
+
+Creates a readable stream for AI responses. This is based on the responses returned by `fetch` and serves as the basis for the OpenAIStream and AnthropicStream. It allows you to handle AI response streams in a controlled and customized manner that will work with `useChat` and `useCompletion`.
+
+AIStream will throw an error if the response doesn't have a 2xx status code, to ensure that the stream is only created for successful responses.
+
+#### Import
+
+**React:**
+
+```ts
+import { AIStream } from 'ai'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **response:** `Response` – This is the response object returned by `fetch`. It's used as the source of the readable stream.
+
+* **customParser:** `(AIStreamParser) => void` – This is a function that is used to parse the events in the stream. It should return a function that receives a stringified chunk from the LLM and extracts the message content. The function is expected to return nothing (`void`) or a `string`.
+
+  **AIStreamParser:**
+
+  ```ts
+  (data: string) => string | void
+  ```
+
+* **callbacks:** `AIStreamCallbacksAndOptions` – An object containing callback functions and options to handle the stream events.
+
+  **AIStreamCallbacksAndOptions** may include:
+
+  * **onStart:** `() => Promise<void>` – An optional function called at the start of stream processing.
+  * **onCompletion:** `(completion: string) => Promise<void>` – An optional function called for every completion; passed the completion string.
+  * **onFinal:** `(completion: string) => Promise<void>` – An optional function called once when the stream is closed with the final completion message.
+  * **onToken:** `(token: string) => Promise<void>` – An optional function called for each token in the stream; passed the token string.
+
+*(AIStream returns a ReadableStream of AI response data that can be consumed by the UI hooks.)*
+
+---
+
+### StreamingTextResponse
+
+**Status:** *Removed in AI SDK 4.0.* Use `streamText.toDataStreamResponse()` instead.
+
+A utility class that simplifies the process of returning a ReadableStream of text in HTTP responses. It is a lightweight wrapper around the native Response class, automatically setting the status code to 200 and the `Content-Type` header to `'text/plain; charset=utf-8'`.
+
+#### Import
+
+```ts
+import { StreamingTextResponse } from 'ai'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **stream:** `ReadableStream` – The stream of content which represents the HTTP response.
+
+* **init?:** `ResponseInit` – Used to customize the properties of the HTTP response. It corresponds to the `ResponseInit` options of the standard Response constructor.
+
+* **status?:** `number` – The status code for the response. *Note:* StreamingTextResponse will overwrite this value with 200.
+
+* **statusText?:** `string` – The status message associated with the status code.
+
+* **headers?:** `HeadersInit` – Any headers you want to add to your response. StreamingTextResponse will add `'Content-Type': 'text/plain; charset=utf-8'` to these headers.
+
+* **data?:** `StreamData` – A StreamData object that you are using to generate additional data for the response.
+
+**Returns:**
+
+An instance of `Response` with the provided ReadableStream as the body, the status set to 200, and the `Content-Type` header set to `'text/plain; charset=utf-8'`. Additional headers and properties can be added using the `init` parameter.
+
+---
+
+### streamToResponse
+
+**Status:** *Removed in AI SDK 4.0.* Use `pipeDataStreamToResponse` from streamText instead.
+
+`streamToResponse` pipes a data stream to a Node.js `ServerResponse` object and sets the status code and headers.
+
+This is useful to create data stream responses in environments that use Node.js HTTP `ServerResponse` objects, such as custom Node.js servers.
+
+By default (if not specified in options), the status code is set to 200 and the `Content-Type` header is set to `text/plain; charset=utf-8`.
+
+#### Import
+
+```ts
+import { streamToResponse } from 'ai'
+```
+
+#### Example
+
+You can use `streamToResponse` to pipe a data stream to a Node.js HTTP server response:
+
+```ts
+import { openai } from '@ai-sdk/openai';
+import { StreamData, streamText, streamToResponse } from 'ai';
+import { createServer } from 'http';
+
+createServer(async (req, res) => {
+  const result = streamText({
+    model: openai('gpt-4-turbo'),
+    prompt: 'What is the weather in San Francisco?',
+  });
+
+  // use stream data
+  const data = new StreamData();
+  data.append('initialized call');
+
+  streamToResponse(
+    result.toAIStream({
+      onFinal() {
+        data.append('call completed');
+        data.close();
+      },
+    }),
+    res,
+    {},
+    data,
+  );
+}).listen(8080);
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **stream:** `ReadableStream` – The Web Stream to pipe to the response. (For example, the return value of OpenAIStream, HuggingFaceStream, AnthropicStream, or an AIStream instance.)
+
+* **response:** `ServerResponse` – The Node.js ServerResponse object to pipe the stream to (typically the `res` in a Node.js HTTP request handler).
+
+* **options:** `Options` – Configuration for the response.
+
+  **Options** may include:
+
+  * **status:** `number` – The status code to set on the response. Defaults to `200`.
+  * **headers:** `Record<string, string>` – Additional headers to set on the response. Defaults to `{ 'Content-Type': 'text/plain; charset=utf-8' }`.
+
+* **data:** `StreamData` – StreamData object for forwarding additional data to the client.
+
+**Returns:** *None (the stream is piped directly to the ServerResponse and the response is ended when the stream completes).*
+
+---
+
+### GoogleGenerativeAIStream
+
+**Status:** *Removed in AI SDK 4.0.*
+
+GoogleGenerativeAIStream is part of the legacy Google Generative AI integration. It is not compatible with the AI SDK 3.1 functions. It is recommended to use the 【95†AI SDK Google Generative AI Provider】 instead.
+
+The GoogleGenerativeAIStream function is a utility that transforms the output from Google's Generative AI SDK into a ReadableStream. It uses AIStream under the hood, applying a specific parser for Google's response data structure. This works with the official Generative AI SDK, and it's supported in Node.js, Edge Runtime, and browser environments.
+
+#### Import
+
+**React:**
+
+```ts
+import { GoogleGenerativeAIStream } from 'ai'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **response:** `{ stream: AsyncIterable<GenerateContentResponse> }` – The response object returned by the Google Generative AI API (which provides an async iterable stream of `GenerateContentResponse` items).
+
+* **callbacks?:** `AIStreamCallbacksAndOptions` – An object containing callback functions to handle the start, each token, and completion of the AI response. (See AIStream for callback details.)
+
+  *(Same callback structure as AIStream: onStart, onCompletion, onFinal, onToken)*
+
+**Returns:**
+
+A `ReadableStream`.
+
+---
+
+### OpenAIStream
+
+**Status:** *Removed in AI SDK 4.0.*
+
+OpenAIStream is part of the legacy OpenAI integration. It is not compatible with the AI SDK 3.x functions. It is recommended to use the 【95†AI SDK OpenAI Provider】 instead.
+
+OpenAIStream transforms the response from OpenAI's language models into a ReadableStream.
+
+*Note:* Prior to v4, the official OpenAI API SDK did not support the Edge Runtime and only worked in serverless environments. The `openai-edge` package is based on `fetch` instead of axios (and thus works in the Edge Runtime), so we recommend using `openai` v4+ or `openai-edge` for new projects.
+
+#### Import
+
+**React:**
+
+```ts
+import { OpenAIStream } from 'ai'
+```
+
+#### API Signature
+
+**Parameters:**
+
+* **response:** `Response` – The response object returned by a call made by the OpenAI Provider SDK.
+
+* **callbacks?:** `AIStreamCallbacksAndOptions` – An object containing callback functions to handle the stream events (start, each token, completion). If this parameter is not provided, a default behavior is implemented.
+
+  **AIStreamCallbacksAndOptions**:
+
+  * **onStart:** `() => Promise<void>` – Optional function called at the start of stream processing.
+  * **onCompletion:** `(completion: string) => Promise<void>` – Optional function called for every completion; passed the completion text.
+  * **onFinal:** `(completion: string) => Promise<void>` – Optional function called once when the stream is closed with the final completion.
+  * **onToken:** `(token: string) => Promise<void>` – Optional function called for each token in the stream; passed the token text.
+
+*(OpenAIStream returns a ReadableStream of the model's response which can be consumed by the UI hooks or other stream handlers.)*
+

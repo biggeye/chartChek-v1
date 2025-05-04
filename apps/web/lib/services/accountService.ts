@@ -54,21 +54,6 @@ export async function getUserProfile(userId: string): Promise<UserProfile | null
 
 
 
-const DEFAULT_COMPLIANCE_CONFIG: ComplianceConfig = {
-  admission: [
-    { evalType: 'BIO', count: 1 },
-    { evalType: 'NURSING', count: 1 },
-    { evalType: 'PSYCH', count: 1 },
-  ],
-  daily: [
-    { evalType: 'GROUP', count: 1 }
-  ],
-  cycle: [
-    { evalType: 'TREATMENT_PLAN_UPDATE', count: 1 }
-  ],
-  cycleLength: 7
-};
-
 // --- Compliance Config Service Functions ---
 
 /**
@@ -82,17 +67,9 @@ export async function getComplianceConfig(accountId: string): Promise<Compliance
     .eq('account_id', accountId)
     .single();
 
-  if (error || !data) {
-    // Could log error here if needed
-    return DEFAULT_COMPLIANCE_CONFIG;
-  }
-
   // Validate config from DB
   const parsed = complianceConfigSchema.safeParse(data.config);
-  if (!parsed.success) {
-    // Invalid config in DB; fall back to default
-    return DEFAULT_COMPLIANCE_CONFIG;
-  }
+
   return parsed.data;
 }
 

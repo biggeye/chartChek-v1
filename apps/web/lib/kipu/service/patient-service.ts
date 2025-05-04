@@ -94,7 +94,7 @@ export async function kipuGetPatient<T>(
 export async function kipuGetPatientsAdmissions<T>(
   credentials: KipuCredentials,
   page = 1,
-  limit = 20,
+  limit = 200,
   start_date: string,
   end_date: string,
 ): Promise<KipuApiResponse<T>> {
@@ -102,8 +102,8 @@ export async function kipuGetPatientsAdmissions<T>(
     // Build the query string with required parameters
     const queryParams = new URLSearchParams({
       app_id: credentials.appId,
-      page: page.toString(),
-      limit: limit.toString(),
+  //    page: page.toString(),
+   //   limit: limit.toString(),
       start_date: start_date.toString() || '1990-01-01',
       end_date: end_date.toString() || '2030-12-31',
       phi_level: 'high'
@@ -111,6 +111,7 @@ export async function kipuGetPatientsAdmissions<T>(
     // Use kipuServerGet directly as in the API route
     const endpoint = `/api/patients/admissions?${queryParams}`;
     return await kipuServerGet(endpoint, credentials);
+    
   } catch (error) {
     console.error(`Error in kipuGetPatients:`, error);
     return {

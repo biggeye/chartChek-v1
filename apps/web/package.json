@@ -5,6 +5,8 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
+   "graphite": "graphite-cli ./apps/web",
+
     "analyze": "ANALYZE=true pnpm run build",
     "build": "pnpm with-env next build",
     "build:test": "NODE_ENV=test pnpm with-env:test next build",

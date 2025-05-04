@@ -17,9 +17,10 @@ interface MessageInputProps {
   input: string;
   onInputChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  disabled?: boolean;
 }
 
-export function MessageInput({ input, onInputChange, onSubmit }: MessageInputProps) {
+export function MessageInput({ input, onInputChange, onSubmit, disabled }: MessageInputProps) {
   const { isDesktopSidebarCollapsed } = useSidebarStores();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -39,7 +40,7 @@ export function MessageInput({ input, onInputChange, onSubmit }: MessageInputPro
 
   return (
     <div className={cn(
-      "fixed bottom-4 bg-background border border-border rounded-lg shadow-md z-10 transition-all duration-300 ease-in-out",
+      "fixed bottom-4 bg-background dark:bg-muted/70 border border-border rounded-lg shadow-md z-10 transition-all duration-300 ease-in-out",
       "left-4 right-4",
       isDesktopSidebarCollapsed ? "lg:left-24" : "lg:left-[calc(18rem+1rem)]",
       "xl:right-[calc(24rem+1rem)]"
@@ -105,11 +106,11 @@ export function MessageInput({ input, onInputChange, onSubmit }: MessageInputPro
               onChange={onInputChange}
               placeholder="Type your message..."
               rows={1}
-              className="text-sm relative w-full resize-none overflow-hidden min-h-[40px] max-h-[120px] px-2 py-2 rounded-md border border-input focus:border-primary focus:ring-1 focus-visible:outline-none"
+              className="text-sm relative w-full resize-none overflow-hidden min-h-[40px] max-h-[120px] px-2 py-2 rounded-md border border-input focus:border-primary focus:ring-1 focus-visible:outline-none dark:bg-muted"
             />
             <Button
               type="submit"
-              disabled={!input.trim()}
+              disabled={!input.trim() || disabled}
               className="h-8 w-8 bg-primary text-primary-foreground hover:bg-accent ml-2"
             >
               <Send />

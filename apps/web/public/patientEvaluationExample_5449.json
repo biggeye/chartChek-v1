@@ -1,0 +1,3714 @@
+{
+    "id": 5446,
+    "name": "Bio-psychosocial Assessment",
+    "status": "in progress",
+    "patientCasefileId": "1067:a09e3321-909d-4208-8567-19e4e43443bb",
+    "evaluationId": 965,
+    "patientProcessId": 41,
+    "requireSignature": true,
+    "requirePatientSignature": false,
+    "billable": true,
+    "evaluationType": "standard",
+    "evaluationContent": "standard",
+    "ancillary": null,
+    "renderingProvider": null,
+    "billableClaimFormat": null,
+    "requireGuarantorSignature": false,
+    "requireGuardianSignature": false,
+    "isCrm": false,
+    "availableOnPortal": false,
+    "placeOfService": null,
+    "billingCodes": {
+        "HCode": [],
+        "CCode": [],
+        "RCode": [],
+        "Custom": []
+    },
+    "signatureUserTitles": {
+        "7": "true",
+        "8": "true",
+        "17": "true",
+        "21": "true"
+    },
+    "reviewSignatureUserTitles": {
+        "8": "true",
+        "17": "true"
+    },
+    "createdAt": "2024-05-06T21:26:56.254-07:00",
+    "createdBy": "Ashley Banali",
+    "updatedAt": "2024-10-07T12:56:45.766-07:00",
+    "updatedBy": "Jennifer Rosa, Administrator",
+    "masterTreatmentPlanCategory": "",
+    "forceAllStaffUsersTitles": false,
+    "forceAllReviewUsersTitles": false,
+    "evaluationVersionId": 337,
+    "locked": false,
+    "isRequired": false,
+    "patientEvaluationItems": [
+        {
+            "id": 105012,
+            "name": "Date/Time:",
+            "evaluationItemId": 21072,
+            "createdAt": "2024-05-06T21:26:56.598-07:00",
+            "updatedAt": "2024-05-06T21:26:56.598-07:00",
+            "fieldType": "evaluation_datetime",
+            "label": "Date/Time:",
+            "dividerBelow": true,
+            "optional": false,
+            "date": "10/06/2024 09:26 PM"
+        },
+        {
+            "id": 105013,
+            "name": "I. SOCIAL AREA",
+            "evaluationItemId": 21073,
+            "createdAt": "2024-05-06T21:26:56.605-07:00",
+            "updatedAt": "2024-05-06T21:26:56.605-07:00",
+            "fieldType": "title",
+            "label": "<center>I. SOCIAL AREA</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105014,
+            "name": "A. Family of Origin",
+            "evaluationItemId": 21074,
+            "createdAt": "2024-05-06T21:26:56.613-07:00",
+            "updatedAt": "2024-05-06T21:26:56.613-07:00",
+            "fieldType": "title",
+            "label": "A. Family of Origin",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105015,
+            "name": "1. Where were you raised and by whom?",
+            "evaluationItemId": 21075,
+            "createdAt": "2024-05-06T21:26:56.620-07:00",
+            "updatedAt": "2024-05-06T21:26:56.620-07:00",
+            "fieldType": "text",
+            "label": "1. Where were you raised and by whom?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated \"I was raised in Ventura county and by my parents.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105016,
+            "name": "2. Do you have any siblings?",
+            "evaluationItemId": 21076,
+            "createdAt": "2024-05-06T21:26:56.627-07:00",
+            "updatedAt": "2024-07-12T09:44:04.593-07:00",
+            "fieldType": "matrix",
+            "label": "2. Do you have any siblings?",
+            "dividerBelow": false,
+            "optional": true
+        },
+        {
+            "id": 105017,
+            "name": "3. How were the relationships between family members in the immediate family/in the household?",
+            "evaluationItemId": 21077,
+            "createdAt": "2024-05-06T21:26:56.635-07:00",
+            "updatedAt": "2024-05-06T21:26:56.635-07:00",
+            "fieldType": "text",
+            "label": "3. How were the relationships between family members in the immediate family/in the household?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated \"My mom and dad both struggled with addiction, which always caused a lot of fights and arguments at home.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105018,
+            "name": "4. Who do you feel closest to in the family and why?",
+            "evaluationItemId": 21078,
+            "createdAt": "2024-05-06T21:26:56.642-07:00",
+            "updatedAt": "2024-05-06T21:26:56.642-07:00",
+            "fieldType": "text",
+            "label": "4. Who do you feel closest to in the family and why?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated \"I feel closest to dad because they were the only person I felt I could talk to about anything going on in my life without judgement.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105019,
+            "name": "5. Is there any history of the following:",
+            "evaluationItemId": 21079,
+            "createdAt": "2024-05-06T21:26:56.649-07:00",
+            "updatedAt": "2024-05-06T21:26:56.649-07:00",
+            "fieldType": "title",
+            "label": "<u>5. Is there any history of the following:</u>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105020,
+            "name": "Mother:",
+            "evaluationItemId": 21080,
+            "createdAt": "2024-05-06T21:26:56.656-07:00",
+            "updatedAt": "2024-05-06T21:26:56.656-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "Mother:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Substance Abuse",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Criminal Involvement",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Mental Health Problems",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105021,
+            "name": "Father:",
+            "evaluationItemId": 21081,
+            "createdAt": "2024-05-06T21:26:56.663-07:00",
+            "updatedAt": "2024-05-06T21:26:56.663-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "Father:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Substance Abuse",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Criminal Involvement",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Mental Health Problems",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105022,
+            "name": "Step-Parent:",
+            "evaluationItemId": 21082,
+            "createdAt": "2024-05-06T21:26:56.671-07:00",
+            "updatedAt": "2024-05-06T21:26:56.671-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "Step-Parent:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Substance Abuse",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Criminal Involvement",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Mental Health Problems",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105023,
+            "name": "Siblings:",
+            "evaluationItemId": 21083,
+            "createdAt": "2024-05-06T21:26:56.679-07:00",
+            "updatedAt": "2024-05-06T21:26:56.679-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "Siblings:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Substance Abuse",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Criminal Involvement",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Mental Health Problems",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105024,
+            "name": "Other:",
+            "evaluationItemId": 21084,
+            "createdAt": "2024-05-06T21:26:56.686-07:00",
+            "updatedAt": "2024-05-06T21:26:56.686-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "Other:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Substance Abuse",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Criminal Involvement",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Mental Health Problems",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105025,
+            "name": "If Yes to any of the above, elaborate:",
+            "evaluationItemId": 21085,
+            "createdAt": "2024-05-06T21:26:56.693-07:00",
+            "updatedAt": "2024-05-08T21:31:06.680-07:00",
+            "fieldType": "text",
+            "label": "If YES to any of the above, elaborate:",
+            "dividerBelow": true,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated \"My mom and dad both struggled with addiction throughout my life.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105026,
+            "name": "B. Family of Choice",
+            "evaluationItemId": 21086,
+            "createdAt": "2024-05-06T21:26:56.700-07:00",
+            "updatedAt": "2024-05-06T21:26:56.700-07:00",
+            "fieldType": "title",
+            "label": "B. Family of Choice",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105027,
+            "name": "1. Are you involved in a significant relationship?",
+            "evaluationItemId": 21087,
+            "createdAt": "2024-05-06T21:26:56.707-07:00",
+            "updatedAt": "2024-07-12T09:57:48.612-07:00",
+            "fieldType": "text",
+            "label": "1. Are you involved in a significant relationship?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105028,
+            "name": "If YES, are you satisfied with relationship with partner?",
+            "evaluationItemId": 21088,
+            "createdAt": "2024-05-06T21:26:56.715-07:00",
+            "updatedAt": "2024-07-12T09:57:48.619-07:00",
+            "fieldType": "text",
+            "label": "If YES, are you satisfied with relationship with partner?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No relationship"
+        },
+        {
+            "id": 105029,
+            "name": "2. Marriage History",
+            "evaluationItemId": 21089,
+            "createdAt": "2024-05-06T21:26:56.723-07:00",
+            "updatedAt": "2024-07-12T09:57:49.893-07:00",
+            "fieldType": "matrix",
+            "label": "2. Marriage History:",
+            "dividerBelow": false,
+            "optional": true
+        },
+        {
+            "id": 105030,
+            "name": "3. Do you have any children?",
+            "evaluationItemId": 21090,
+            "createdAt": "2024-05-06T21:26:56.730-07:00",
+            "updatedAt": "2024-07-12T09:57:52.112-07:00",
+            "fieldType": "matrix",
+            "label": "3. Do you have any children?",
+            "dividerBelow": false,
+            "optional": true
+        },
+        {
+            "id": 105031,
+            "name": "4. Are you satisfied with your relationship with your children?",
+            "evaluationItemId": 21091,
+            "createdAt": "2024-05-06T21:26:56.739-07:00",
+            "updatedAt": "2024-05-06T21:26:56.739-07:00",
+            "fieldType": "radio_buttons",
+            "label": "4. Are you satisfied with your relationship with your children?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": false
+                        },
+                        {
+                            "label": "N/A",
+                            "value": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105032,
+            "name": "5. Is there any history of the following:",
+            "evaluationItemId": 21092,
+            "createdAt": "2024-05-06T21:26:56.746-07:00",
+            "updatedAt": "2024-05-06T21:26:56.746-07:00",
+            "fieldType": "title",
+            "label": "<u>5. Is there any history of the following:</u>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105033,
+            "name": "Partner:",
+            "evaluationItemId": 21093,
+            "createdAt": "2024-05-06T21:26:56.753-07:00",
+            "updatedAt": "2024-05-06T21:26:56.753-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "Partner:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Substance Abuse",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Criminal Involvement",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Mental Health Problems",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105034,
+            "name": "Past Partner:",
+            "evaluationItemId": 21094,
+            "createdAt": "2024-05-06T21:26:56.760-07:00",
+            "updatedAt": "2024-05-06T21:26:56.760-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "Past Partner:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Substance Abuse",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Criminal Involvement",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Mental Health Problems",
+                    "description": "n/a",
+                    "value": true
+                }
+            ]
+        },
+        {
+            "id": 105035,
+            "name": "Children:",
+            "evaluationItemId": 21095,
+            "createdAt": "2024-05-06T21:26:56.767-07:00",
+            "updatedAt": "2024-05-06T21:26:56.767-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "Children:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Substance Abuse",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Criminal Involvement",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Mental Health Problems",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105036,
+            "name": "If YES to any of the above, elaborate:",
+            "evaluationItemId": 21096,
+            "createdAt": "2024-05-06T21:26:56.774-07:00",
+            "updatedAt": "2024-05-08T21:31:06.704-07:00",
+            "fieldType": "text",
+            "label": "If YES to any of the above, elaborate:",
+            "dividerBelow": true,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated \"My ex-girlfriends struggled with substance abuse, mental health problems, criminal involvement, or all three<em> </em>during our relationship and my addiction only continued to get worse since I had someone to use with.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105037,
+            "name": "C. Cultural Influences",
+            "evaluationItemId": 21097,
+            "createdAt": "2024-05-06T21:26:56.782-07:00",
+            "updatedAt": "2024-05-06T21:26:56.782-07:00",
+            "fieldType": "title",
+            "label": "C. Cultural Influences",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105038,
+            "name": "1. Were you raised in any specific culture?",
+            "evaluationItemId": 21098,
+            "createdAt": "2024-05-06T21:26:56.789-07:00",
+            "updatedAt": "2024-07-12T09:58:34.658-07:00",
+            "fieldType": "text",
+            "label": "1. Were you raised in any specific culture?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105039,
+            "name": "2. Do you identify with any specific cultural group?",
+            "evaluationItemId": 21099,
+            "createdAt": "2024-05-06T21:26:56.797-07:00",
+            "updatedAt": "2024-07-12T09:58:36.635-07:00",
+            "fieldType": "text",
+            "label": "2. Do you identify with any specific cultural group?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105040,
+            "name": "3. Do you currently practice any specific cultural rituals?",
+            "evaluationItemId": 21100,
+            "createdAt": "2024-05-06T21:26:56.805-07:00",
+            "updatedAt": "2024-07-12T09:58:36.640-07:00",
+            "fieldType": "text",
+            "label": "3. Do you currently practice any specific cultural rituals?",
+            "dividerBelow": true,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105041,
+            "name": "D. Spirituality/Religious Assessment",
+            "evaluationItemId": 21101,
+            "createdAt": "2024-05-06T21:26:56.812-07:00",
+            "updatedAt": "2024-05-06T21:26:56.812-07:00",
+            "fieldType": "title",
+            "label": "D. Spirituality/Religious Assessment",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105042,
+            "name": "1. Is religion or spirituality important in your life?",
+            "evaluationItemId": 21102,
+            "createdAt": "2024-05-06T21:26:56.819-07:00",
+            "updatedAt": "2024-05-08T21:31:06.716-07:00",
+            "fieldType": "text",
+            "label": "1. Is religion or spirituality important in your life?",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated \"My spirituality is very important in my life, but the more I became consumed by my addiction, the more I began to lose the connection I had built with my spirituality.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105043,
+            "name": "2. Do you use prayer/meditation?",
+            "evaluationItemId": 21103,
+            "createdAt": "2024-05-06T21:26:56.827-07:00",
+            "updatedAt": "2024-05-08T21:31:06.719-07:00",
+            "fieldType": "text",
+            "label": "2. Do you use prayer/meditation?",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated <em>\"</em>I use meditation and prayer.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105044,
+            "name": "3. How does your faith help you cope with problems in your life?",
+            "evaluationItemId": 21104,
+            "createdAt": "2024-05-06T21:26:56.834-07:00",
+            "updatedAt": "2024-05-08T21:31:06.721-07:00",
+            "fieldType": "text",
+            "label": "3. How does your faith help you cope with problems in your life?",
+            "dividerBelow": true,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated \"Faith helps me cope with the problems I am dealing with in my life by knowing there has to be a better path planned for me by my higher power.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105045,
+            "name": "II. LEGAL HISTORY",
+            "evaluationItemId": 21105,
+            "createdAt": "2024-05-06T21:26:56.842-07:00",
+            "updatedAt": "2024-05-06T21:26:56.842-07:00",
+            "fieldType": "title",
+            "label": "<center>II. LEGAL HISTORY</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105046,
+            "name": "1. Do you have a past or current history in the Criminal Justice System?",
+            "evaluationItemId": 21106,
+            "createdAt": "2024-05-06T21:26:56.849-07:00",
+            "updatedAt": "2024-07-12T10:00:07.805-07:00",
+            "fieldType": "text",
+            "label": "1. Is Client currently involved in the Criminal Justice System?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105047,
+            "name": "2. Have you ever been incarcerated?",
+            "evaluationItemId": 21107,
+            "createdAt": "2024-05-06T21:26:56.856-07:00",
+            "updatedAt": "2024-05-06T21:26:56.856-07:00",
+            "fieldType": "radio_buttons",
+            "label": "2. Have you ever been incarcerated?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105048,
+            "name": "If YES, list incarceration history, most recent first.",
+            "evaluationItemId": 21108,
+            "createdAt": "2024-05-06T21:26:56.864-07:00",
+            "updatedAt": "2024-07-12T10:00:10.144-07:00",
+            "fieldType": "matrix",
+            "label": "If YES, list incarceration history, most recent first:",
+            "dividerBelow": false,
+            "optional": true
+        },
+        {
+            "id": 105049,
+            "name": "3. Do you currently owe any restitution?",
+            "evaluationItemId": 21109,
+            "createdAt": "2024-05-06T21:26:56.871-07:00",
+            "updatedAt": "2024-07-12T10:00:12.506-07:00",
+            "fieldType": "text",
+            "label": "3. Do you currently owe any restitution?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105050,
+            "name": "4. How much will your legal situation influence your progress in treatment.",
+            "evaluationItemId": 21110,
+            "createdAt": "2024-05-06T21:26:56.878-07:00",
+            "updatedAt": "2024-07-12T10:00:12.509-07:00",
+            "fieldType": "text",
+            "label": "4. How much will your legal situation influence your progress in treatment:",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "N/A"
+        },
+        {
+            "id": 105051,
+            "name": "5. What is the urgency of your legal situation?",
+            "evaluationItemId": 21111,
+            "createdAt": "2024-05-06T21:26:56.885-07:00",
+            "updatedAt": "2024-07-12T10:00:12.513-07:00",
+            "fieldType": "text",
+            "label": "5. What is the urgency of your legal situation?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "N/A"
+        },
+        {
+            "id": 105052,
+            "name": "6. Is the legal situation related to your current issues with substance use or mental illness?",
+            "evaluationItemId": 21112,
+            "createdAt": "2024-05-06T21:26:56.892-07:00",
+            "updatedAt": "2024-07-12T10:00:14.592-07:00",
+            "fieldType": "text",
+            "label": "6. Is the legal situation related to your current issues with substance use or mental illness?",
+            "dividerBelow": true,
+            "optional": true,
+            "description": "N/A"
+        },
+        {
+            "id": 105053,
+            "name": "III. EDUCATIONAL / VOCATIONAL / MILITARY ISSUES",
+            "evaluationItemId": 21113,
+            "createdAt": "2024-05-06T21:26:56.899-07:00",
+            "updatedAt": "2024-05-06T21:26:56.899-07:00",
+            "fieldType": "title",
+            "label": "<center>III. EDUCATIONAL / VOCATIONAL / MILITARY ISSUES</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105054,
+            "name": "A. Educational History",
+            "evaluationItemId": 21114,
+            "createdAt": "2024-05-06T21:26:56.905-07:00",
+            "updatedAt": "2024-05-06T21:26:56.905-07:00",
+            "fieldType": "title",
+            "label": "A. Educational History",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105055,
+            "name": "1. What is the highest grade completed / degree or certificate obtained?",
+            "evaluationItemId": 21115,
+            "createdAt": "2024-05-06T21:26:56.912-07:00",
+            "updatedAt": "2024-05-06T21:26:56.912-07:00",
+            "fieldType": "string",
+            "label": "1. What is the highest grade completed / degree or certificate obtained?",
+            "dividerBelow": false,
+            "optional": false,
+            "value": "HS Diploma"
+        },
+        {
+            "id": 105056,
+            "name": "2. Are you currently enrolled and attending school?",
+            "evaluationItemId": 21116,
+            "createdAt": "2024-05-06T21:26:56.918-07:00",
+            "updatedAt": "2024-07-12T10:00:27.356-07:00",
+            "fieldType": "text",
+            "label": "2. Are you currently enrolled and attending school?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105057,
+            "name": "5. Do you have any future educational goals?",
+            "evaluationItemId": 21117,
+            "createdAt": "2024-05-06T21:26:56.925-07:00",
+            "updatedAt": "2024-07-12T10:00:27.359-07:00",
+            "fieldType": "text",
+            "label": "3. Do you have any future educational goals?",
+            "dividerBelow": true,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105058,
+            "name": "B  EMPLOYMENT HISTORY (Employment Screen:  If Client is not in the labor force and not on disability, Client is to be referred to Vocational Rehabilitation Services for an Assessment)",
+            "evaluationItemId": 21118,
+            "createdAt": "2024-05-06T21:26:56.932-07:00",
+            "updatedAt": "2024-05-06T21:26:56.932-07:00",
+            "fieldType": "title",
+            "label": "B. Employment History",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105059,
+            "name": "1. Have you ever been employed?",
+            "evaluationItemId": 21119,
+            "createdAt": "2024-05-06T21:26:56.939-07:00",
+            "updatedAt": "2024-05-06T21:26:56.939-07:00",
+            "fieldType": "radio_buttons",
+            "label": "1. Has Client ever been employed?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": true
+                        },
+                        {
+                            "label": "No",
+                            "value": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105060,
+            "name": "If YES, list employment history, (most recent first):",
+            "evaluationItemId": 21120,
+            "createdAt": "2024-05-06T21:26:56.945-07:00",
+            "updatedAt": "2024-05-08T21:31:06.745-07:00",
+            "fieldType": "matrix",
+            "label": "If YES, list employment history (most recent first):",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "label": null,
+                    "columnNames": [
+                        {
+                            "key": "Job/Position",
+                            "value": "Foreman"
+                        },
+                        {
+                            "key": "Employment Dates",
+                            "value": "2018-2023"
+                        },
+                        {
+                            "key": "Reason for Leaving",
+                            "value": "addiction"
+                        },
+                        {
+                            "key": "Salary",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": null,
+                    "columnNames": [
+                        {
+                            "key": "Job/Position",
+                            "value": ""
+                        },
+                        {
+                            "key": "Employment Dates",
+                            "value": ""
+                        },
+                        {
+                            "key": "Reason for Leaving",
+                            "value": ""
+                        },
+                        {
+                            "key": "Salary",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": null,
+                    "columnNames": [
+                        {
+                            "key": "Job/Position",
+                            "value": ""
+                        },
+                        {
+                            "key": "Employment Dates",
+                            "value": ""
+                        },
+                        {
+                            "key": "Reason for Leaving",
+                            "value": ""
+                        },
+                        {
+                            "key": "Salary",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": null,
+                    "columnNames": [
+                        {
+                            "key": "Job/Position",
+                            "value": ""
+                        },
+                        {
+                            "key": "Employment Dates",
+                            "value": ""
+                        },
+                        {
+                            "key": "Reason for Leaving",
+                            "value": ""
+                        },
+                        {
+                            "key": "Salary",
+                            "value": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105061,
+            "name": "2. Do you need / want any specific vocational training?",
+            "evaluationItemId": 21121,
+            "createdAt": "2024-05-06T21:26:56.952-07:00",
+            "updatedAt": "2024-07-12T10:00:52.213-07:00",
+            "fieldType": "text",
+            "label": "2. Do you need/want any specific vocational training?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No"
+        },
+        {
+            "id": 105062,
+            "name": "3. Have you ever received any vocational training?",
+            "evaluationItemId": 21122,
+            "createdAt": "2024-05-06T21:26:56.959-07:00",
+            "updatedAt": "2024-05-08T21:31:06.750-07:00",
+            "fieldType": "text",
+            "label": "3. Have you  ever received any vocational training?",
+            "dividerBelow": true,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated \"Yes, I went through vocational training to become a carpenter.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105063,
+            "name": "C. Military Service",
+            "evaluationItemId": 21123,
+            "createdAt": "2024-05-06T21:26:56.966-07:00",
+            "updatedAt": "2024-05-06T21:26:56.966-07:00",
+            "fieldType": "title",
+            "label": "C. Military Service",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105064,
+            "name": "1. Have you ever served in the Military?",
+            "evaluationItemId": 21124,
+            "createdAt": "2024-05-06T21:26:56.973-07:00",
+            "updatedAt": "2024-05-06T21:26:56.973-07:00",
+            "fieldType": "radio_buttons",
+            "label": "1. Have you ever served in the Military?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105065,
+            "name": "Military service",
+            "evaluationItemId": 21125,
+            "createdAt": "2024-05-06T21:26:56.980-07:00",
+            "updatedAt": "2024-07-12T10:16:03.572-07:00",
+            "fieldType": "matrix",
+            "label": "If YES:",
+            "dividerBelow": false,
+            "optional": true
+        },
+        {
+            "id": 105066,
+            "name": "Additional information / comments concerning Educational / Vocational Issues:",
+            "evaluationItemId": 21126,
+            "createdAt": "2024-05-06T21:26:56.987-07:00",
+            "updatedAt": "2024-07-12T10:16:03.579-07:00",
+            "fieldType": "text",
+            "label": "Additional information / comments concerning Educational / Vocational Issues:",
+            "dividerBelow": true,
+            "optional": true,
+            "description": "None"
+        },
+        {
+            "id": 105067,
+            "name": "IV. SEXUAL / ABUSE / TRAUMA HISTORY",
+            "evaluationItemId": 21127,
+            "createdAt": "2024-05-06T21:26:56.994-07:00",
+            "updatedAt": "2024-05-06T21:26:56.994-07:00",
+            "fieldType": "title",
+            "label": "<center>IV. SEXUAL / ABUSE / TRAUMA HISTORY</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105068,
+            "name": "Describe your present sexual orientation",
+            "evaluationItemId": 21128,
+            "createdAt": "2024-05-06T21:26:57.000-07:00",
+            "updatedAt": "2024-05-06T21:26:57.000-07:00",
+            "fieldType": "string",
+            "label": "Describe your present sexual orientation:",
+            "dividerBelow": false,
+            "optional": false,
+            "value": "Assigned Gender at Birth"
+        },
+        {
+            "id": 105069,
+            "name": "Check all that apply",
+            "evaluationItemId": 21129,
+            "createdAt": "2024-05-06T21:26:57.007-07:00",
+            "updatedAt": "2024-05-06T21:26:57.007-07:00",
+            "fieldType": "title",
+            "label": "<b>Check all that apply:</b><br /><br />For all checked, describe below.",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105070,
+            "name": "Sexual/Abuse/Trauma Checklist",
+            "evaluationItemId": 21130,
+            "createdAt": "2024-05-06T21:26:57.013-07:00",
+            "updatedAt": "2024-05-06T21:26:57.013-07:00",
+            "fieldType": "check_box",
+            "label": "",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Always had the same sexual orientation?",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "History of sexual abuse?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "History of sexual molestation?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "History of being involved in prostitution?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "History of being raped?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "History of illegal sexual acts?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "History of being involved in incestuous relationship(s)?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "History of gender identification issues?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "History of Safe Sex?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "History of HIV risk behavior?",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105071,
+            "name": "If yes, was it alcohol/drug related?",
+            "evaluationItemId": 21131,
+            "createdAt": "2024-05-06T21:26:57.021-07:00",
+            "updatedAt": "2024-05-06T21:26:57.021-07:00",
+            "fieldType": "radio_buttons",
+            "label": "If YES, was it alcohol/drug related?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": false
+                        },
+                        {
+                            "label": "N/A",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105072,
+            "name": "Explain any checked items above",
+            "evaluationItemId": 21132,
+            "createdAt": "2024-05-06T21:26:57.028-07:00",
+            "updatedAt": "2024-05-08T21:31:06.758-07:00",
+            "fieldType": "text",
+            "label": "Explain any checked items above:",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated \"I have always been attracted to the opposite sex.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105073,
+            "name": "Are you currently in or have you ever been involved in an abusive relationship? ",
+            "evaluationItemId": 21133,
+            "createdAt": "2024-05-06T21:26:57.036-07:00",
+            "updatedAt": "2024-05-06T21:26:57.036-07:00",
+            "fieldType": "text",
+            "label": "Are you currently in or have you ever been involved in an abusive relationship? ",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated no.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105074,
+            "name": "TRAUMA ASSESSMENT:",
+            "evaluationItemId": 21134,
+            "createdAt": "2024-05-06T21:26:57.044-07:00",
+            "updatedAt": "2024-05-06T21:26:57.044-07:00",
+            "fieldType": "title",
+            "label": "<h3>TRAUMA ASSESSMENT:</h3><br><p><strong>Have you ever experienced any of the following types of trauma?</strong></p>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105075,
+            "name": "Significant death of a family member or friend",
+            "evaluationItemId": 21135,
+            "createdAt": "2024-05-06T21:26:57.052-07:00",
+            "updatedAt": "2024-05-06T21:26:57.052-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Significant death of a family member or friend:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105076,
+            "name": "Witnessing an accident",
+            "evaluationItemId": 21136,
+            "createdAt": "2024-05-06T21:26:57.059-07:00",
+            "updatedAt": "2024-05-06T21:26:57.059-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Witnessing an Accident:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105077,
+            "name": "Community Violence",
+            "evaluationItemId": 21137,
+            "createdAt": "2024-05-06T21:26:57.067-07:00",
+            "updatedAt": "2024-05-06T21:26:57.067-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Community Violence:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105078,
+            "name": "Domestic Violence",
+            "evaluationItemId": 21138,
+            "createdAt": "2024-05-06T21:26:57.076-07:00",
+            "updatedAt": "2024-05-06T21:26:57.076-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Domestic Violence:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105079,
+            "name": "Childhood Trauma",
+            "evaluationItemId": 21139,
+            "createdAt": "2024-05-06T21:26:57.084-07:00",
+            "updatedAt": "2024-05-06T21:26:57.084-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Childhood Trauma:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105080,
+            "name": "Natural Disaster",
+            "evaluationItemId": 21140,
+            "createdAt": "2024-05-06T21:26:57.092-07:00",
+            "updatedAt": "2024-05-06T21:26:57.092-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Natural Disaster:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105081,
+            "name": "Family Violence",
+            "evaluationItemId": 21141,
+            "createdAt": "2024-05-06T21:26:57.100-07:00",
+            "updatedAt": "2024-05-06T21:26:57.100-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Family Violence:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105082,
+            "name": "Neglect",
+            "evaluationItemId": 21142,
+            "createdAt": "2024-05-06T21:26:57.107-07:00",
+            "updatedAt": "2024-05-06T21:26:57.107-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Neglect:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105083,
+            "name": "Any type of physical, sexual or emotional abuse",
+            "evaluationItemId": 21143,
+            "createdAt": "2024-05-06T21:26:57.115-07:00",
+            "updatedAt": "2024-05-06T21:26:57.115-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Any type of physical, sexual or emotional abuse:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": true
+                        },
+                        {
+                            "label": "No",
+                            "value": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105084,
+            "name": "School violence",
+            "evaluationItemId": 21144,
+            "createdAt": "2024-05-06T21:26:57.122-07:00",
+            "updatedAt": "2024-05-06T21:26:57.122-07:00",
+            "fieldType": "radio_buttons",
+            "label": "School Violence:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": true
+                        },
+                        {
+                            "label": "No",
+                            "value": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105085,
+            "name": "Do you have a history of past or current types of trauma listed above, or sexual, psychological or physical abuse or any other type of abuse, and/or neglect, trauma or exploitation explain below:",
+            "evaluationItemId": 21145,
+            "createdAt": "2024-05-06T21:26:57.130-07:00",
+            "updatedAt": "2024-05-08T21:31:06.761-07:00",
+            "fieldType": "text",
+            "label": "Do you have a history of past or current types of trauma listed above, or sexual, psychological or physical abuse or any other type of abuse, and/or neglect, trauma or exploitation explain below:",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated \"Yes, I have experienced emotional abuse and school violence in my life. It eventually led me down the path of addiction because it was the only way I knew how to cope.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105086,
+            "name": "Do you feel that this trauma may interfere with treatment and/or has led to past relapses? Describe and Elaborate on any Yes answers above:",
+            "evaluationItemId": 21146,
+            "createdAt": "2024-05-06T21:26:57.137-07:00",
+            "updatedAt": "2024-05-08T21:31:06.763-07:00",
+            "fieldType": "text",
+            "label": "Do you feel that this trauma may interfere with treatment and/or has led to past relapses?",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated \"Yes, I think it could interfere with my treatment because I continue to have a hard time talking about the traumatic events I've experienced throughout my life and dealt with multiple relapses in the past as a result.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105087,
+            "name": "Do you have a history of sexual, psychological or physical abuse or any other type of abuse, neglect, trauma or exploitation – Is the facility going to provide Trauma Therapy: ",
+            "evaluationItemId": 21147,
+            "createdAt": "2024-05-06T21:26:57.145-07:00",
+            "updatedAt": "2024-05-06T21:26:57.145-07:00",
+            "fieldType": "check_box",
+            "label": "Do you have a history of sexual, psychological or physical abuse or any other type of abuse, neglect, trauma or exploitation – Is the facility going to provide Trauma Therapy: ",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "label": "<strong>YES</strong>. If YES, a Trauma Assessment is to be conducted by a Licensed Individual & added to the Problem List with a Treatment Plan",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "<strong>NO</strong>. If NO, referral is to be made and problem is to be deferred on Problem List.",
+                    "description": "n/a",
+                    "value": true
+                }
+            ]
+        },
+        {
+            "id": 105088,
+            "name": "V. LEISURE/RECREATIONAL ACTIVITIES",
+            "evaluationItemId": 21148,
+            "createdAt": "2024-05-06T21:26:57.152-07:00",
+            "updatedAt": "2024-05-06T21:26:57.152-07:00",
+            "fieldType": "title",
+            "label": "<center>V. LEISURE/RECREATIONAL ACTIVITIES</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105089,
+            "name": "List any hobbies, recreational interests, sports, games or other leisure activities you enjoy.",
+            "evaluationItemId": 21149,
+            "createdAt": "2024-05-06T21:26:57.159-07:00",
+            "updatedAt": "2024-05-06T21:26:57.159-07:00",
+            "fieldType": "text",
+            "label": "List any hobbies, recreational interests, sports, games or other leisure activities you enjoy:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated \"I have not engaged in my old hobbies and interests for a long time because eventually my addiction was taking up all of my free time. I used to enjoy sports, cooking, fishing, and camping.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105090,
+            "name": "What effect has your substance use had on your leisure time?",
+            "evaluationItemId": 21150,
+            "createdAt": "2024-05-06T21:26:57.167-07:00",
+            "updatedAt": "2024-05-06T21:26:57.167-07:00",
+            "fieldType": "text",
+            "label": "What effect has your substance use had on your leisure time?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated \"I now spend all of my time trying to make money to get high or I spend it getting high.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105091,
+            "name": "Problems checklist",
+            "evaluationItemId": 21151,
+            "createdAt": "2024-05-06T21:26:57.174-07:00",
+            "updatedAt": "2024-05-06T21:26:57.174-07:00",
+            "fieldType": "check_box",
+            "label": "",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Job",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Money",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Lack of time",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Transportation",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "No interest",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Too much time",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Physical limitations",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Other:",
+                    "description": "n/a",
+                    "value": null
+                }
+            ]
+        },
+        {
+            "id": 105092,
+            "name": "VI. CURRENT SOCIAL ENVIRONMENT",
+            "evaluationItemId": 21152,
+            "createdAt": "2024-05-06T21:26:57.182-07:00",
+            "updatedAt": "2024-05-06T21:26:57.182-07:00",
+            "fieldType": "title",
+            "label": "<center>VI. CURRENT SOCIAL ENVIRONMENT</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105093,
+            "name": "Current Social Situation/Environment  (present living arrangement & environment, identify significant relationships with family members, support systems, current social /  peer groups and community resources)",
+            "evaluationItemId": 21153,
+            "createdAt": "2024-05-06T21:26:57.189-07:00",
+            "updatedAt": "2024-05-06T21:26:57.189-07:00",
+            "fieldType": "text",
+            "label": "Current Social Situation/Environment  (present living arrangement & environment, identify significant relationships with family members, support systems, current social /  peer groups and community resources):",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client states they are lacking a healthy support system of sober friends and don't know of any community resources in their area. They also do not have a healthy environment, supportive of her recovery to return back too.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105094,
+            "name": "VII. CURRENT FINANCIAL STATUS",
+            "evaluationItemId": 21154,
+            "createdAt": "2024-05-06T21:26:57.197-07:00",
+            "updatedAt": "2024-05-06T21:26:57.197-07:00",
+            "fieldType": "title",
+            "label": "<center>VII. CURRENT FINANCIAL STATUS</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105095,
+            "name": "Current Financial Status",
+            "evaluationItemId": 21155,
+            "createdAt": "2024-05-06T21:26:57.204-07:00",
+            "updatedAt": "2024-05-06T21:26:57.204-07:00",
+            "fieldType": "text",
+            "label": "Current Financial Status & How did you pay for Drug/Alcohol Addiction?",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated \"My current financial status is severely lacking at the moment and I was paying for my addiction by any means necessary, whether that meant stealing what I could, pawning any item worth money, or having to sell drugs in order to feed my own habit.\"</p>"
+                }
+            ]
+        },
+        {
+            "id": 105096,
+            "name": "VIII. CONSEQUENCES OF ADDICTION",
+            "evaluationItemId": 21156,
+            "createdAt": "2024-05-06T21:26:57.211-07:00",
+            "updatedAt": "2024-05-06T21:26:57.211-07:00",
+            "fieldType": "title",
+            "label": "<center>VIII. CONSEQUENCES OF ADDICTION</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105097,
+            "name": "1. Describe client's consequences of addiction.",
+            "evaluationItemId": 21157,
+            "createdAt": "2024-05-06T21:26:57.219-07:00",
+            "updatedAt": "2024-05-06T21:26:57.219-07:00",
+            "fieldType": "string",
+            "label": "1. Describe client's consequences of addiction:",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Physical",
+                    "value": "Client stated he has a loss of appetite, allergies, difficulty falling and staying asleep."
+                },
+                {
+                    "label": "Emotional",
+                    "value": "Client stated having schizophrenia and severe depression."
+                },
+                {
+                    "label": "Spiritual",
+                    "value": "Client stated he needs to reconnect with his higher power."
+                },
+                {
+                    "label": "Value System",
+                    "value": "Client states he has lost a lot of his value system because of his addiction."
+                },
+                {
+                    "label": "Legal",
+                    "value": "no legal problems"
+                },
+                {
+                    "label": "Financial",
+                    "value": "Client stated having no financial means because he spent it all on his addiction."
+                },
+                {
+                    "label": "Social",
+                    "value": "Client stated that he does not really have any sober friends."
+                },
+                {
+                    "label": "Mental",
+                    "value": "Client stated having severe and unmanageable depression and schizophrenia."
+                },
+                {
+                    "label": "Behavioral",
+                    "value": "Client stated he has a lot of old habits from his addiction he wants to change."
+                }
+            ]
+        },
+        {
+            "id": 105098,
+            "name": "IV. SUBSTANCE USE HISTORY & ASSESSMENT",
+            "evaluationItemId": 21158,
+            "createdAt": "2024-05-06T21:26:57.226-07:00",
+            "updatedAt": "2024-05-06T21:26:57.226-07:00",
+            "fieldType": "title",
+            "label": "<center>IV. SUBSTANCE USE HISTORY & ASSESSMENT</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105099,
+            "name": "Substance History",
+            "evaluationItemId": 21159,
+            "createdAt": "2024-05-06T21:26:57.234-07:00",
+            "updatedAt": "2024-05-06T21:26:57.234-07:00",
+            "fieldType": "matrix",
+            "label": "Substance History:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Alcohol",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": "21 YRS OLD"
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": "9/3/24"
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": "daily"
+                        },
+                        {
+                            "key": "Amount",
+                            "value": "750 ML"
+                        },
+                        {
+                            "key": "Method",
+                            "value": "oral"
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": "continued"
+                        }
+                    ]
+                },
+                {
+                    "label": "Marijuana",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Cocaine (Powder)",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Crack Cocaine",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Crystal Meth",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Heroin",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Suboxone/Zubsolv",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Oxycontin",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Methadone",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Other Opiates",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Benzodiazepines",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": "XANAX 38 YRS OLD"
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": "9/3/24"
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": "DAILY"
+                        },
+                        {
+                            "key": "Amount",
+                            "value": "10 MG"
+                        },
+                        {
+                            "key": "Method",
+                            "value": "ORAL"
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": "CONTINUED"
+                        }
+                    ]
+                },
+                {
+                    "label": "Hallucinogens",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Amphetamines",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Inhalants",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Ketamine (Special K)",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Triple C's",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Codeine",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Ecstasy",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Bath Salts",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Flakka",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "MDMA/Molly",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Steroids",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "K2/Spice",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Kratom",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Kava",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                },
+                {
+                    "label": "Other OTC Drugs",
+                    "columnNames": [
+                        {
+                            "key": "First Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Last Used",
+                            "value": ""
+                        },
+                        {
+                            "key": "Frequency/Duration",
+                            "value": ""
+                        },
+                        {
+                            "key": "Amount",
+                            "value": ""
+                        },
+                        {
+                            "key": "Method",
+                            "value": ""
+                        },
+                        {
+                            "key": "Pattern of Use (Episodic, Experimental, Binge, Continued, Mental/Behavioral)",
+                            "value": ""
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105100,
+            "name": "Other Drugs Used",
+            "evaluationItemId": 21160,
+            "createdAt": "2024-05-06T21:26:57.242-07:00",
+            "updatedAt": "2024-07-12T11:09:42.299-07:00",
+            "fieldType": "matrix",
+            "label": "Other Drugs Used:",
+            "dividerBelow": true,
+            "optional": true
+        },
+        {
+            "id": 105101,
+            "name": " Assessment for Other Addictive Disorders: ",
+            "evaluationItemId": 21161,
+            "createdAt": "2024-05-06T21:26:57.249-07:00",
+            "updatedAt": "2024-05-06T21:26:57.249-07:00",
+            "fieldType": "title",
+            "label": "Assessment for Other Addictive Disorders",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105102,
+            "name": "History of Other Addictive Behaviors:",
+            "evaluationItemId": 21162,
+            "createdAt": "2024-05-06T21:26:57.257-07:00",
+            "updatedAt": "2024-05-06T21:26:57.257-07:00",
+            "fieldType": "title",
+            "label": "History of Other Addictive Behaviors:",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105103,
+            "name": "Eating Disorders? ",
+            "evaluationItemId": 21163,
+            "createdAt": "2024-05-06T21:26:57.264-07:00",
+            "updatedAt": "2024-05-06T21:26:57.264-07:00",
+            "fieldType": "check_box",
+            "label": "Eating Disorders? ",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Anorexia Nervosa",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Bulimia Nervosa",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Binge-Eating",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Denied",
+                    "description": "n/a",
+                    "value": true
+                }
+            ]
+        },
+        {
+            "id": 105104,
+            "name": "Have you ever received treatment for an Eating Disorder?",
+            "evaluationItemId": 21164,
+            "createdAt": "2024-05-06T21:26:57.272-07:00",
+            "updatedAt": "2024-05-06T21:26:57.272-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Have you ever received treatment for an Eating Disorder?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105105,
+            "name": "Is Eating Disorder still an issue for you?",
+            "evaluationItemId": 21165,
+            "createdAt": "2024-05-06T21:26:57.279-07:00",
+            "updatedAt": "2024-05-06T21:26:57.279-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Is Eating Disorder still an issue for you?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": false
+                        },
+                        {
+                            "label": "N/A",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105106,
+            "name": "Do you have a history of Gambling?  ",
+            "evaluationItemId": 21166,
+            "createdAt": "2024-05-06T21:26:57.286-07:00",
+            "updatedAt": "2024-07-12T11:10:27.123-07:00",
+            "fieldType": "text",
+            "label": "Do you have a history of Gambling?  ",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "None"
+        },
+        {
+            "id": 105107,
+            "name": "Do you feel that gambling is an issue for you? ",
+            "evaluationItemId": 21167,
+            "createdAt": "2024-05-06T21:26:57.294-07:00",
+            "updatedAt": "2024-05-06T21:26:57.294-07:00",
+            "fieldType": "radio_buttons",
+            "label": "Do you feel that gambling is an issue for you? ",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": false
+                        },
+                        {
+                            "label": "No",
+                            "value": false
+                        },
+                        {
+                            "label": "N/A",
+                            "value": true
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105108,
+            "name": "Are there other addictive behaviors (work, nicotine, sex, caffeine, shopping, and/or exercising) that the you have a problem with?",
+            "evaluationItemId": 21168,
+            "createdAt": "2024-05-06T21:26:57.302-07:00",
+            "updatedAt": "2024-07-12T11:10:29.545-07:00",
+            "fieldType": "text",
+            "label": "Are there other addictive behaviors (work, nicotine, sex, caffeine, shopping, and/or exercising) that the you have a problem with?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "None"
+        },
+        {
+            "id": 105109,
+            "name": "Are there any other addictive disorders that will need to be addressed in treatment?  ",
+            "evaluationItemId": 21169,
+            "createdAt": "2024-05-06T21:26:57.309-07:00",
+            "updatedAt": "2024-07-12T11:10:29.548-07:00",
+            "fieldType": "text",
+            "label": "Are there any other addictive disorders that will need to be addressed in treatment?  ",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "None"
+        },
+        {
+            "id": 105110,
+            "name": "List Drugs of Choice:",
+            "evaluationItemId": 21170,
+            "createdAt": "2024-05-06T21:26:57.316-07:00",
+            "updatedAt": "2024-05-06T21:26:57.316-07:00",
+            "fieldType": "patient.drug_of_choice",
+            "label": "List Drugs of Choice:",
+            "dividerBelow": false,
+            "optional": false,
+            "drugsOfChoice": [
+                {
+                    "preference": "Primary",
+                    "drugClass": "Alcohol",
+                    "substances": [
+                        "Beer"
+                    ]
+                },
+                {
+                    "preference": "Secondary",
+                    "drugClass": "Sedatives, Hypnotics and Anxiolytics",
+                    "substances": [
+                        "Alprazolam"
+                    ]
+                },
+                {
+                    "preference": "Tertiary",
+                    "drugClass": "",
+                    "substances": []
+                }
+            ]
+        },
+        {
+            "id": 105111,
+            "name": "Drug Craving:  (Range 0-10, 10 being highest) ",
+            "evaluationItemId": 21171,
+            "createdAt": "2024-05-06T21:26:57.323-07:00",
+            "updatedAt": "2024-05-06T21:26:57.323-07:00",
+            "fieldType": "string",
+            "label": "Drug Craving:  (Range 0-10, 10 being highest) ",
+            "dividerBelow": true,
+            "optional": false,
+            "value": "6"
+        },
+        {
+            "id": 105112,
+            "name": "Treatment History",
+            "evaluationItemId": 21172,
+            "createdAt": "2024-05-06T21:26:57.330-07:00",
+            "updatedAt": "2024-05-06T21:26:57.330-07:00",
+            "fieldType": "title",
+            "label": "Treatment History",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105113,
+            "name": "Number of Times:",
+            "evaluationItemId": 21173,
+            "createdAt": "2024-05-06T21:26:57.337-07:00",
+            "updatedAt": "2024-05-06T21:26:57.337-07:00",
+            "fieldType": "string",
+            "label": "Number of Times:",
+            "dividerBelow": false,
+            "optional": false,
+            "value": "0"
+        },
+        {
+            "id": 105114,
+            "name": "Previous Treatment",
+            "evaluationItemId": 21174,
+            "createdAt": "2024-05-06T21:26:57.344-07:00",
+            "updatedAt": "2024-07-12T11:11:12.391-07:00",
+            "fieldType": "matrix",
+            "label": "Previous Treatment:",
+            "dividerBelow": false,
+            "optional": true
+        },
+        {
+            "id": 105115,
+            "name": "Describe your treatment and relapse history, including AA experiences and attempts at abstinence/recovery.",
+            "evaluationItemId": 21175,
+            "createdAt": "2024-05-06T21:26:57.352-07:00",
+            "updatedAt": "2024-05-06T21:26:57.352-07:00",
+            "fieldType": "text",
+            "label": "Describe your treatment and relapse history, including AA experiences and attempts at abstinence/recovery:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p><span style=\"font-family: Roboto, sans-serif; font-size: 17.6px;\">Client stated having never been in treatment but has heard of AA/NA and has experienced relapses in the past from attempting to get sober on his own.</span></p>"
+                }
+            ]
+        },
+        {
+            "id": 105116,
+            "name": "What precipitating events lead to relapse (i.e. Triggers):",
+            "evaluationItemId": 21176,
+            "createdAt": "2024-05-06T21:26:57.358-07:00",
+            "updatedAt": "2024-05-06T21:26:57.358-07:00",
+            "fieldType": "text",
+            "label": "What precipitating events lead to relapse (i.e. triggers)?",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated the events leading up to my relapse were my inability to maintain employment, financial problems, and deterioration of family relationships.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105117,
+            "name": "X. TREATMENT ACCEPTANCE / RESISTANCE DIMENSION",
+            "evaluationItemId": 21177,
+            "createdAt": "2024-05-06T21:26:57.366-07:00",
+            "updatedAt": "2024-05-06T21:26:57.366-07:00",
+            "fieldType": "title",
+            "label": "<center>X. TREATMENT ACCEPTANCE / RESISTANCE DIMENSION</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105118,
+            "name": "1. Describe your externally motivated for Treatment?",
+            "evaluationItemId": 21178,
+            "createdAt": "2024-05-06T21:26:57.373-07:00",
+            "updatedAt": "2024-05-06T21:26:57.373-07:00",
+            "fieldType": "text",
+            "label": "1. Describe your external motivation for Treatment?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated their external motivation for treatment is rebuild health connections with her family, take better care of her health, and become financially stable.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105119,
+            "name": "2. Describe your internally motivated for Treatment?",
+            "evaluationItemId": 21179,
+            "createdAt": "2024-05-06T21:26:57.380-07:00",
+            "updatedAt": "2024-05-08T21:31:06.780-07:00",
+            "fieldType": "text",
+            "label": "2. Describe your internal motivation for Treatment?",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated their internal motivation for treatment is to learn how to manage their anxiety and depression, rebuild their self-esteem, and have a more positive outlook on life.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105120,
+            "name": "3. Relapse/Continued Use Potential",
+            "evaluationItemId": 21180,
+            "createdAt": "2024-05-06T21:26:57.387-07:00",
+            "updatedAt": "2024-05-06T21:26:57.387-07:00",
+            "fieldType": "title",
+            "label": "3. Relapse/Continued Use Potential",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105121,
+            "name": "Client's Strengths",
+            "evaluationItemId": 21181,
+            "createdAt": "2024-05-06T21:26:57.394-07:00",
+            "updatedAt": "2024-05-06T21:26:57.394-07:00",
+            "fieldType": "check_box",
+            "label": "Client's Strengths:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Willingness to seek treatment",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Has financial support",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Has outside support system",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Willingness to comply with treatment",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Ability to benefit from treatment",
+                    "description": "n/a",
+                    "value": true
+                }
+            ]
+        },
+        {
+            "id": 105122,
+            "name": "Client's Weaknesses",
+            "evaluationItemId": 21182,
+            "createdAt": "2024-05-06T21:26:57.400-07:00",
+            "updatedAt": "2024-05-06T21:26:57.400-07:00",
+            "fieldType": "check_box",
+            "label": "Client's Weaknesses:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Lacks coping skills",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Poor impulse control",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Inability to form relationships",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Low self esteem",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Multiple treatment failures",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Grief loss issues",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Poor motivation",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Low ability to benefit from treatment",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105123,
+            "name": "Barriers to Treatment",
+            "evaluationItemId": 21183,
+            "createdAt": "2024-05-06T21:26:57.407-07:00",
+            "updatedAt": "2024-05-06T21:26:57.407-07:00",
+            "fieldType": "check_box",
+            "label": "Barriers to Treatment:",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Medical condition",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Psychiatric diagnosis",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Financial",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Outside obligations",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Language",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Cultural",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Family pressures",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "External forces:",
+                    "description": "n/a",
+                    "value": null
+                },
+                {
+                    "label": "Other:",
+                    "description": "n/a",
+                    "value": null
+                }
+            ]
+        },
+        {
+            "id": 105124,
+            "name": "XI. RECOVERY ENVIRONMENT",
+            "evaluationItemId": 21184,
+            "createdAt": "2024-05-06T21:26:57.414-07:00",
+            "updatedAt": "2024-05-06T21:26:57.414-07:00",
+            "fieldType": "title",
+            "label": "<center>XI. RECOVERY ENVIRONMENT</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105125,
+            "name": "1. Do you have an existing positive support system?",
+            "evaluationItemId": 21185,
+            "createdAt": "2024-05-06T21:26:57.421-07:00",
+            "updatedAt": "2024-05-08T21:31:06.783-07:00",
+            "fieldType": "text",
+            "label": "1. Do you have an existing positive support system?",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client stated he does not have a positive support system because he has no friends in sobriety and his family creates more stress than positivity.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105126,
+            "name": "2. Is your current living environment conducive to progress in therapy?",
+            "evaluationItemId": 21186,
+            "createdAt": "2024-05-06T21:26:57.428-07:00",
+            "updatedAt": "2024-07-12T11:27:37.084-07:00",
+            "fieldType": "text",
+            "label": "2. Is your current living environment conducive to progress in therapy?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "Yes"
+        },
+        {
+            "id": 105127,
+            "name": "3. Are you currently engaged in any substance-free leisure activities or hobbies?",
+            "evaluationItemId": 21187,
+            "createdAt": "2024-05-06T21:26:57.435-07:00",
+            "updatedAt": "2024-07-12T11:27:37.090-07:00",
+            "fieldType": "text",
+            "label": "3. Are you currently engaged in any substance-free leisure activities or hobbies?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "Yes"
+        },
+        {
+            "id": 105128,
+            "name": "4. What strengths do you have that will assist you in regards to recovery?",
+            "evaluationItemId": 21188,
+            "createdAt": "2024-05-06T21:26:57.441-07:00",
+            "updatedAt": "2024-05-06T21:26:57.441-07:00",
+            "fieldType": "text",
+            "label": "4. What strengths do you have that will assist you in regards to recovery?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client stated some of the strengths she has that will assist her in her recovery are being extremely motivated, persistent, friendly, and goal oriented.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105129,
+            "name": "5. Additional information / comments concerning recovery environment issues:",
+            "evaluationItemId": 21189,
+            "createdAt": "2024-05-06T21:26:57.448-07:00",
+            "updatedAt": "2024-07-12T11:29:09.960-07:00",
+            "fieldType": "text",
+            "label": "5. Additional information / comments concerning recovery environment issues:",
+            "dividerBelow": true,
+            "optional": true,
+            "description": "None"
+        },
+        {
+            "id": 105130,
+            "name": "XII. INTERVIEW WITH SIGNIFICANT FAMILY MEMBER (When available in person or by phone)",
+            "evaluationItemId": 21190,
+            "createdAt": "2024-05-06T21:26:57.454-07:00",
+            "updatedAt": "2024-05-06T21:26:57.454-07:00",
+            "fieldType": "title",
+            "label": "<center><h2>XV. INTERVIEW WITH SIGNIFICANT FAMILY MEMBER</h2></center><h3>(When available in person or by phone)</h3>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105131,
+            "name": "1. Does family member / significant other view Client’s behavior and / or usage as a problem?",
+            "evaluationItemId": 21191,
+            "createdAt": "2024-05-06T21:26:57.461-07:00",
+            "updatedAt": "2024-07-21T23:24:49.038-07:00",
+            "fieldType": "text",
+            "label": "1. Does family member / significant other view Client’s behavior and/or usage as a problem?",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client's family stated that they view their behavior/usage a problem because of the negative change in their behavior/personality.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105132,
+            "name": "2. Has any family member / significant other attempted to address / intervene in Client’s behavior and / or usage?",
+            "evaluationItemId": 21192,
+            "createdAt": "2024-05-06T21:26:57.467-07:00",
+            "updatedAt": "2024-05-06T21:26:57.467-07:00",
+            "fieldType": "radio_buttons",
+            "label": "2. Has any family member / significant other attempted to address/intervene in Client’s behavior and/or usage?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "recordItems": [
+                        {
+                            "label": "Yes",
+                            "value": true
+                        },
+                        {
+                            "label": "No",
+                            "value": false
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105133,
+            "name": "Why or Why Not?",
+            "evaluationItemId": 21193,
+            "createdAt": "2024-05-06T21:26:57.474-07:00",
+            "updatedAt": "2024-05-06T21:26:57.474-07:00",
+            "fieldType": "text",
+            "label": "Why or Why Not?",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Client's family addressed their usage because they saw the damage it was causing.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105134,
+            "name": "3. Has family member / significant other noticed any changes in Client’s behavior?",
+            "evaluationItemId": 21194,
+            "createdAt": "2024-05-06T21:26:57.480-07:00",
+            "updatedAt": "2024-07-21T23:26:05.736-07:00",
+            "fieldType": "text",
+            "label": "3. Has family member / significant other noticed any changes in Client’s behavior?",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p style=\"text-align: left;\">Client's family noticed a change in their behavior when they began isolating themselves from the family.</p>\r\n<p> </p>"
+                }
+            ]
+        },
+        {
+            "id": 105135,
+            "name": "4. Have there been any traumatic events in the family or specific to the Client?",
+            "evaluationItemId": 21195,
+            "createdAt": "2024-05-06T21:26:57.486-07:00",
+            "updatedAt": "2024-07-21T23:26:01.186-07:00",
+            "fieldType": "text",
+            "label": "4. Have there been any traumatic events in the family or specific to the Client?",
+            "dividerBelow": false,
+            "optional": true,
+            "records": [
+                {
+                    "description": "<p>Client's family stated yes but does not wish to discuss it at this time.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105136,
+            "name": "5. Is family member / significant other willing to participate in Client’s treatment?",
+            "evaluationItemId": 21196,
+            "createdAt": "2024-05-06T21:26:57.493-07:00",
+            "updatedAt": "2024-07-21T23:26:34.735-07:00",
+            "fieldType": "text",
+            "label": "5. Is family member / significant other willing to participate in Client’s treatment?",
+            "dividerBelow": true,
+            "optional": true,
+            "description": "Yes"
+        },
+        {
+            "id": 105137,
+            "name": "CLINICAL IMPRESSIONS:  (Include the impact of spirituality on the ability of the individual to receive care/services/determination of any barriers to treatment and/or affiliation with certain types of self-help groups, and if any further assessments are ",
+            "evaluationItemId": 21197,
+            "createdAt": "2024-05-06T21:26:57.499-07:00",
+            "updatedAt": "2024-05-06T21:26:57.499-07:00",
+            "fieldType": "text",
+            "label": "<h3>CLINICAL IMPRESSIONS:</h3><p><i>Include the impact of spirituality on the ability of the individual to receive care/services/determination of any barriers to treatment and/or affiliation with certain types of self-help groups, and if any further assessments are needed.</i></p>",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Ahmad Nasseri presents with a complex clinical profile that includes Major Depressive Disorder, Recurrent Episode, Moderate (F33.1), Generalized Anxiety Disorder (F41.1), and Severe Alcohol Use Disorder (F10.20), along with Severe Benzodiazepine Use Disorder (F13.20). His co-occurring mental health and substance use disorders are deeply intertwined with a significant trauma history, leading to ongoing emotional instability, impaired functioning, and poor impulse control. Ahmad has been using substances as a way to self-medicate his anxiety and depression, which has caused a progressive deterioration in his physical, psychological, and social well-being. Given his current condition, a Partial Hospitalization Program (PHP) is recommended to address his complex treatment needs through a structured therapeutic environment.</p>\r\n<p>Spirituality has been an important part of Ahmad&rsquo;s identity, providing him with a sense of purpose and meaning prior to the escalation of his addiction. However, his substance use and mental health struggles have created a rift between his spiritual beliefs and his actions, leading to profound feelings of guilt, shame, and self-blame. This internal conflict has exacerbated his depressive symptoms and worsened his overall mental health. Reintegrating spiritual support into Ahmad&rsquo;s treatment plan is essential, as addressing these internal struggles will help reduce the emotional burdens contributing to his addiction. Referrals to spiritually-informed counseling or faith-based recovery groups, such as Alcoholics Anonymous (AA) or Narcotics Anonymous (NA), may help Ahmad reconcile his spiritual beliefs with his recovery process, providing a supportive community that aligns with his values.</p>\r\n<p>Ahmad faces several barriers to successful treatment engagement, with feelings of shame and guilt acting as major obstacles. His low self-worth and internalized guilt, especially regarding his spiritual conflict, may hinder his full participation in therapy and lead to withdrawal or resistance. Overcoming these barriers will require a compassionate and inclusive approach, ensuring that Ahmad feels supported as he works through his emotional and spiritual challenges. The treatment plan should focus on addressing these barriers while helping Ahmad develop healthier coping mechanisms.</p>\r\n<p>The immediate treatment goals for Ahmad include stabilizing his mental health and achieving sobriety. PHP will provide daily therapeutic interventions, including Cognitive Behavioral Therapy (CBT) to challenge maladaptive thought patterns, and Dialectical Behavioral Therapy (DBT) to improve emotional regulation. His substance use issues, particularly his alcohol and benzodiazepine dependencies, will be addressed through relapse prevention planning, craving management, and skill-building sessions. Integrating spiritual practices into his recovery will be a key component of his treatment plan, helping Ahmad reconnect with his spiritual values and reduce his feelings of guilt and shame.</p>\r\n<p>Further assessments will be necessary to fully understand the extent of Ahmad&rsquo;s trauma and spiritual distress. A spiritual assessment will help clarify how his beliefs influence his recovery, while a trauma assessment will uncover the impact of past experiences on his current mental health and substance use patterns. A dual diagnosis assessment will also ensure that both his psychiatric conditions and substance use disorders are addressed concurrently, allowing for a coordinated and comprehensive treatment plan.</p>\r\n<p>In conclusion, Ahmad's treatment in the PHP setting will focus on mental health stabilization, substance use recovery, and spiritual reintegration. By providing daily therapeutic interventions, addressing trauma, and incorporating spiritual support, Ahmad will have the opportunity to develop healthier coping strategies and move toward long-term recovery. The structured yet flexible nature of PHP will allow Ahmad to receive the care he needs while gradually transitioning to a more independent lifestyle, supported by ongoing therapeutic and medical oversight.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105138,
+            "name": "XII. ASSESSMENT OF MENTAL STATUS DURING INTERVIEW",
+            "evaluationItemId": 21198,
+            "createdAt": "2024-05-06T21:26:57.506-07:00",
+            "updatedAt": "2024-05-06T21:26:57.506-07:00",
+            "fieldType": "title",
+            "label": "<center>XII. ASSESSMENT OF MENTAL STATUS DURING INTERVIEW</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105139,
+            "name": "APPEARANCE",
+            "evaluationItemId": 21199,
+            "createdAt": "2024-05-06T21:26:57.512-07:00",
+            "updatedAt": "2024-05-06T21:26:57.512-07:00",
+            "fieldType": "check_box",
+            "label": "APPEARANCE:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Clean/neat",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Disheveled/Unkempt",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105140,
+            "name": "AFFECT",
+            "evaluationItemId": 21200,
+            "createdAt": "2024-05-06T21:26:57.519-07:00",
+            "updatedAt": "2024-05-06T21:26:57.519-07:00",
+            "fieldType": "check_box",
+            "label": "AFFECT:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Appropriate",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Inappropriate",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Flat",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105141,
+            "name": "MOOD",
+            "evaluationItemId": 21201,
+            "createdAt": "2024-05-06T21:26:57.525-07:00",
+            "updatedAt": "2024-05-06T21:26:57.525-07:00",
+            "fieldType": "check_box",
+            "label": "MOOD:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Happy",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Sad",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Angry",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Depressed",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Labile",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Anxious",
+                    "description": "n/a",
+                    "value": true
+                }
+            ]
+        },
+        {
+            "id": 105142,
+            "name": "BEHAVIOR",
+            "evaluationItemId": 21202,
+            "createdAt": "2024-05-06T21:26:57.531-07:00",
+            "updatedAt": "2024-05-06T21:26:57.531-07:00",
+            "fieldType": "check_box",
+            "label": "BEHAVIOR:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Cooperative",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Uncooperative",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105143,
+            "name": "ORIENTATION",
+            "evaluationItemId": 21203,
+            "createdAt": "2024-05-06T21:26:57.538-07:00",
+            "updatedAt": "2024-05-06T21:26:57.538-07:00",
+            "fieldType": "check_box_first_value_none",
+            "label": "ORIENTATION:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "None",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Person",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Time",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Place",
+                    "description": "n/a",
+                    "value": true
+                }
+            ]
+        },
+        {
+            "id": 105144,
+            "name": "INSIGHT",
+            "evaluationItemId": 21204,
+            "createdAt": "2024-05-06T21:26:57.544-07:00",
+            "updatedAt": "2024-05-06T21:26:57.544-07:00",
+            "fieldType": "check_box",
+            "label": "INSIGHT:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Good",
+                    "description": "n/a",
+                    "value": false
+                },
+                {
+                    "label": "Fair",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Poor",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105145,
+            "name": "JUDGMENT",
+            "evaluationItemId": 21205,
+            "createdAt": "2024-05-06T21:26:57.551-07:00",
+            "updatedAt": "2024-05-06T21:26:57.551-07:00",
+            "fieldType": "check_box",
+            "label": "JUDGMENT:",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "label": "Mature",
+                    "description": "n/a",
+                    "value": true
+                },
+                {
+                    "label": "Immature",
+                    "description": "n/a",
+                    "value": false
+                }
+            ]
+        },
+        {
+            "id": 105146,
+            "name": "LEVELS OF IMPAIRMENT / SEVERITY RATINGS",
+            "evaluationItemId": 21206,
+            "createdAt": "2024-05-06T21:26:57.557-07:00",
+            "updatedAt": "2024-05-06T21:26:57.557-07:00",
+            "fieldType": "title",
+            "label": "<center>LEVELS OF IMPAIRMENT / SEVERITY RATINGS</center>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105147,
+            "name": "RATE CLIENTS LEVEL OF IMPAIRMENT & SEVERITY:  RATING/SEVERITY SCALE:",
+            "evaluationItemId": 21207,
+            "createdAt": "2024-05-06T21:26:57.563-07:00",
+            "updatedAt": "2024-05-06T21:26:57.563-07:00",
+            "fieldType": "title",
+            "label": "<b>RATE CLIENT'S LEVEL OF IMPAIRMENT & SEVERITY:</b><br /><br />RATING/SEVERITY SCALE:<br /><br />0 – Not at all<br />1 – Slightly<br />2 – Moderately<br />3 – Considerably<br />4 – Extremely",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105148,
+            "name": "PROBLEMS",
+            "evaluationItemId": 21208,
+            "createdAt": "2024-05-06T21:26:57.570-07:00",
+            "updatedAt": "2024-07-12T11:29:55.781-07:00",
+            "fieldType": "points_item",
+            "label": "PROBLEMS:",
+            "dividerBelow": false,
+            "optional": true,
+            "optionText": "2 – Moderately",
+            "points": 2
+        },
+        {
+            "id": 105149,
+            "name": "MEDICAL",
+            "evaluationItemId": 21209,
+            "createdAt": "2024-05-06T21:26:57.577-07:00",
+            "updatedAt": "2024-07-12T11:29:55.784-07:00",
+            "fieldType": "points_item",
+            "label": "MEDICAL:",
+            "dividerBelow": false,
+            "optional": true,
+            "optionText": "1 – Slightly",
+            "points": 1
+        },
+        {
+            "id": 105150,
+            "name": "EMPLOYMENT",
+            "evaluationItemId": 21210,
+            "createdAt": "2024-05-06T21:26:57.584-07:00",
+            "updatedAt": "2024-07-12T11:29:59.862-07:00",
+            "fieldType": "points_item",
+            "label": "EMPLOYMENT:",
+            "dividerBelow": false,
+            "optional": true,
+            "optionText": "0 – Not at all",
+            "points": 0
+        },
+        {
+            "id": 105151,
+            "name": "PEER SUPPORT",
+            "evaluationItemId": 21211,
+            "createdAt": "2024-05-06T21:26:57.590-07:00",
+            "updatedAt": "2024-07-12T11:29:59.791-07:00",
+            "fieldType": "points_item",
+            "label": "PEER SUPPORT:",
+            "dividerBelow": false,
+            "optional": true,
+            "optionText": "1 – Slightly",
+            "points": 1
+        },
+        {
+            "id": 105152,
+            "name": "DRUG/ALCOHOL USAGE",
+            "evaluationItemId": 21212,
+            "createdAt": "2024-05-06T21:26:57.597-07:00",
+            "updatedAt": "2024-07-12T11:30:02.176-07:00",
+            "fieldType": "points_item",
+            "label": "DRUG/ALCOHOL USAGE:",
+            "dividerBelow": false,
+            "optional": true,
+            "optionText": "3 – Considerably",
+            "points": 3
+        },
+        {
+            "id": 105153,
+            "name": "LEGAL",
+            "evaluationItemId": 21213,
+            "createdAt": "2024-05-06T21:26:57.605-07:00",
+            "updatedAt": "2024-07-12T11:30:02.184-07:00",
+            "fieldType": "points_item",
+            "label": "LEGAL:",
+            "dividerBelow": false,
+            "optional": true,
+            "optionText": "0 – Not at all",
+            "points": 0
+        },
+        {
+            "id": 105154,
+            "name": "FAMILY/SOCIAL",
+            "evaluationItemId": 21214,
+            "createdAt": "2024-05-06T21:26:57.612-07:00",
+            "updatedAt": "2024-07-12T11:30:12.916-07:00",
+            "fieldType": "points_item",
+            "label": "FAMILY/SOCIAL:",
+            "dividerBelow": false,
+            "optional": true,
+            "optionText": "1 – Slightly",
+            "points": 1
+        },
+        {
+            "id": 105155,
+            "name": "PSYCHIATRIC - MENTAL HEALTH",
+            "evaluationItemId": 21215,
+            "createdAt": "2024-05-06T21:26:57.619-07:00",
+            "updatedAt": "2024-07-12T11:30:15.548-07:00",
+            "fieldType": "points_item",
+            "label": "PSYCHIATRIC - MENTAL HEALTH:",
+            "dividerBelow": false,
+            "optional": true,
+            "optionText": "2 – Moderately",
+            "points": 2
+        },
+        {
+            "id": 105156,
+            "name": "TOTAL SCORE",
+            "evaluationItemId": 21216,
+            "createdAt": "2024-05-06T21:26:57.627-07:00",
+            "updatedAt": "2024-07-12T11:30:15.603-07:00",
+            "fieldType": "points_total",
+            "label": "TOTAL SCORE:",
+            "dividerBelow": false,
+            "optional": false,
+            "optionText": null,
+            "points": 10
+        },
+        {
+            "id": 105157,
+            "name": "Overall Level of Impairment & Severity",
+            "evaluationItemId": 21217,
+            "createdAt": "2024-05-06T21:26:57.635-07:00",
+            "updatedAt": "2024-05-06T21:26:57.635-07:00",
+            "fieldType": "title",
+            "label": "<b>OVERALL LEVEL OF IMPAIRMENT & SEVERITY</b><br /><br /><table class=\"tftable\" border=\"1\"> <tr><td>0</td><td>Not at all impaired</td></tr> <tr><td>1-7</td><td>Slightly impaired</td></tr> <tr><td>8-15</td><td>Moderately impaired</td></tr> <tr><td>16-23</td><td>Considerably impaired</td></tr> <tr><td>24 & OVER</td><td>Extremely impaired</td></tr> </table>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105158,
+            "name": "RATIONALE FOR TREATMENT AT THIS LEVEL OF CARE:",
+            "evaluationItemId": 21218,
+            "createdAt": "2024-05-06T21:26:57.642-07:00",
+            "updatedAt": "2024-05-06T21:26:57.642-07:00",
+            "fieldType": "text",
+            "label": "RATIONALE FOR TREATMENT AT THIS LEVEL OF CARE:",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Ahmad&rsquo;s overall functioning is considerably impaired due to the combined impact of his substance use, underlying psychiatric disorders, and his lack of a supportive social network. His substance use disorder (alcohol and benzodiazepines) has led to significant deterioration in physical health, emotional regulation, and daily living skills. Additionally, his psychiatric conditions, including Major Depressive Disorder and Generalized Anxiety Disorder, have compounded his challenges, contributing to poor impulse control, low motivation, and persistent feelings of hopelessness. The absence of a stable support system further exacerbates his condition, leaving him vulnerable to relapse and emotional instability. Partial Hospitalization Program (PHP) is the most appropriate next step as it offers intensive therapeutic intervention while enabling him to gradually regain personal responsibility in a supportive, semi-structured environment.</p>\r\n<p>Ahmad&rsquo;s treatment history reveals multiple failed attempts at maintaining sobriety in outpatient settings, highlighting his need for a higher level of care. His polysubstance use, trauma history, and co-occurring mental health conditions have proven to be too complex to manage in less structured environments. While residential care initially provided the intensive oversight and stability he needed to achieve early recovery, PHP is now recommended to bridge the gap between 24-hour residential care and independent living.</p>\r\n<p>The Partial Hospitalization Program will allow Ahmad to continue receiving intensive therapy and medical oversight during the day, addressing both his psychiatric conditions and his substance use. He will benefit from evidence-based interventions such as Cognitive Behavioral Therapy (CBT) to help manage his anxiety and depression, while Dialectical Behavioral Therapy (DBT) will target emotional dysregulation and improve his distress tolerance. Additionally, trauma-informed therapy will help him process his past experiences, which are critical contributors to his substance use and psychiatric conditions. The structure of PHP ensures that Ahmad remains engaged in treatment while gradually assuming more independence, reducing the risk of relapse while promoting long-term recovery.</p>\r\n<p>Clinically, PHP provides the opportunity for daily monitoring of his progress, particularly in the areas of mood stabilization, impulse control, and relapse prevention. Medications for mood and anxiety management can be adjusted as necessary, and any emerging withdrawal symptoms or cravings can be managed promptly. Given his history of poor judgment and difficulty managing stress, the structured environment of PHP is critical to preventing further psychological and physiological deterioration.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105159,
+            "name": "REASON FOR TREATMENT AT THIS TIME / GOAL FOR TREATMENT",
+            "evaluationItemId": 21219,
+            "createdAt": "2024-05-06T21:26:57.650-07:00",
+            "updatedAt": "2024-05-06T21:26:57.650-07:00",
+            "fieldType": "text",
+            "label": "REASON FOR TREATMENT AT THIS TIME / GOAL FOR TREATMENT:",
+            "dividerBelow": true,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Ahmad&rsquo;s presentation includes both physical and psychological symptoms indicative of deteriorating health, including severe anxiety, sleep disturbances, and fluctuating moods. His ongoing substance use and trauma history have led to persistent difficulties in functioning, with an inability to maintain stable relationships or employment. PHP offers the intensity of care required to stabilize his condition while working toward longer-term recovery.</p>\r\n<p>The immediate goals for Ahmad&rsquo;s treatment include:</p>\r\n<p>Achieving sobriety: Through the support of the PHP, Ahmad will be able to abstain from substances in a controlled environment, while developing coping strategies to resist cravings and manage triggers.<br />Stabilizing his mental health: Psychiatric treatment will focus on stabilizing his depressive and anxious symptoms, with close monitoring of medication efficacy and therapy to improve emotional regulation and mood stability.<br />Developing healthy coping strategies: Ahmad will engage in both individual and group therapy sessions that will focus on building skills for managing his anxiety and depression without resorting to substances. He will also work on understanding the link between his past trauma and current behaviors, breaking the cycle of substance use as a coping mechanism.<br />Long-term goals include:</p>\r\n<p>Rebuilding relationships: Ahmad will explore his strained familial relationships, especially the detachment from supportive family members. Family therapy may be considered as part of his recovery plan to help repair these connections.<br />Regaining a sense of purpose: In PHP, Ahmad will be guided toward setting realistic personal and professional goals, such as resuming work or education once stabilized, which will contribute to a sense of meaning and fulfillment in his life.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105160,
+            "name": "INTEGRATED DIAGNOSTIC SUMMARY/CLINICAL IMPRESSION",
+            "evaluationItemId": 21220,
+            "createdAt": "2024-05-06T21:26:57.657-07:00",
+            "updatedAt": "2024-05-06T21:26:57.657-07:00",
+            "fieldType": "text",
+            "label": "INTEGRATED DIAGNOSTIC SUMMARY/CLINICAL IMPRESSION:",
+            "dividerBelow": false,
+            "optional": false,
+            "records": [
+                {
+                    "description": "<p>Ahmad Nasseri presents with a moderate-to-severe substance use disorder, primarily involving alcohol and benzodiazepines, as well as co-occurring Major Depressive Disorder and Generalized Anxiety Disorder. His substance use has escalated in response to underlying trauma, anxiety, and depression, resulting in a pattern of self-medication that has severely compromised his physical and mental health. Ahmad&rsquo;s history includes frequent relapses in outpatient settings, with poor treatment outcomes due to a lack of sustained therapeutic support and inadequate coping skills. His background also includes a significant trauma history, contributing to his emotional instability and complicating his recovery process.</p>\r\n<p>From a clinical perspective, Ahmad exhibits:</p>\r\n<p>Poor impulse control: His substance use has been a maladaptive response to emotional distress and unresolved trauma.<br />Impaired judgment: Ahmad continues to engage in self-destructive behaviors despite awareness of the negative consequences.<br />High risk of relapse: Without the daily structure and support provided by PHP, Ahmad is likely to relapse, given his difficulties in managing stress and anxiety in less supervised environments.<br />The Partial Hospitalization Program is the appropriate level of care at this time because it provides Ahmad with a high degree of therapeutic support and structure, without the 24-hour supervision of a residential setting. PHP will help him transition to more autonomous living while ensuring that he continues to receive intensive therapy and medical monitoring. This approach will allow Ahmad to work through his underlying trauma, build emotional resilience, and develop the skills necessary for sustained sobriety and mental health stabilization.</p>"
+                }
+            ]
+        },
+        {
+            "id": 105161,
+            "name": "Diagnosis:",
+            "evaluationItemId": 21221,
+            "createdAt": "2024-05-06T21:26:57.664-07:00",
+            "updatedAt": "2024-05-06T21:26:57.664-07:00",
+            "fieldType": "patient.diagnosis_code",
+            "label": "Diagnosis:",
+            "dividerBelow": false,
+            "optional": false,
+            "diagnoses": "F33.2 Major depressive disorder&#44; Recurrent episode&#44; Severe,f,F25.1 Schizoaffective disorder&#44; Depressive type,F29 Unspecified schizophrenia spectrum and other psychotic disorder,F45.8 Other specified somatic symptom and related disorder,F10.20 Alcohol use disorder&#44; Severe"
+        },
+        {
+            "id": 105162,
+            "name": "List Problems Identified in Bio-Psychosocial",
+            "evaluationItemId": 21222,
+            "createdAt": "2024-05-06T21:26:57.671-07:00",
+            "updatedAt": "2024-05-06T21:26:57.671-07:00",
+            "fieldType": "problem_list",
+            "label": "List Problems Identified in Bio-Psychosocial:",
+            "dividerBelow": false,
+            "optional": false,
+            "totalProblems": 2,
+            "problems": [
+                {
+                    "description": "Unipolar Depression",
+                    "status": "Active",
+                    "behavioralDefinitions": [
+                        {
+                            "description": "Engages in addictive behavior as a means of escaping from feelings of sadness, worthlessness, and helplessness."
+                        },
+                        {
+                            "description": "Verbalizes persistent feelings of helplessness, hopelessness, worthlessness, and/or guilt."
+                        }
+                    ]
+                },
+                {
+                    "description": "Substance Use Disorders",
+                    "status": "Active",
+                    "behavioralDefinitions": [
+                        {
+                            "description": "Continues substance use despite knowledge of experiencing persistent physical, legal, financial, vocational, social, and/or relationship problems that are directly caused by the use of the substance."
+                        },
+                        {
+                            "description": "Reports suspension of important social, recreational, or occupational activities because they interfere with using."
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": 105163,
+            "name": "If a problem is identified, but not to be treated in treatment, add to Problem List and Check to either Defer or Refer.",
+            "evaluationItemId": 21224,
+            "createdAt": "2024-05-06T21:26:57.679-07:00",
+            "updatedAt": "2024-05-06T21:26:57.679-07:00",
+            "fieldType": "title",
+            "label": "If a problem is identified, but not to be treated in treatment, add to Problem List and check to either Defer or Refer.",
+            "dividerBelow": true,
+            "optional": false
+        },
+        {
+            "id": 105164,
+            "name": "",
+            "evaluationItemId": 21870,
+            "createdAt": "2024-05-06T21:26:57.686-07:00",
+            "updatedAt": "2024-05-06T21:26:57.686-07:00",
+            "fieldType": "golden_thread_tag",
+            "label": "",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105165,
+            "name": "(c) Kipu September 2020",
+            "evaluationItemId": 21225,
+            "createdAt": "2024-05-06T21:26:57.693-07:00",
+            "updatedAt": "2024-05-06T21:26:57.693-07:00",
+            "fieldType": "title",
+            "label": "<p align=\"right\"><i>© 2012-2021 Kipu Systems LLC</i></p>",
+            "dividerBelow": false,
+            "optional": false
+        },
+        {
+            "id": 105166,
+            "name": "4. Have there been any traumatic events in the family or specific to the Client?",
+            "evaluationItemId": 22129,
+            "createdAt": "2024-05-06T21:26:57.700-07:00",
+            "updatedAt": "2024-07-21T23:31:23.307-07:00",
+            "fieldType": "text",
+            "label": "4. Have there been any traumatic events in the family or specific to the Client?",
+            "dividerBelow": false,
+            "optional": true,
+            "description": "No"
+        }
+    ]
+}

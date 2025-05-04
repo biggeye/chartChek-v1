@@ -50,10 +50,10 @@ export default function SettingsLayout({
     pathname === href || (href !== "/product/settings" && pathname.startsWith(href));
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col bg-background">
       <SettingsBreadcrumb breadcrumbs={breadcrumbs} displayName={displayName} />
       <div className="flex flex-1">
-
+        
         {/* Main content */}
         {children}
       </div>

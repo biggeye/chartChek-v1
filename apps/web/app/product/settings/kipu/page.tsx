@@ -9,10 +9,11 @@ import { Info, Key, Lock, User, Globe, AlertCircle, CheckCircle2 } from 'lucide-
 import { Alert as CustomAlert, AlertTitle, AlertDescription } from '@kit/ui/alert';
 import { createClient } from '~/utils/supabase/client';
 import { useFacilityStore } from '~/store/patient/facilityStore';
+import { getCurrentUserId } from '~/utils/supabase/user';
 import type { UserApiSettings } from 'types/store/user';
 
 export default function KipuSettings() {
-
+const supabase = createClient();
   
   const currentFacilityId = useFacilityStore((state) => state.currentFacilityId);
   const [apiSettings, setApiSettings] = useState<UserApiSettings>({
@@ -29,16 +30,25 @@ export default function KipuSettings() {
   const [testingConnection, setTestingConnection] = useState(false);
   const [testConnectionResult, setTestConnectionResult] = useState<{ success: boolean; message: string } | null>(null);
 
+
   useEffect(() => {
     loadApiSettings();
   }, []);
 
   const loadApiSettings = async () => {
+    const userId = await getCurrentUserId();
     try {
-      const response = await fetch('/api/kipu/config');
-      if (!response.ok) throw new Error(response.statusText);
-      const data: UserApiSettings = await response.json();
-      setApiSettings(data);
+      console.log('userId:', userId); // how do i parse the result of this promise? 
+      
+      
+      const response = await supabase.from('user_api_settings')
+      .select('*')
+      .eq('account_id', userId)
+      .single();
+      
+    if (response) {
+      setApiSettings(response.data);
+    }
     } catch (err) {
       console.warn('Failed to load KIPU settings:', err);
     }
@@ -51,7 +61,7 @@ export default function KipuSettings() {
 
     try {
       const supabase = createClient();
-      const user = await supabase.auth.getUser();
+      const userId = await getCurrentUserId();
       const res = await fetch('/api/kipu/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -71,7 +81,7 @@ export default function KipuSettings() {
         name: loc.location_name,
         kipu_id: Number(loc.location_id),
         metadata: { enabled: loc.enabled, buildings: loc.buildings || [] },
-        account_id: user.data.user?.id,
+        account_id: userId
       }));
 
       if (facilities.length > 0) {

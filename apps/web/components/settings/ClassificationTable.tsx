@@ -35,6 +35,7 @@ export default function ClassificationTable() {
       console.log('🔍 [Classification] Fetching from KIPU...');
       // 1. Fetch from KIPU
       const resKipu = await fetch('/api/kipu/evaluations');
+      console.log('🔍 [Classification] KIPU Response:', resKipu);
       if (!resKipu.ok) throw new Error('Failed to fetch from KIPU');
       const kipuData = await resKipu.json();
       

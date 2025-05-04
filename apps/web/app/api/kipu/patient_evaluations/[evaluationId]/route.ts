@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServer } from '~/utils/supabase/server';
 import { serverLoadKipuCredentialsFromSupabase } from '~/lib/kipu/auth/server'; 
 import { kipuGetPatientEvaluation } from '~/lib/kipu/service/patient-evaluation-service'; 
-import { KipuPatientEvaluation } from '~/types/kipu/kipuAdapter'; 
 import { snakeToCamel } from '~/utils/case-converters'; 
 
 /**

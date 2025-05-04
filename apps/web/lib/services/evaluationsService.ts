@@ -42,6 +42,7 @@ export const fetchEvaluationDetails = async (evaluationId: string | number) => {
 
   // Assuming the API returns the evaluation data directly as JSON
   const result = await response.json();
+  console.log('evaluationsService.fetchEvaluationDetails result:', result);
   return result; // Return the full evaluation details object
 };
 

@@ -1,7 +1,6 @@
 import { google } from '@ai-sdk/google';
 import { streamText, CoreMessage } from 'ai';
 import { createServer } from '~/utils/supabase/server';
-import { saveChatMessages } from '~/lib/ai/chatHistory';
 
 interface ChatRequestBody {
   sessionId: string;
@@ -12,32 +11,80 @@ interface ChatRequestBody {
 
 export const runtime = 'edge';
 
+// Prevent response caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+  'Pragma': 'no-cache',
+  'Expires': '0'
+};
+
 export async function POST(req: Request) {
   const supabase = await createServer();
+  const { sessionId, messages, systemPrompt, context } = (await req.json()) as ChatRequestBody;
+  const contextString = Array.isArray(context) ? context.join('\n') : context;
 
   try {
-    const { sessionId, messages, systemPrompt, context } = (await req.json()) as ChatRequestBody;
-    const contextString = Array.isArray(context) ? context.join('\n') : context;
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return new Response('Unauthorized', { status: 401 });
+      return new Response('Unauthorized', {
+        status: 401,
+        headers: NO_CACHE_HEADERS
+      });
+    }
+
+    // First verify the session exists and belongs to this user
+    const { data: session, error: sessionError } = await supabase
+      .from('chat_sessions')
+      .select('id')
+      .eq('id', sessionId)
+      .eq('account_id', user.id)
+      .single();
+
+    if (sessionError || !session) {
+      return new Response('Session not found or unauthorized', {
+        status: 404,
+        headers: NO_CACHE_HEADERS
+      });
     }
 
     const system =
       systemPrompt ??
-      `You are operating as a psychiatrist, operating in behavioral health.
-You are authorized to access, process, and present patient-related information to verified healthcare professionals acting within their professional responsibilities.
-You may assist with clinical decision-making support, including summarizing a patient's treatment history, presenting symptom overviews, and offering helpful insights.
-You do not retain or store patient information across sessions.
-If you are provided with context, use it to inform your response.
+      `
+      Role & Scope  
+- Act as a psychiatrist specializing in behavioral health and substance‑use disorder treatment.   
 
-Context: ${contextString}`;
+Permitted Functions  
+- Provide clinical‑decision support, such as:  
+  • Summaries of a patient’s treatment history  
+  • Symptom overviews  
+  • Evidence‑based insights and considerations  
+- Deliver comprehensive, context‑aware analyses of the patient’s condition and treatments.  
 
-    const { textStream } = streamText({
+Data Handling & Privacy  
+- Do not store or retain patient information between sessions.  
+- Use only the information supplied in the current request and cite it when relevant.  
+
+Hallucination & Uncertainty Policy  
+- Never fabricate, speculate, or guess.  
+- When information is missing:  
+  • Explicitly list the gaps before responding.  
+  • Refrain from filling gaps with placeholders or conjecture.  
+
+Response Style  
+- Be concise, clinically precise, and reference provided context where possible.
+
+
+Patient Information: ${contextString}`;
+
+    // Get the stream from the AI SDK and return it directly
+    const result = streamText({
       model: google('gemini-2.5-pro-exp-03-25'),
       messages,
       system,
@@ -46,38 +93,15 @@ Context: ${contextString}`;
       maxSteps: 5,
     });
 
-
-    console.log('User ID:', user.id);
-    console.log('Session ID:', sessionId);
-    // Immediately save incoming messages
-    saveChatMessages({ sessionId, userId: user.id, messages });
-
-    let assistantResponse = '';
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        for await (const textPart of textStream) {
-          assistantResponse += textPart;
-          controller.enqueue(textPart);
-        }
-        controller.close();
-
-        // Save assistant's message after completion
-        await saveChatMessages({
-          sessionId,
-          userId: user.id,
-          messages: [{ role: 'assistant', content: assistantResponse }],
-        });
-      },
-    });
-
-    return new Response(stream, {
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    });
+    return result.toDataStreamResponse();
   } catch (error) {
-    return new Response(JSON.stringify({ error }), {
+    console.error('Chat API Error:', error);
+    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...NO_CACHE_HEADERS
+      },
     });
   }
 }

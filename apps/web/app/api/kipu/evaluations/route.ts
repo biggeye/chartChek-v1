@@ -58,6 +58,7 @@ export async function GET(request: Request) {
     
     // Make request to KIPU API using helper function
     const response = await kipuServerGet(apiPath, credentials);
+    console.log('🔍 KIPU Evaluations Response:', response);
      if (!response.success) {
       return NextResponse.json(
         { error: 'Failed to fetch evaluation templates from KIPU', details: response.error },

@@ -16,12 +16,24 @@ export const saveChatMessages = async ({
     throw new Error('User ID and Session ID must be provided.');
   }
 
+  // First check if the session exists and belongs to this user
+  const { data: existingSession, error: sessionError } = await supabase
+    .from('chat_sessions')
+    .select('id')
+    .eq('id', sessionId)
+    .eq('account_id', userId)
+    .single();
+
+  if (sessionError || !existingSession) {
+    throw new Error('Session not found or unauthorized');
+  }
+
   const formattedMessages = messages.map((msg) => ({
+    id: crypto.randomUUID(),
     session_id: sessionId,
-    user_id: userId,
+    account_id: userId,
     role: msg.role,
     content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
-    created_at: new Date().toISOString(),
   }));
 
   const { error } = await supabase.from('chat_messages').insert(formattedMessages);

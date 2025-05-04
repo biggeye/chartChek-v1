@@ -193,58 +193,52 @@ export default function UserProfile({ userId }: UserProfileProps) {
   }
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     
-    setIsSaving(true)
-    setError(null)
-    setSuccessMessage(null)
+    setIsSaving(true);
+    setError(null);
+    setSuccessMessage(null);
     
-    let uploadedAvatarUrl: string | null = formData.avatar_url; // Default to existing URL
+    let uploadedAvatarUrl: string | null = formData.avatar_url;
 
-    // --- Avatar Upload Logic --- 
+    // Handle avatar upload if a new file is selected
     if (avatarFile) {
       setUploading(true);
       try {
         const fileExt = avatarFile.name.split('.').pop();
-        const filePath = `public/${userId}/avatar.${fileExt}`; // Path within the bucket
+        const fileName = `${userId}_${Date.now()}.${fileExt}`;
+        const filePath = `avatars/${fileName}`;
 
-        // Upload the file, overwriting if it exists (upsert: true)
-        const { error: uploadError } = await supabase.storage
-          .from('avatar') // Use the 'avatar' bucket
-          .upload(filePath, avatarFile, { upsert: true });
+        // Upload the file to the avatars bucket
+        const { error: uploadError, data: uploadData } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, avatarFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
-        if (uploadError) {
-          throw uploadError;
-        }
+        if (uploadError) throw uploadError;
 
-        // Get the public URL of the uploaded file
+        // Get the public URL
         const { data: urlData } = supabase.storage
-          .from('avatar')
+          .from('avatars')
           .getPublicUrl(filePath);
 
-        if (!urlData?.publicUrl) {
-            console.warn('Could not get public URL for uploaded avatar.');
-             // Decide if this is a critical error or if we proceed without the new URL
-             // For now, we'll proceed using the potentially old URL or null
-        } else {
-             uploadedAvatarUrl = urlData.publicUrl; // Store the new URL
+        if (urlData?.publicUrl) {
+          uploadedAvatarUrl = urlData.publicUrl;
         }
-
       } catch (error) {
-        console.error('Error uploading avatar:', error); // Log the full error object
-        alert('Failed to upload avatar. Please try again.'); // Basic user feedback
-        // Optionally stop the save process if avatar upload fails critically
-        // setIsSaving(false); 
-        // setUploading(false); 
-        // return; 
-      } finally {
-        setUploading(false); // Ensure uploading state is reset
+        console.error('Error uploading avatar:', error);
+        setError('Failed to upload avatar. Please try again.');
+        setIsSaving(false);
+        setUploading(false);
+        return;
       }
+      setUploading(false);
     }
-    // --- End Avatar Upload Logic ---
 
     try {
-      // Update profile data in the database
+      // Update profile data including the new avatar URL
       const { data, error: updateError } = await supabase
         .from('accounts')
         .update({
@@ -253,59 +247,46 @@ export default function UserProfile({ userId }: UserProfileProps) {
           title: formData.title,
           phone: formData.phone,
           about: formData.about,
-          avatar_url: uploadedAvatarUrl, // Use the potentially updated URL
+          avatar_url: uploadedAvatarUrl,
           street_address: formData.street_address,
           city: formData.city,
           state: formData.state,
           postal_code: formData.postal_code,
           country: formData.country,
           preferred_language: formData.preferred_language,
-          updated_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
         })
         .eq('id', userId)
         .select()
-        .single()
+        .single();
 
-      if (updateError) {
-        console.error('Error updating profile data:', updateError); // Log specific update error
-        throw updateError; // Re-throw to be caught by the outer catch
+      if (updateError) throw updateError;
+
+      setSuccessMessage('Profile updated successfully!');
+      
+      // Update form data with the new values
+      if (data) {
+        setFormData({
+          ...formData,
+          avatar_url: uploadedAvatarUrl || ''
+        });
       }
 
-      if (!data) {
-        // Handle case where the update succeeded but no data was returned (unexpected)
-        console.warn('Profile update succeeded but no data returned.');
+      // Clear the file input
+      setAvatarFile(null);
+      
+      // Keep the preview URL until a new file is selected
+      if (uploadedAvatarUrl) {
+        setAvatarPreview(uploadedAvatarUrl);
       }
-
-      setSuccessMessage('Profile updated successfully!')
-      setError(null)
-      // Update local state after successful save
-      setFormData({
-        first_name: data.first_name || '',
-        last_name: data.last_name || '',
-        email: data.email || '',
-        title: data.title || '',
-        phone: data.phone || '',
-        about: data.about || '',
-        avatar_url: data.avatar_url || '',
-        street_address: data.street_address || '',
-        city: data.city || '',
-        state: data.state || '',
-        postal_code: data.postal_code || '',
-        country: data.country || '',
-        preferred_language: data.preferred_language || '',
-      })
-      setAvatarFile(null); // Clear selected file after successful upload and save
-      // Keep the preview URL until a new file is selected or existing URL is loaded
-      // setAvatarPreview(null); // Don't clear preview immediately
 
     } catch (err) {
-      console.error('Error saving user data:', err); // Log the full error object
-      setError('Failed to save profile. Please check the details and try again.')
-      setSuccessMessage(null)
+      console.error('Error saving profile:', err);
+      setError('Failed to save profile. Please try again.');
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target

@@ -16,7 +16,7 @@ interface ContextQueueState {
 
   // Getters
   getSelectedItems: () => ContextItem[]
-  getSelectedContent: () => string
+  getSelectedContent: () => string | undefined
 
   // Supabase queue integration
   storeContextInQueue: (threadId: string, customContent?: string) => Promise<any>
@@ -74,39 +74,29 @@ export const useContextQueueStore = create<ContextQueueState>()((set, get) => ({
     return get().items.filter((item) => item.selected)
   },
 
-  getSelectedContent: () => {
+  getSelectedContent: (): string | undefined => {
     const items = get().items.filter((item) => item.selected)
-    const parser = new PatientEvaluationParserService() // Instantiate parser once
-
-    // Debug logging for selected items
-    console.log(`Getting content for ${items.length} selected items`);
     
-    return items
-      .map((item) => {
-        // Debug logging for each item
-        console.log(`Processing item: ${item.id}, type: ${item.type}, title: ${item.title}`);
-        console.log(`Content available: ${Boolean(item.content)}`);
-        if (item.content) {
-          console.log(`Content length: ${item.content.length}`);
-          console.log(`Content sample: ${item.content.substring(0, 50)}...`);
-        }
-        
-        if (item.type === "evaluation") {
-          // Parse the *entire* evaluation item first
-          // Assuming the raw evaluation structure is suitable for parseEvaluation
-          const parsedContent = parser.parseEvaluation(item as any); // Use the parsed content
-          return `EVALUATION: ${item.title}\n${parsedContent}`
-        }
+    if (items.length === 0) {
+      return undefined;
+    }
 
-        // For document type items
-        if (!item.content) {
-          console.warn(`Missing content for item: ${item.id}, title: ${item.title}`);
-          return `${item.type.toUpperCase()}: ${item.title}\n[No content available]`;
-        }
-        
-        return `${item.type.toUpperCase()}: ${item.title}\n${item.content}`;
-      })
-      .join("\n\n")
+    const parser = new PatientEvaluationParserService()
+    
+    const contentArray = items.map((item): string => {
+      if (item.type === "evaluation") {
+        const parsedContent = parser.parseEvaluation(item as any);
+        return `EVALUATION: ${item.title}\n${parsedContent}`
+      }
+
+      if (!item.content) {
+        return `${item.type.toUpperCase()}: ${item.title}\n[No content available]`;
+      }
+      
+      return `${item.type.toUpperCase()}: ${item.title}\n${item.content}`;
+    });
+  
+    return contentArray.join("\n\n");
   },
 
   // Store processed context in Supabase context_items table

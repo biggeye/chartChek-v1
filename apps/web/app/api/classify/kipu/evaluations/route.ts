@@ -28,8 +28,6 @@ export async function POST(req: NextRequest) {
       }>;
     } = await req.json();
 
-    console.log('Received evaluation templates for classification:', evaluations);
-
     const {
       data: { user },
       error: authError
@@ -46,8 +44,7 @@ export async function POST(req: NextRequest) {
       `Classify the following evaluation into one of these categories: ${EVAL_CATEGORIES.join(", ")}.\nEvaluation name: "${name}"\nReturn only the category.`
     );
 
-    console.log('Generated prompts for classification:', prompts);
-
+  
     const responses = await Promise.all(
       prompts.map(async (prompt) => {
         const { text } = await generateText({
@@ -57,8 +54,7 @@ export async function POST(req: NextRequest) {
           temperature: 0.2,
           maxTokens: 10,
         });
-        console.log(`Classification response for "${prompt}": ${text}`);
-        return text;
+         return text;
       })
     );
 
@@ -68,9 +64,8 @@ export async function POST(req: NextRequest) {
       name: evaluation.name,
       patient_process_id: evaluation.patient_process_id,
       category: responses[idx] || 'Other',
+      account_id: user.id,
     }));
-
-    console.log('Prepared batch update payload:', updates);
 
     // Batch upsert (update) categories in evaluation_templates
     const { error } = await supabase
@@ -78,8 +73,7 @@ export async function POST(req: NextRequest) {
     .upsert(updates, { onConflict: 'id' });
     if (error) throw new Error(error.message);
 
-    console.log('Successfully updated evaluation_templates:', updates.length);
-
+  
     return NextResponse.json({ status: 'success', updated: updates.length });
   } catch (err) {
     console.error('Classification error:', err);

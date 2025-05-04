@@ -57,8 +57,8 @@ test.describe('Protected routes', () => {
   test('will redirect to the sign-in page if not authenticated', async ({
     page,
   }) => {
-    await page.goto('/home/settings');
+    await page.goto('/product/settings');
 
-    expect(page.url()).toContain('/auth/sign-in?next=/home/settings');
+    expect(page.url()).toContain('/auth/sign-in?next=/product/settings');
   });
 });

@@ -1,38 +1,73 @@
-import { createServer } from "~/utils/supabase/server";
-import { getUserProfile } from "~/lib/services/accountService";
-import { redirect } from "next/navigation";
-import { ReactNode } from "react";
+'use client';
+
 import AppLayout from "./AppLayout";
-import Footer from "~/components/footer";
 import { DebugPanel } from "~/components/dev/DebugPanel";
+import { createClient } from '~/utils/supabase/client';
+import { useEffect, useState, useMemo } from 'react';
+import { AppLogo } from '~/components/app-logo';
+import { Loader2 } from 'lucide-react';
 
+interface UserData {
+  id: string;
+  username: string;
+  avatar_url: string | null;
+}
 
-export default async function ProtectedLayout({
-  children
+export default function ProductLayout({
+  children,
 }: {
-  children: ReactNode
+  children: React.ReactNode;
 }) {
-  // const cookieStore = cookies(); // No longer needed here if createServer handles it
-  const supabase = await createServer(); // Await the promise and remove argument
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const supabase = createClient();
 
-  if (authError || !user) {
-    console.error("Auth error or no user, redirecting to login:", authError?.message);
-    redirect("/auth/sign-in");
+  useEffect(() => {
+    async function loadUserData() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: accountData } = await supabase
+            .from('accounts')
+            .select('id, username, avatar_url')
+            .eq('id', user.id)
+            .single();
+
+          if (accountData) {
+            setUserData(accountData);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading user data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadUserData();
+  }, []);
+
+  if (isLoading || !userData) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <AppLogo className="h-12 w-auto animate-pulse" />
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <span className="text-sm text-muted-foreground">Loading your workspace...</span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // Add validation for existing user ID
-  if (!user.id) {
-    console.error('Authenticated user missing ID:', user);
-    redirect("/auth/sign-in");
-  }
-
-  const profile = await getUserProfile(user.id);
-  const username = profile?.username || user.email || 'User'; // Use username, fallback to email, then generic 'User'
-  const avatarUrl = profile?.avatar_url || null; // Get avatar_url, default to null
 
   return (
-    <AppLayout account_id={user.id} username={username} avatarUrl={avatarUrl}>
+    <AppLayout
+      account_id={userData.id}
+      username={userData.username}
+      avatarUrl={userData.avatar_url}
+    >
       {children}
       <DebugPanel />
     </AppLayout>

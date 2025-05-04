@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServer } from '~/utils/supabase/server';
+import { serverLoadKipuCredentialsFromSupabase } from '~/lib/kipu/auth/server';
 import { kipuGetPatient } from '~/lib/kipu/service/patient-service';
 import { mapKipuPatientToPatientBasicInfo } from '~/lib/kipu/mapping';
-import { getKipuCredentials } from '~/lib/kipu/service/user-settings';
-import { parsePatientId } from '~/lib/kipu/auth/config';
-import { serverLoadKipuCredentialsFromSupabase } from '~/lib/kipu/auth/server';
+
 
 /**
  * GET handler for retrieving a specific patient's details

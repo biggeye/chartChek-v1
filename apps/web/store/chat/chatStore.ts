@@ -42,17 +42,41 @@ export const useChatStore = create<ChatState>((set, get) => ({
   createSession: async (title?: string) => {
     const state = get();
     
-    // If we're already creating a session or have a current session, don't create another
-    if (state.isCreatingSession) {
-      throw new Error('Session creation already in progress');
-    }
-    
+    // If we already have a current session, return it
     if (state.currentSessionId) {
       return state.currentSessionId;
     }
+    
+    // Use a local variable to track if we should proceed with creation
+    let shouldCreate = false;
+    
+    set(state => {
+      // Only proceed if we're not already creating and don't have a session
+      if (!state.isCreatingSession && !state.currentSessionId) {
+        shouldCreate = true;
+        return { isCreatingSession: true };
+      }
+      return state;
+    });
+
+    // If we shouldn't create, wait for existing creation to finish
+    if (!shouldCreate) {
+      // Wait for the existing creation to finish
+      let retries = 0;
+      while (get().isCreatingSession && retries < 50) {
+        await new Promise(resolve => setTimeout(resolve, 100));
+        retries++;
+      }
+      
+      // After waiting, return whatever session we have
+      const finalState = get();
+      if (finalState.currentSessionId) {
+        return finalState.currentSessionId;
+      }
+      throw new Error('Session creation timeout');
+    }
 
     try {
-      set({ isCreatingSession: true });
       const historyStore = useHistoryStore.getState();
       const sessionId = await historyStore.createSession(title);
       set({ currentSessionId: sessionId, isCreatingSession: false });

@@ -16,6 +16,7 @@ import {
 import { Input } from '@kit/ui/input'
 import { useFacilityStore } from '~/store/patient/facilityStore'
 import { createClient } from '~/utils/supabase/client'
+import { logger } from '~/lib/logger'
 
 // Initialize Supabase client
 const supabase = createClient();
@@ -35,6 +36,8 @@ export default function UserDocumentUploadDialog({
   isLoading = false,
   error = null
 }: UserDocumentUploadDialogProps) {
+  logger.info('[UserDocumentUploadDialog] Initializing dialog', { isOpen, isLoading })
+
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const [categorization, setCategorization] = useState<DocumentCategorization>({
     document_type: 'document_page_upload',
@@ -48,6 +51,7 @@ export default function UserDocumentUploadDialog({
   // Fetch facility data when currentFacilityId changes
   useEffect(() => {
     if (currentFacilityId) {
+      logger.info('[UserDocumentUploadDialog] Fetching facility data', { currentFacilityId })
       const fetchFacilityData = async () => {
         try {
           const { data, error } = await supabase
@@ -57,11 +61,15 @@ export default function UserDocumentUploadDialog({
             .single();
           
           if (error) {
-            console.error('Error fetching facility data:', error);
+            logger.error('[UserDocumentUploadDialog] Error fetching facility data:', error)
             return;
           }
           
           if (data) {
+            logger.info('[UserDocumentUploadDialog] Facility data fetched successfully', { 
+              facilityId: data.id,
+              facilityName: data.name 
+            })
             setFacilityUuid(data.id);
             setFacilityName(data.name);
             
@@ -72,7 +80,7 @@ export default function UserDocumentUploadDialog({
             }));
           }
         } catch (err) {
-          console.error('Error in facility data lookup:', err);
+          logger.error('[UserDocumentUploadDialog] Error in facility data lookup:', err)
         }
       };
       
@@ -81,22 +89,29 @@ export default function UserDocumentUploadDialog({
   }, [currentFacilityId]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('[UserDocumentUploadDialog] File input change event triggered');
+    logger.debug('[UserDocumentUploadDialog] File input change event triggered')
     const file = e.target.files?.[0]
     if (file) {
-      console.log('[UserDocumentUploadDialog] File selected:', file.name, file.type, file.size);
+      logger.info('[UserDocumentUploadDialog] File selected', {
+        fileName: file.name,
+        fileType: file.type,
+        fileSize: file.size
+      })
       setSelectedFile(file)
     } else {
-      console.log('[UserDocumentUploadDialog] No file selected from input');
+      logger.warn('[UserDocumentUploadDialog] No file selected from input')
     }
   }
   
   const handleUpload = async () => {
-    console.log('[UserDocumentUploadDialog] Upload button clicked, selectedFile:', selectedFile?.name);
+    logger.info('[UserDocumentUploadDialog] Upload initiated', {
+      fileName: selectedFile?.name,
+      categorization
+    })
     if (selectedFile) {
       try {
-        console.log('[UserDocumentUploadDialog] Calling onUpload with file and categorization:', categorization);
         await onUpload(selectedFile, categorization)
+        logger.info('[UserDocumentUploadDialog] Upload completed successfully')
         // Reset form after successful upload
         setSelectedFile(null)
         setCategorization({
@@ -106,13 +121,14 @@ export default function UserDocumentUploadDialog({
         setTagInput('')
         onClose()
       } catch (error) {
-        console.error('[UserDocumentUploadDialog] Error in handleUpload:', error)
+        logger.error('[UserDocumentUploadDialog] Error in handleUpload:', error)
       }
     }
   }
 
   const addTag = () => {
     if (tagInput.trim() && !categorization.tags?.includes(tagInput.trim())) {
+      logger.debug('[UserDocumentUploadDialog] Adding tag', { tag: tagInput.trim() })
       setCategorization({
         ...categorization,
         tags: [...(categorization.tags || []), tagInput.trim()]
@@ -122,12 +138,23 @@ export default function UserDocumentUploadDialog({
   }
 
   const removeTag = (tag: string) => {
+    logger.debug('[UserDocumentUploadDialog] Removing tag', { tag })
     setCategorization({
       ...categorization,
       tags: categorization.tags?.filter(t => t !== tag)
     })
   }
-  
+
+  // Log dialog state changes
+  useEffect(() => {
+    logger.debug('[UserDocumentUploadDialog] Dialog state changed', { 
+      isOpen,
+      isLoading,
+      hasError: !!error,
+      hasSelectedFile: !!selectedFile
+    })
+  }, [isOpen, isLoading, error, selectedFile])
+
   return (
     <Transition
       show={isOpen}

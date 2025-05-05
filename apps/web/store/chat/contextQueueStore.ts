@@ -4,6 +4,7 @@ import { KipuEvaluationItemObject as EvaluationDetail } from "types/kipu/kipuAda
 import { PatientEvaluationParserService } from "~/lib/parse-evaluation"
 import type { ContextItem, EvaluationContextItem, PatientEvaluationItem } from "types/chat"
 import { createClient } from "~/utils/supabase/client"
+import { useChatStore } from "./chatStore"
 
 interface ContextQueueState {
   items: ContextItem[]
@@ -18,9 +19,9 @@ interface ContextQueueState {
   getSelectedItems: () => ContextItem[]
   getSelectedContent: () => string | undefined
 
-  // Supabase queue integration
-  storeContextInQueue: (threadId: string, customContent?: string) => Promise<any>
-  getContextFromQueue: (threadId: string) => Promise<string>
+  // Supabase context management
+  storeContextInSession: (sessionId: string) => Promise<void>
+  loadContextFromSession: (sessionId: string) => Promise<void>
 }
 
 export const useContextQueueStore = create<ContextQueueState>()((set, get) => ({
@@ -99,90 +100,141 @@ export const useContextQueueStore = create<ContextQueueState>()((set, get) => ({
     return contentArray.join("\n\n");
   },
 
-  // Store processed context in Supabase context_items table
-  storeContextInQueue: async (threadId: string, customContent?: string) => {
+  // Store selected context items in Supabase for a chat session
+  storeContextInSession: async (sessionId: string) => {
     try {
-      // Validate threadId
-      if (!threadId || typeof threadId !== 'string') {
-        console.warn("Invalid threadId provided for storing context:", threadId);
-        throw new Error("Invalid thread ID");
-      }
-      
-      console.log("Storing context for thread ID:", threadId);
-      // Use custom content if provided, otherwise get selected content
-      const contextContent = customContent || get().getSelectedContent();
       const supabaseClient = createClient();
       const { data: userData } = await supabaseClient.auth.getUser();
       
       if (!userData?.user?.id) {
         throw new Error("User not authenticated");
       }
-      
-      // Create properly structured metadata object
-      const metadata = { thread_id: threadId };
-      
-      const { data, error } = await supabaseClient
+
+      const selectedItems = get().getSelectedItems();
+      const formattedContent = get().getSelectedContent();
+
+      if (!formattedContent || selectedItems.length === 0) {
+        console.log("No context items to store");
+        return;
+      }
+
+      // First store the combined context as a single item
+      const { data: contextItem, error: contextError } = await supabaseClient
         .from('context_items')
         .insert([
-          { 
-            content: contextContent,
-            title: `Thread ${threadId} Context`,
-            type: "document",
+          {
+            type: "document", 
+            title: `Session ${sessionId} Context`,
+            content: formattedContent,
             account_id: userData.user.id,
-            metadata: metadata,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
+            metadata: {
+              session_id: sessionId,
+              source: "combined_context",
+              item_count: selectedItems.length
+            }
+          }
+        ])
+        .select('id')
+        .single();
+
+      if (contextError) {
+        throw contextError;
+      }
+
+      // Then link it to the session
+      const { error: linkError } = await supabaseClient
+        .from('session_context')
+        .insert([
+          {
+            session_id: sessionId,
+            context_item_id: contextItem.id
           }
         ]);
-      
-      if (error) {
-        console.error("Error inserting context:", error);
-        throw error;
+
+      if (linkError) {
+        throw linkError;
       }
-      
-      return data;
+
+      console.log(`[ContextQueue] Stored ${selectedItems.length} items for session ${sessionId}`);
     } catch (error) {
-      console.error("Error storing context in queue:", error);
+      console.error("[ContextQueue] Error storing context:", error);
       throw error;
     }
   },
 
-  // Retrieve context from Supabase context_items for a specific thread
-  getContextFromQueue: async (threadId: string) => {
+  // Load context items for a chat session from Supabase
+  loadContextFromSession: async (sessionId: string) => {
     try {
       const supabaseClient = createClient();
       
-      // Log the threadId for debugging
-      console.log("Getting context for thread ID:", threadId);
+      // First check if user is authenticated
+      const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
       
-      // First check if the threadId is valid
-      if (!threadId || typeof threadId !== 'string') {
-        console.warn("Invalid threadId provided:", threadId);
-        return '';
+      if (authError || !user) {
+        console.error("[ContextQueue] Authentication error:", authError);
+        return;
       }
       
-      // Use a more reliable approach for JSON field querying
-      const { data, error } = await supabaseClient
+      // Get all context items for this session
+      const { data: contextItems, error } = await supabaseClient
         .from('context_items')
-        .select('content')
-        .filter('metadata', 'cs', JSON.stringify({ thread_id: threadId }))
-        .order('created_at', { ascending: false })
-        .limit(1);
-      
+        .select('*')
+        .eq('metadata->session_id', sessionId)
+        .eq('account_id', user.id) // Add user filter
+        .order('created_at', { ascending: true });
+
       if (error) {
-        console.error("Supabase query error:", error);
-        throw error;
+        console.error("[ContextQueue] Error querying context:", error);
+        return; // Don't throw, just return since no context is a valid state
       }
-      
-      // Check if we got any results
-      if (data?.length > 0) {
-        return data[0]?.content || '';
+
+      if (!contextItems?.length) {
+        console.log(`[ContextQueue] No context found for session ${sessionId}`);
+        set({ items: [] }); // Explicitly set empty array to clear any existing items
+        return;
       }
-      
-      return '';
+
+      // Convert Supabase items to ContextItems and add to queue
+      const processedItems = contextItems.map(item => {
+        try {
+          const baseItem = {
+            id: item.id,
+            type: item.type as "document" | "evaluation" | "upload",
+            title: item.title,
+            content: item.content,
+            createdAt: new Date(item.created_at),
+            selected: true,
+          };
+
+          // If it's an evaluation, add the required evaluation fields
+          if (item.type === "evaluation") {
+            const metadata = item.metadata as any;
+            return {
+              ...baseItem,
+              patientId: metadata.patientId || "",
+              evaluationId: metadata.evaluationId || "",
+              evaluationDate: new Date(metadata.evaluationDate || Date.now()),
+              evaluationType: metadata.evaluationType || "Unknown",
+              details: metadata.details || [],
+              severity: metadata.severity || "medium"
+            } as EvaluationContextItem;
+          }
+
+          return baseItem as ContextItem;
+        } catch (itemError) {
+          console.error(`[ContextQueue] Error processing item ${item.id}:`, itemError);
+          return null; // Skip malformed items
+        }
+      });
+
+      // Filter out null items and ensure type safety
+      const validItems = processedItems.filter((item): item is ContextItem => item !== null);
+
+      set({ items: validItems });
+      console.log(`[ContextQueue] Loaded ${validItems.length} items for session ${sessionId}`);
     } catch (error) {
-      console.error("Error retrieving context from queue:", error);
-      return '';
+      console.error("[ContextQueue] Error loading context:", error);
+      set({ items: [] }); // Reset items on error to ensure clean state
     }
-  },
-}))
+  }
+}));

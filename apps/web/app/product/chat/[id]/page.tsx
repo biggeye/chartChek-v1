@@ -1,15 +1,13 @@
 'use client';
 
-import { useParams } from 'next/navigation';
-import { useContextQueueStore } from '~/store/chat/contextQueueStore';
+import { useSessionManager } from '~/hooks/useSessionManager';
 import { Loader } from '~/components/loading';
-import { ChatPanel } from '../ChatPanel';
+import { ChatPanel } from '../../../../components/chat/ChatPanel';
 
 export default function HistoricalChatPage() {
-  const { id: sessionId } = useParams();
-  const { items: contextItems } = useContextQueueStore();
+  const { currentSessionId, contextString, ensureSession, isCreatingSession } = useSessionManager();
 
-  if (!sessionId) {
+  if (!currentSessionId || isCreatingSession) {
     return (
       <Loader
         showLogo={false}
@@ -22,8 +20,8 @@ export default function HistoricalChatPage() {
   return (
     <div className="flex flex-col">
       <ChatPanel
-        sessionId={sessionId as string}
-        contextString={Array.isArray(contextItems) ? contextItems.join('\n') : ''}
+        sessionId={currentSessionId}
+        contextString={contextString}
       />
     </div>
   );

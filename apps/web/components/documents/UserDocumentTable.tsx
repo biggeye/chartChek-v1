@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { Badge } from '@kit/ui/badge';
 import { format } from 'date-fns';
 import { Skeleton } from '@kit/ui/skeleton';
+import { logger } from '~/lib/logger';
+import { useEffect } from 'react';
 
 interface UserDocumentsTableProps {
   documents: UserDocument[];
@@ -21,17 +23,35 @@ export default function UserDocumentsTable({
   onFileSelect,
   isLoading = false 
 }: UserDocumentsTableProps) {
+  logger.info('[UserDocumentsTable] Initializing table', { 
+    documentCount: documents.length,
+    isLoading 
+  })
   
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    logger.debug('[UserDocumentsTable] File input change detected')
     const file = e.target.files?.[0];
     if (file && onFileSelect) {
-      await onFileSelect(file);
+      logger.info('[UserDocumentsTable] Processing file selection', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+      })
+      try {
+        await onFileSelect(file);
+        logger.info('[UserDocumentsTable] File selection processed successfully')
+      } catch (error) {
+        logger.error('[UserDocumentsTable] Error processing file selection:', error)
+      }
     }
   };
 
   // Helper function to format processing status
   const getStatusBadge = (status?: string) => {
-    if (!status) return null;
+    if (!status) {
+      logger.debug('[UserDocumentsTable] No status provided for badge')
+      return null;
+    }
     
     const statusMap: Record<string, { color: string, label: string }> = {
       'pending': { color: 'bg-yellow-100 text-yellow-800', label: 'Pending' },
@@ -42,6 +62,7 @@ export default function UserDocumentsTable({
     };
     
     const { color, label } = statusMap[status] || { color: 'bg-gray-100 text-gray-800', label: status };
+    logger.debug('[UserDocumentsTable] Generated status badge', { status, label, color })
     
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${color}`}>
@@ -52,7 +73,10 @@ export default function UserDocumentsTable({
 
   // Helper function to format file size
   const formatFileSize = (bytes?: number) => {
-    if (!bytes) return 'Unknown';
+    if (!bytes) {
+      logger.debug('[UserDocumentsTable] No file size provided')
+      return 'Unknown';
+    }
     
     const units = ['B', 'KB', 'MB', 'GB'];
     let size = bytes;
@@ -63,11 +87,26 @@ export default function UserDocumentsTable({
       unitIndex++;
     }
     
-    return `${size.toFixed(1)} ${units[unitIndex]}`;
+    const formattedSize = `${size.toFixed(1)} ${units[unitIndex]}`;
+    logger.debug('[UserDocumentsTable] Formatted file size', { 
+      originalBytes: bytes,
+      formattedSize 
+    })
+    return formattedSize;
   };
+
+  // Log component updates
+  useEffect(() => {
+    logger.debug('[UserDocumentsTable] Component state updated', {
+      documentCount: documents.length,
+      isLoading,
+      hasFileSelectHandler: !!onFileSelect
+    })
+  }, [documents, isLoading, onFileSelect])
 
   // Loading skeleton
   if (isLoading) {
+    logger.info('[UserDocumentsTable] Rendering loading state')
     return (
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="mt-8 flow-root">
@@ -132,6 +171,7 @@ export default function UserDocumentsTable({
 
   // Empty state
   if (documents.length === 0) {
+    logger.info('[UserDocumentsTable] Rendering empty state')
     return (
       <div className="text-center py-12 px-4">
         <svg
@@ -173,6 +213,10 @@ export default function UserDocumentsTable({
       </div>
     );
   }
+
+  logger.info('[UserDocumentsTable] Rendering document table', { 
+    documentCount: documents.length 
+  })
 
   return (
     <div className="px-4 sm:px-6 lg:px-8">

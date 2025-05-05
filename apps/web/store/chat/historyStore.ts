@@ -98,6 +98,8 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
         .insert({
           id: sessionId,
           account_id: user.id,
+          created_at: now,
+          updated_at: now
         });
 
       if (sessionError) {
@@ -105,7 +107,19 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
         throw sessionError;
       }
 
-      // Update local state
+      // Verify the session was created by fetching it
+      const { data: createdSession, error: verifyError } = await supabase
+        .from('chat_sessions')
+        .select('*')
+        .eq('id', sessionId)
+        .single();
+
+      if (verifyError || !createdSession) {
+        console.error('Failed to verify session creation:', verifyError);
+        throw new Error('Session creation could not be verified');
+      }
+
+      // Update local state only after successful verification
       set(state => ({
         sessions: [{
           id: sessionId,

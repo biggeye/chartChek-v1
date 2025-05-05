@@ -1,15 +1,30 @@
-
 "use client";
 
 import { evaluationFieldComponents, MatrixField, extractContent } from "../patient/evaluations/PatientEvaluationItems";
 import { KipuPatientEvaluationItem } from "~/types/kipu/kipuAdapter";
+import { logger } from '~/lib/logger';
+import { useEffect } from 'react';
 
 interface DocumentViewerProps {
   items?: KipuPatientEvaluationItem[];
 }
 
 export default function DocumentViewer({ items }: DocumentViewerProps) {
+  logger.info('[DocumentViewer] Initializing viewer', { 
+    itemCount: items?.length ?? 0 
+  })
+
+  useEffect(() => {
+    if (items?.length) {
+      logger.debug('[DocumentViewer] Processing evaluation items', {
+        itemCount: items.length,
+        itemTypes: items.map(item => item.fieldType)
+      })
+    }
+  }, [items])
+
   if (!items || items.length === 0) {
+    logger.info('[DocumentViewer] No items to display')
     return (
       <div className="space-y-6">
         <div className="text-center p-6 border-2 border-dashed rounded-lg">
@@ -19,6 +34,10 @@ export default function DocumentViewer({ items }: DocumentViewerProps) {
     );
   }
 
+  logger.info('[DocumentViewer] Rendering evaluation items', {
+    itemCount: items.length
+  })
+
   return (
     <div className="p-2 bg-white rounded-2xl shadow-lg space-y-2">
       {items.map((item: KipuPatientEvaluationItem, idx) => {
@@ -26,6 +45,12 @@ export default function DocumentViewer({ items }: DocumentViewerProps) {
           const previousItem = items[idx - 1];
           const prevAnswer = extractContent(previousItem)?.toLowerCase();
           const previousAnswerYes = prevAnswer === 'yes';
+
+          logger.debug('[DocumentViewer] Processing matrix field', {
+            itemId: item.id,
+            previousAnswer: prevAnswer,
+            shouldRender: previousAnswerYes
+          })
 
           return previousAnswerYes ? (
             <div key={item.id}>
@@ -37,9 +62,18 @@ export default function DocumentViewer({ items }: DocumentViewerProps) {
           const Component = evaluationFieldComponents[item.fieldType] || evaluationFieldComponents.default;
 
           if (!Component) {
-            console.error(`No component found for field type: ${item.fieldType}`);
+            logger.error('[DocumentViewer] No component found for field type', {
+              fieldType: item.fieldType,
+              itemId: item.id
+            })
             return null; 
           }
+
+          logger.debug('[DocumentViewer] Rendering field component', {
+            itemId: item.id,
+            fieldType: item.fieldType,
+            componentName: Component.displayName || Component.name
+          })
 
           return (
             <div key={item.id}>

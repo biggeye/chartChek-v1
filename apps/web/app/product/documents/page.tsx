@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Button } from '@kit/ui/button'
 import UserDocumentUploadDialog from '~/components/documents/UserDocumentUploadDialog'
 import UserDocumentsTable from '~/components/documents/UserDocumentTable'
@@ -10,8 +10,11 @@ import { AlertCircle } from 'lucide-react'
 import { ScrollArea } from '@kit/ui/scroll-area'
 import { useUserDocuments } from '~/hooks/useUserDocuments'
 import { DocumentCategorization } from '~/types/store/doc/userDocument'
+import { logger } from '~/lib/logger'
 
 export default function DocumentsPage() {
+  logger.info('[DocumentsPage] Initializing documents page')
+  
   const { 
     documents, 
     isLoading, 
@@ -25,9 +28,10 @@ export default function DocumentsPage() {
 
   // Handle document upload
   const handleFileUpload = useCallback(async (file: File, categorization: DocumentCategorization): Promise<void> => {
-    console.log('[DocumentsPage:handleFileUpload] Starting file upload process', {
-      file_name: file.name,
+    logger.info('[DocumentsPage:handleFileUpload] Starting file upload process', {
+      fileName: file.name,
       fileSize: file.size,
+      fileType: file.type,
       categorization
     })
 
@@ -38,23 +42,42 @@ export default function DocumentsPage() {
         const result = await uploadAndProcessDocument(file, categorization)
         
         if (result) {
-          console.log('[DocumentsPage:handleFileUpload] Upload successful:', result)
+          logger.info('[DocumentsPage:handleFileUpload] Upload successful', {
+            documentId: result.document_id,
+            status: result.processing_status
+          })
           setIsUploadDialogOpen(false)
           // Refresh the documents list
           refetch()
         } else {
-          console.error('[DocumentsPage:handleFileUpload] Upload failed: No result returned')
+          logger.error('[DocumentsPage:handleFileUpload] Upload failed: No result returned')
           setUploadError('Upload failed. Please try again.')
         }
       } catch (error) {
-        console.error('[DocumentsPage:handleFileUpload] Upload error:', error)
+        logger.error('[DocumentsPage:handleFileUpload] Upload error:', error)
         setUploadError((error as Error).message || 'Upload failed. Please try again.')
       }
     } else {
-      console.error('[DocumentsPage:handleFileUpload] No file provided')
+      logger.error('[DocumentsPage:handleFileUpload] No file provided')
       setUploadError('No file selected. Please select a file to upload.')
     }
   }, [uploadAndProcessDocument, refetch])
+
+  // Log when documents or error state changes
+  useEffect(() => {
+    if (error) {
+      logger.error('[DocumentsPage] Error fetching documents:', error)
+    } else if (documents) {
+      logger.info('[DocumentsPage] Documents loaded successfully', {
+        count: documents.length
+      })
+    }
+  }, [documents, error])
+
+  // Log loading state changes
+  useEffect(() => {
+    logger.debug('[DocumentsPage] Loading state changed:', { isLoading })
+  }, [isLoading])
 
   return (
     <div className="container mx-auto py-6 space-y-6">

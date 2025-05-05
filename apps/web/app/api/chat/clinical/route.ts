@@ -2,7 +2,7 @@ import { google } from '@ai-sdk/google';
 import { openai } from '@ai-sdk/openai';
 import { generateText } from 'ai';
 import { downloadPDFServer } from '~/lib/services/toolCallService';
-import { tools as kipuTools } from '~/product/chat/tools';
+import { tools as kipuTools } from '~/components/chat/tools';
 
 export async function POST(req: Request) {
   console.log('Received POST request');

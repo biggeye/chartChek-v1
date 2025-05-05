@@ -100,7 +100,7 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
         selectedEvaluations,
         currentSessionId.toString() // Ensure it's a string
       );
-
+      
       if (result.success && result.processedCount > 0) {
         setSelectedEvaluations([]);
         if (onProcessed) {

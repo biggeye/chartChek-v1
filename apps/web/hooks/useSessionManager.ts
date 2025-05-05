@@ -19,14 +19,7 @@ export function useSessionManager(): SessionManagerReturn {
   const { id: urlSessionId } = useParams();
   const { currentSessionId, setCurrentSession, createSession, isCreatingSession } = useChatStore();
   const { loadSessions, sessions } = useHistoryStore();
-  const { items: contextItems, getSelectedContent } = useContextQueueStore();
-
-  // Sync URL session with store
-  useEffect(() => {
-    if (urlSessionId && urlSessionId !== currentSessionId) {
-      setCurrentSession(urlSessionId as string);
-    }
-  }, [urlSessionId, currentSessionId, setCurrentSession]);
+  const { items: contextItems, getSelectedContent, clearQueue, loadContextFromSession } = useContextQueueStore();
 
   // Load sessions if not loaded
   useEffect(() => {
@@ -35,24 +28,50 @@ export function useSessionManager(): SessionManagerReturn {
     }
   }, [sessions.length, loadSessions]);
 
+  // Sync URL session with store
+  useEffect(() => {
+    if (urlSessionId && urlSessionId !== currentSessionId) {
+      // First clear existing context
+      clearQueue();
+      
+      // Set the new session
+      setCurrentSession(urlSessionId as string);
+      
+      // Load context for the new session
+      loadContextFromSession(urlSessionId as string).catch(error => {
+        console.error('Failed to load context for session:', error);
+      });
+    }
+  }, [urlSessionId, currentSessionId, setCurrentSession, clearQueue, loadContextFromSession]);
+
   // Memoize ensureSession to prevent recreation on every render
   const ensureSession = useCallback(async () => {
     try {
-      // If we have a URL session ID, use that
+      // If we have a URL session ID, verify it exists in our sessions list
       if (urlSessionId) {
-        setCurrentSession(urlSessionId as string);
-        return urlSessionId as string;
+        const sessionExists = sessions.some(s => s.id === urlSessionId);
+        if (sessionExists) {
+          setCurrentSession(urlSessionId as string);
+          return urlSessionId as string;
+        }
+        // If URL session doesn't exist, clear it and create new
+        router.replace('/product/chat');
       }
       
-      // If we have a current session, use that
+      // If we have a current session, verify it exists
       if (currentSessionId) {
-        return currentSessionId;
+        const sessionExists = sessions.some(s => s.id === currentSessionId);
+        if (sessionExists) {
+          return currentSessionId;
+        }
+        // If current session doesn't exist, clear it
+        setCurrentSession('');
       }
 
       // Only create a new session if we don't have one and aren't already creating one
       if (!isCreatingSession) {
         const newSessionId = await createSession();
-        router.push(`/product/chat/${newSessionId}`);
+        router.replace(`/product/chat/${newSessionId}`);
         return newSessionId;
       } else {
         throw new Error('Session creation already in progress');
@@ -61,7 +80,7 @@ export function useSessionManager(): SessionManagerReturn {
       console.error('Failed to ensure session:', error);
       throw error;
     }
-  }, [urlSessionId, currentSessionId, createSession, router, setCurrentSession, isCreatingSession]);
+  }, [urlSessionId, currentSessionId, sessions, createSession, router, setCurrentSession, isCreatingSession]);
 
   // Get the context string from the selected items
   const contextString = getSelectedContent();

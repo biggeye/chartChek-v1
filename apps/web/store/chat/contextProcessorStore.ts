@@ -157,7 +157,7 @@ Clinical Information:
             try {
               // Directly fetch the evaluation details - we know this works
               const rawEvaluation = await fetchEvaluationDetails(evaluationId);
-              
+
               if (!rawEvaluation) {
                 throw new Error(`Failed to get evaluation data for ID ${evaluationId}`);
               }
@@ -212,16 +212,16 @@ Clinical Information:
             const metadata = {
               patientId: result.patientId,
               evaluationId: result.id,
-              source: "kipu_evaluation", // More specific source
+              source: result.name, //
               patientName: result.patientName,
               // Add sessionId directly to metadata if it exists
               ...(currentSessionId && { sessionId: currentSessionId })
             };
             // ---------------------------------------------
-            const itemTitle = `${result.patientName} - ${result.title}`;
+            const itemTitle = `${result.patientName} - ${result.name}`;
 
             // API Call 1: Create Context Item (Now includes session info if available)
-             try {
+            try {
               const response = await fetch('/api/llm/context/items', {
                 method: 'POST',
                 headers: {
@@ -239,7 +239,7 @@ Clinical Information:
                 throw new Error(`API error: ${response.status} ${response.statusText}`);
               }
               const data = await response.json();
-               // Add to local UI queue after successful API call
+              // Add to local UI queue after successful API call
               successfullyProcessedItemsForLocalQueue.push({
                 type: 'document',
                 title: itemTitle,
@@ -275,7 +275,7 @@ Clinical Information:
             useContextQueueStore.getState().addItem(item);
           });
 
-              return { success: true, processedCount: successCount };
+          return { success: true, processedCount: successCount };
         } else {
           const finalError = `All ${validResults.length} parsed KIPU evaluations failed during API operations. Errors: ${apiErrors.join(', ')}`;
           throw new Error(finalError);

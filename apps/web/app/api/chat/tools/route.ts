@@ -2,7 +2,7 @@ import { google } from '@ai-sdk/google';
 import { openai } from '@ai-sdk/openai';
 import { streamText, CoreMessage } from 'ai';
 import { downloadPDFServer } from '~/lib/services/toolCallService';
-import { tools as kipuTools } from '~/product/chat/tools';
+import { tools as kipuTools } from '~/components/chat/tools';
 import { createServer } from '~/utils/supabase/server';
 
 import { z } from 'zod';

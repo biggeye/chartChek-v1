@@ -21,7 +21,7 @@ interface MessageInputProps {
 
 export function ChatPanel({ sessionId }: ChatPanelProps) {
   const { data: user } = useUser();
-  const { items: contextItems, getSelectedContent } = useContextQueueStore();
+  const { items: contextItems, getSelectedContent, storeContextInSession } = useContextQueueStore();
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [historyError, setHistoryError] = useState<Error | null>(null);
@@ -64,6 +64,20 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
     verifyAndFetchHistory();
   }, [sessionId, user]);
 
+  useEffect(() => {
+    if (sessionId && contextItems.length > 0) {
+      console.log('[ChatPanel] Context items changed, storing in session:', {
+        sessionId,
+        itemCount: contextItems.length,
+        selectedCount: contextItems.filter(item => item.selected).length
+      });
+      
+      storeContextInSession(sessionId).catch(error => {
+        console.error('[ChatPanel] Failed to store context:', error);
+      });
+    }
+  }, [sessionId, contextItems, storeContextInSession]);
+
   const handleResponse = useCallback(async (response: Response) => {
     if (!response.ok) {
       console.error(`HTTP ${response.status}: ${response.statusText}`);
@@ -104,19 +118,34 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
     api: '/api/chat',
     body: {
       sessionId,
-      context: contextItems || getSelectedContent(),
+      context: getSelectedContent(),
     },
     id: sessionId,
     initialMessages,
-    onResponse: handleResponse,
+    onResponse: async (response) => {
+      if (!response.ok) {
+        console.error(`[ChatPanel] HTTP ${response.status}: ${response.statusText}`);
+        throw new Error(`Chat API error: ${response.statusText}`);
+      }
+      // Log the context that was sent
+      console.log('[ChatPanel] Chat request sent with context:', {
+        contextLength: getSelectedContent()?.length || 0,
+        sessionId
+      });
+    },
     onFinish: handleFinish,
     onError: (error) => {
-      console.error('Chat error:', error);
+      console.error('[ChatPanel] Chat error:', error);
     },
     headers: {
       'Content-Type': 'application/json',
     }
   });
+
+  useEffect(() => {
+    const currentContext = getSelectedContent();
+    console.log('[ChatPanel] Current context:', currentContext);
+  }, [getSelectedContent]);
 
   if (!user) {
     return (

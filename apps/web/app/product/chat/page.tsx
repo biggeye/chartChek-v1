@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useSessionManager } from '~/hooks/useSessionManager';
 import { Loader } from '~/components/loading';
-import { ChatPanel } from './ChatPanel';
+import { ChatPanel } from '../../../components/chat/ChatPanel';
 
 export default function ChatPage() {
   const { currentSessionId, contextString, ensureSession, isCreatingSession } = useSessionManager();

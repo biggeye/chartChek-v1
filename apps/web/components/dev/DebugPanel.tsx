@@ -9,6 +9,8 @@ import { useFacilityStore } from '~/store/patient/facilityStore';
 import { useEvaluationsStore } from '~/store/patient/evaluationsStore';
 // chat state
 import { useChatStore } from '~/store/chat/chatStore';
+import { useContextQueueStore } from '~/store/chat/contextQueueStore';
+import { useContextProcessorStore } from '~/store/chat/contextProcessorStore';
 //doc state
 import { useUserDocumentStore } from '~/store/doc/userDocumentStore';
 import useTemplateStore from '~/store/doc/templateStore';
@@ -81,6 +83,8 @@ const FunctionExecutor = ({ func, onClose }: FunctionExecutorProps) => {
   const userDocumentStore = useUserDocumentStore();
   const evaluationsStore = useEvaluationsStore();
   const templateStore = useTemplateStore();
+  const contextQueueStore = useContextQueueStore();
+  const contextProcessorStore = useContextProcessorStore();
 
   const chatStore = useChatStore();
 
@@ -91,7 +95,8 @@ const FunctionExecutor = ({ func, onClose }: FunctionExecutorProps) => {
     userDocumentStore,
     evaluationsStore,
     templateStore,
-
+    contextQueueStore,
+    contextProcessorStore,
     chatStore
   };
 
@@ -611,7 +616,9 @@ export const DebugPanel = () => {
     facilityStore: false,
     evaluationsStore: false,
     userDocumentStore: false,
-    templateStore: false
+    templateStore: false,
+    contextQueueStore: false,
+    contextProcessorStore: false
   });
   const [selectedFunction, setSelectedFunction] = useState<Function | null>(null);
   
@@ -623,6 +630,8 @@ export const DebugPanel = () => {
   const templateStore = useTemplateStore();
   const chatStore = useChatStore();
   const protocolStore = useProtocolStore();
+  const contextQueueStore = useContextQueueStore();
+  const contextProcessorStore = useContextProcessorStore();
 
   const toggleSection = (section: string) => {
     setExpandedSections((prev: Record<string, boolean>) => ({
@@ -705,6 +714,25 @@ export const DebugPanel = () => {
                 onToggle={() => toggleSection('chatStore')}
                 setSelectedFunction={setSelectedFunction}
                 sectionKey="chatStore"
+              />
+   
+              <DebugSection
+                title="Context Queue State"
+                data={contextQueueStore}
+                isExpanded={expandedSections['contextQueueStore'] || false}
+                onToggle={() => toggleSection('contextQueueStore')}
+                setSelectedFunction={setSelectedFunction}
+                sectionKey="contextQueueStore"
+              />
+   
+        
+              <DebugSection
+                title="Context Processor State"
+                data={contextProcessorStore}
+                isExpanded={expandedSections['contextProcessorStore'] || false}
+                onToggle={() => toggleSection('contextProcessorStore')}
+                setSelectedFunction={setSelectedFunction}
+                sectionKey="contextProcessorStore"
               />
             </div>
           )}

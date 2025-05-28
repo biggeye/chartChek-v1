@@ -4,6 +4,7 @@ import { create } from 'zustand';
 import { createClient } from '~/utils/supabase/client'; // Supabase client import
 import type { Facility, FacilityStore, Pagination } from 'types/store/patient/facility'; // Assuming correct type paths
 import { usePatientStore } from './patientStore'; // Import patient store for interaction
+import type { KipuOccupancy } from 'types/kipu/kipuAdapter';
 // Removed queryKeys and invalidateFacilityCache as React Query invalidation isn't directly handled here anymore
 // If cache invalidation is needed elsewhere, those parts can be reintegrated or handled differently.
 
@@ -28,6 +29,7 @@ export const useFacilityStore = create<FacilityStore>((set, get) => ({
   pagination: null, // Pagination info if fetching facilities supports it
   isLoading: false, // Loading state specifically for fetching the facilities list
   error: null, // Error state for facility fetching or operations
+  occupancy: undefined,
 
   // --- ACTIONS ---
   
@@ -180,6 +182,9 @@ export const useFacilityStore = create<FacilityStore>((set, get) => ({
   // setPagination: (pagination: Pagination | null) => set({ pagination }), // If needed
   // setLoading: (isLoading: boolean) => set({ isLoading }), // Handled by fetchFacilities
   // setError: (error: string | null) => set({ error }), // Handled by fetchFacilities
+  setOccupancy: (data) => set({ occupancy: data }),
+  setIsLoading: (isLoading) => set({ isLoading }),
+  setError: (error) => set({ error }),
 }));
 
 // Standard export of the hook for use in components

@@ -8,21 +8,34 @@ import { Badge } from '@kit/ui/badge';
 import { format } from 'date-fns';
 import { Skeleton } from '@kit/ui/skeleton';
 import { logger } from '~/lib/logger';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Button } from '@kit/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@kit/ui/table';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@kit/ui/dialog';
+import { useUserDocuments } from '~/hooks/useUserDocuments';
+import { formatDate, formatFileSize } from '~/lib/utils';
 
 interface UserDocumentsTableProps {
   documents: UserDocument[];
   detailsUrlPrefix?: string;
   onFileSelect?: (file: File) => Promise<void>;
   isLoading?: boolean;
+  onChunk?: (documentId: string) => void;
 }
 
 export default function UserDocumentsTable({ 
   documents, 
   detailsUrlPrefix = '/product/documents', 
   onFileSelect,
-  isLoading = false 
+  isLoading = false,
+  onChunk
 }: UserDocumentsTableProps) {
+  const { deleteDocument, isDeleting } = useUserDocuments();
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [chunkDialogDocId, setChunkDialogDocId] = useState<string | null>(null);
+  const [chunkSize, setChunkSize] = useState(1000);
+  const [chunkOverlap, setChunkOverlap] = useState(200);
+
   logger.info('[UserDocumentsTable] Initializing table', { 
     documentCount: documents.length,
     isLoading 
@@ -103,6 +116,33 @@ export default function UserDocumentsTable({
       hasFileSelectHandler: !!onFileSelect
     })
   }, [documents, isLoading, onFileSelect])
+
+  const handleDelete = async (documentId: string) => {
+    try {
+      await deleteDocument(documentId);
+      setDeleteConfirmId(null);
+    } catch (error) {
+      console.error('Delete failed:', error);
+    }
+  };
+
+  const handleChunk = (documentId: string) => {
+    if (onChunk) {
+      onChunk(documentId);
+    } else {
+      setChunkDialogDocId(documentId);
+    }
+  };
+
+  const handleChunkSubmit = async () => {
+    if (!chunkDialogDocId) return;
+    try {
+      await onChunk?.(chunkDialogDocId);
+      setChunkDialogDocId(null);
+    } catch (error) {
+      console.error('Chunking failed:', error);
+    }
+  };
 
   // Loading skeleton
   if (isLoading) {
@@ -219,68 +259,120 @@ export default function UserDocumentsTable({
   })
 
   return (
-    <div className="px-4 sm:px-6 lg:px-8">
-      <div className="mt-8 flow-root">
-        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-            <div className="overflow-hidden ring-1 shadow-sm ring-black/5 sm:rounded-lg">
-              <table className="min-w-full divide-y divide-gray-300">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="py-3.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-6">
-                      File Name
-                    </th>
-                    <th scope="col" className="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Type
-                    </th>
-                    <th scope="col" className="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Size
-                    </th>
-                    <th scope="col" className="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Status
-                    </th>
-                    <th scope="col" className="hidden md:table-cell px-3 py-3.5 text-left text-sm font-semibold text-gray-900">
-                      Uploaded
-                    </th>
-                    <th scope="col" className="relative py-3.5 pr-4 pl-3 sm:pr-6">
-                      <span className="sr-only">Actions</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {documents.map((doc) => (
-                    <tr key={doc.document_id}>
-                      <td className="py-4 pr-3 pl-4 text-sm font-medium whitespace-nowrap text-gray-900 sm:pl-6">
-                        {doc.file_name}
-                      </td>
-                      <td className="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                        {doc.file_type?.split('/')[1]?.toUpperCase() || 'Unknown'}
-                      </td>
-                      <td className="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                        {formatFileSize(doc.file_size)}
-                      </td>
-                      <td className="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                        {getStatusBadge(doc.processing_status)}
-                      </td>
-                      <td className="hidden md:table-cell px-3 py-4 text-sm whitespace-nowrap text-gray-500">
-                        {doc.created_at ? format(new Date(doc.created_at), 'MMM d, yyyy') : 'Unknown'}
-                      </td>
-                      <td className="relative py-4 pr-4 pl-3 text-right text-sm font-medium whitespace-nowrap sm:pr-6">
-                        <Link 
-                          href={`${detailsUrlPrefix}/${doc.document_id}`}
-                          className="text-indigo-600 hover:text-indigo-900"
-                        >
-                          View<span className="sr-only">, {doc.file_name}</span>
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Title</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Size</TableHead>
+            <TableHead>Uploaded</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {documents.map((doc) => (
+            <TableRow key={doc.document_id}>
+              <TableCell className="font-medium">{doc.title || doc.file_name}</TableCell>
+              <TableCell>{doc.document_type || 'Unknown'}</TableCell>
+              <TableCell>{formatFileSize(Number(doc.file_size))}</TableCell>
+              <TableCell>{formatDate(doc.created_at)}</TableCell>
+              <TableCell>
+                {doc.processing_status === 'pending' && 'Pending'}
+                {doc.processing_status === 'processing' && 'Processing'}
+                {doc.processing_status === 'completed' && (
+                  doc.has_embeddings ? 'Embedded' : 'Ready for Embedding'
+                )}
+                {doc.processing_status === 'error' && 'Error'}
+              </TableCell>
+              <TableCell>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleChunk(doc.document_id)}
+                    disabled={doc.processing_status === 'processing' || doc.has_embeddings}
+                  >
+                    Chunk
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => setDeleteConfirmId(doc.document_id)}
+                    disabled={isDeleting}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Delete</DialogTitle>
+          </DialogHeader>
+          <p>Are you sure you want to delete this document? This action cannot be undone.</p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteConfirmId(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => deleteConfirmId && handleDelete(deleteConfirmId)}
+              disabled={isDeleting}
+            >
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Chunk Dialog */}
+      {!onChunk && (
+        <Dialog open={!!chunkDialogDocId} onOpenChange={() => setChunkDialogDocId(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Configure Chunking</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium">Chunk Size</label>
+                <Input
+                  type="number"
+                  value={chunkSize}
+                  onChange={(e) => setChunkSize(Number(e.target.value))}
+                  min={100}
+                  max={5000}
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium">Chunk Overlap</label>
+                <Input
+                  type="number"
+                  value={chunkOverlap}
+                  onChange={(e) => setChunkOverlap(Number(e.target.value))}
+                  min={0}
+                  max={1000}
+                />
+              </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setChunkDialogDocId(null)}>
+                Cancel
+              </Button>
+              <Button onClick={handleChunkSubmit}>
+                Start Chunking
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }

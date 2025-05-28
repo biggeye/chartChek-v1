@@ -3,6 +3,11 @@ description: Spec and pattern for creating tool invocations for LLMs with vercel
 globs: 
 alwaysApply: false
 ---
+[toolCallService.ts](mdc:apps/web/lib/services/toolCallService.ts)
+[tools.ts](mdc:apps/web/components/chat/tools.ts)
+[chatbot-tools.mdc](mdc:.cursor/rules/chatbot-tools.mdc)
+[KipuToolRenderer.tsx](mdc:apps/web/components/chat/kipu/KipuToolRenderer.tsx)
+
 Chatbot Tool Usage
 With useChat and streamText, you can use tools in your chatbot application. The AI SDK supports three types of tools in this context:
 

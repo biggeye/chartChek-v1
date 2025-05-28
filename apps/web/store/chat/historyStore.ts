@@ -83,15 +83,19 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
 
   createSession: async (title = 'New Chat') => {
     try {
+      console.log('[createSession] Starting session creation');
       const { data: { user }, error: authError } = await supabase.auth.getUser();
+      console.log('[createSession] Auth result:', { user, authError });
       
       if (authError || !user) {
+        console.error('[createSession] Authentication required', { authError, user });
         throw new Error('Authentication required');
       }
 
       const sessionId = uuidv4();
       const now = new Date().toISOString();
 
+      console.log('[createSession] Inserting session:', { sessionId, userId: user.id, now });
       // Create a new session
       const { error: sessionError } = await supabase
         .from('chat_sessions')
@@ -102,11 +106,13 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
           updated_at: now
         });
 
+      console.log('[createSession] Insert result:', { sessionError });
       if (sessionError) {
         console.error('Failed to create session:', sessionError);
         throw sessionError;
       }
 
+      console.log('[createSession] Verifying session creation:', { sessionId });
       // Verify the session was created by fetching it
       const { data: createdSession, error: verifyError } = await supabase
         .from('chat_sessions')
@@ -114,11 +120,13 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
         .eq('id', sessionId)
         .single();
 
+      console.log('[createSession] Verification result:', { createdSession, verifyError });
       if (verifyError || !createdSession) {
         console.error('Failed to verify session creation:', verifyError);
         throw new Error('Session creation could not be verified');
       }
 
+      console.log('[createSession] Session created and verified, updating local state');
       // Update local state only after successful verification
       set(state => ({
         sessions: [{
@@ -130,6 +138,7 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
         }, ...state.sessions]
       }));
 
+      console.log('[createSession] Returning sessionId:', sessionId);
       return sessionId;
     } catch (error) {
       console.error('Error in createSession:', error);

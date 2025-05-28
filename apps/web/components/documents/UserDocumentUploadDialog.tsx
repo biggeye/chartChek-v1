@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@kit/ui/button'
 import { ArrowUpTrayIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { DocumentCategorization } from 'types/store/doc/userDocument'
 import { Transition } from '@headlessui/react'
 import { Label } from '@kit/ui/label'
 import { 
@@ -14,9 +13,12 @@ import {
   SelectValue
 } from '@kit/ui/select'
 import { Input } from '@kit/ui/input'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@kit/ui/dialog'
 import { useFacilityStore } from '~/store/patient/facilityStore'
 import { createClient } from '~/utils/supabase/client'
 import { logger } from '~/lib/logger'
+import { useUserDocuments } from '~/hooks/useUserDocuments'
+import { DocumentUploadMetadata } from '~/types/store/doc/userDocument'
 
 // Initialize Supabase client
 const supabase = createClient();
@@ -24,136 +26,106 @@ const supabase = createClient();
 interface UserDocumentUploadDialogProps {
   isOpen: boolean
   onClose: () => void
-  onUpload: (file: File, categorization: DocumentCategorization) => Promise<void>
-  isLoading?: boolean
-  error?: string | null
+  onSuccess?: () => void
+  facilityId?: string
+  patientId?: string
 }
+
+const DOCUMENT_TYPES = [
+  'Clinical Assessment',
+  'Progress Note',
+  'Treatment Plan',
+  'Discharge Summary',
+  'Lab Report',
+  'Other'
+] as const;
+
+const COMPLIANCE_CONCERNS = [
+  'HIPAA',
+  'Joint Commission',
+  'DHCS',
+  'Other',
+  'None'
+] as const;
 
 export default function UserDocumentUploadDialog({
   isOpen,
   onClose,
-  onUpload,
-  isLoading = false,
-  error = null
+  onSuccess,
+  facilityId,
+  patientId
 }: UserDocumentUploadDialogProps) {
-  logger.info('[UserDocumentUploadDialog] Initializing dialog', { isOpen, isLoading })
+  logger.info('[UserDocumentUploadDialog] Initializing dialog', { isOpen })
 
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [categorization, setCategorization] = useState<DocumentCategorization>({
-    document_type: 'document_page_upload',
-    tags: []
-  })
-  const { currentFacilityId } = useFacilityStore()
-  const [facilityUuid, setFacilityUuid] = useState<string | null>(null)
-  const [facilityName, setFacilityName] = useState<string | null>(null)
-  const [tagInput, setTagInput] = useState<string>('')
-
-  // Fetch facility data when currentFacilityId changes
-  useEffect(() => {
-    if (currentFacilityId) {
-      logger.info('[UserDocumentUploadDialog] Fetching facility data', { currentFacilityId })
-      const fetchFacilityData = async () => {
-        try {
-          const { data, error } = await supabase
-            .from('facilities')
-            .select('id, name')
-            .eq('kipu_id', currentFacilityId)
-            .single();
-          
-          if (error) {
-            logger.error('[UserDocumentUploadDialog] Error fetching facility data:', error)
-            return;
-          }
-          
-          if (data) {
-            logger.info('[UserDocumentUploadDialog] Facility data fetched successfully', { 
-              facilityId: data.id,
-              facilityName: data.name 
-            })
-            setFacilityUuid(data.id);
-            setFacilityName(data.name);
-            
-            // Update the categorization with the facility UUID
-            setCategorization(prev => ({
-              ...prev,
-              facility_id: data.id
-            }));
-          }
-        } catch (err) {
-          logger.error('[UserDocumentUploadDialog] Error in facility data lookup:', err)
-        }
-      };
-      
-      fetchFacilityData();
-    }
-  }, [currentFacilityId]);
+  const { uploadDocument, isUploading } = useUserDocuments();
+  const [file, setFile] = useState<File | null>(null)
+  const [title, setTitle] = useState('')
+  const [documentType, setDocumentType] = useState<string>('')
+  const [complianceConcern, setComplianceConcern] = useState<string>('None')
+  const [complianceConcernOther, setComplianceConcernOther] = useState('')
+  const [tags, setTags] = useState<string[]>([])
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     logger.debug('[UserDocumentUploadDialog] File input change event triggered')
-    const file = e.target.files?.[0]
-    if (file) {
+    const selectedFile = e.target.files?.[0]
+    if (selectedFile) {
       logger.info('[UserDocumentUploadDialog] File selected', {
-        fileName: file.name,
-        fileType: file.type,
-        fileSize: file.size
+        fileName: selectedFile.name,
+        fileType: selectedFile.type,
+        fileSize: selectedFile.size
       })
-      setSelectedFile(file)
+      setFile(selectedFile)
+      // Use filename (without extension) as default title if not set
+      if (!title) {
+        setTitle(selectedFile.name.split('.').slice(0, -1).join('.'))
+      }
     } else {
       logger.warn('[UserDocumentUploadDialog] No file selected from input')
     }
   }
   
-  const handleUpload = async () => {
-    logger.info('[UserDocumentUploadDialog] Upload initiated', {
-      fileName: selectedFile?.name,
-      categorization
-    })
-    if (selectedFile) {
-      try {
-        await onUpload(selectedFile, categorization)
-        logger.info('[UserDocumentUploadDialog] Upload completed successfully')
-        // Reset form after successful upload
-        setSelectedFile(null)
-        setCategorization({
-          document_type: 'document_page_upload',
-          tags: []
-        })
-        setTagInput('')
-        onClose()
-      } catch (error) {
-        logger.error('[UserDocumentUploadDialog] Error in handleUpload:', error)
-      }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file) return;
+
+    try {
+      const metadata: DocumentUploadMetadata = {
+        document_type: documentType,
+        compliance_concern: complianceConcern,
+        compliance_concern_other: complianceConcern === 'Other' ? complianceConcernOther : undefined,
+        tags,
+        facility_id: facilityId,
+        patient_id: patientId,
+        title
+      };
+
+      await uploadDocument({ file, metadata });
+      onSuccess?.();
+      handleClose();
+    } catch (error) {
+      logger.error('[UserDocumentUploadDialog] Error in handleSubmit:', error);
     }
   }
 
-  const addTag = () => {
-    if (tagInput.trim() && !categorization.tags?.includes(tagInput.trim())) {
-      logger.debug('[UserDocumentUploadDialog] Adding tag', { tag: tagInput.trim() })
-      setCategorization({
-        ...categorization,
-        tags: [...(categorization.tags || []), tagInput.trim()]
-      })
-      setTagInput('')
-    }
-  }
-
-  const removeTag = (tag: string) => {
-    logger.debug('[UserDocumentUploadDialog] Removing tag', { tag })
-    setCategorization({
-      ...categorization,
-      tags: categorization.tags?.filter(t => t !== tag)
-    })
+  const handleClose = () => {
+    logger.info('[UserDocumentUploadDialog] Closing dialog')
+    setFile(null)
+    setTitle('')
+    setDocumentType('')
+    setComplianceConcern('None')
+    setComplianceConcernOther('')
+    setTags([])
+    onClose()
   }
 
   // Log dialog state changes
   useEffect(() => {
     logger.debug('[UserDocumentUploadDialog] Dialog state changed', { 
       isOpen,
-      isLoading,
-      hasError: !!error,
-      hasSelectedFile: !!selectedFile
+      isUploading,
+      hasFile: !!file
     })
-  }, [isOpen, isLoading, error, selectedFile])
+  }, [isOpen, isUploading, file])
 
   return (
     <Transition
@@ -169,7 +141,7 @@ export default function UserDocumentUploadDialog({
         {/* Backdrop */}
         <div
           className="absolute inset-0 bg-gray-500/30 backdrop-blur-sm"
-          onClick={onClose}
+          onClick={handleClose}
         />
 
         {/* Modal Content */}
@@ -186,7 +158,7 @@ export default function UserDocumentUploadDialog({
             <div className="flex items-center justify-between p-4 border-b">
               <h2 className="text-lg font-semibold text-gray-900">Upload Document</h2>
               <button
-                onClick={onClose}
+                onClick={handleClose}
                 className="text-gray-500 hover:text-gray-700"
               >
                 <XMarkIcon className="h-5 w-5" />
@@ -195,188 +167,70 @@ export default function UserDocumentUploadDialog({
 
             {/* Modal Body */}
             <div className="p-4 overflow-y-auto flex-grow">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4">
-                  <p className="text-sm">{error}</p>
-                </div>
-              )}
-              {!selectedFile ? (
-                <div className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-12">
-                  <ArrowUpTrayIcon className="h-8 w-8 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-500 mb-4">Click to select or drag and drop a file</p>
-                  <input
-                    id="file-upload"
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Input
                     type="file"
-                    className="hidden"
                     onChange={handleFileChange}
-                    accept=".pdf,.doc,.docx,.txt"
-                    disabled={isLoading}
+                    accept=".pdf,.txt,.doc,.docx"
+                    required
                   />
-                  <label
-                    htmlFor="file-upload"
-                    className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer"
-                  >
-                    Select File
-                  </label>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
-                    <div className="truncate">
-                      <p className="text-sm font-medium text-gray-900">{selectedFile.name}</p>
-                      <p className="text-xs text-gray-500">
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB • {selectedFile.type || 'Unknown type'}
-                      </p>
-                    </div>
-                    <Button
-                      onClick={() => setSelectedFile(null)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      Change
-                    </Button>
-                  </div>
-                  
-                  <div className="border rounded-md p-4 space-y-4">
-                    <h3 className="text-sm font-medium mb-3">Document Categorization</h3>
-                    
-                    {/* Document Type */}
-                    <div>
-                      <Label htmlFor="document-type">Document Type</Label>
-                      <Select
-                        disabled={isLoading}
-                        value={categorization.document_type}
-                        onValueChange={(value: string) => setCategorization({ ...categorization, document_type: value })}
-                      >
-                        <SelectTrigger id="document-type">
-                          <SelectValue placeholder="Select document type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="document_page_upload">Document Page Upload</SelectItem>
-                          <SelectItem value="patient_record">Patient Record</SelectItem>
-                          <SelectItem value="compliance_document">Compliance Document</SelectItem>
-                          <SelectItem value="facility_document">Facility Document</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    {/* Facility */}
-                    <div>
-                      <Label htmlFor="facility">Facility</Label>
-                      <div className="text-sm text-gray-700 py-2 px-3 border rounded-md bg-gray-50">
-                        {facilityName ? `Facility Name: ${facilityName}` : 'No facility selected'}
-                      </div>
-                    </div>
-                    
-                    {/* Compliance Concern */}
-                    <div>
-                      <Label htmlFor="compliance-concern">Compliance Concern</Label>
-                      <Select
-                        disabled={isLoading}
-                        value={categorization.compliance_concern || 'none'}
-                        onValueChange={(value: string) => setCategorization({ 
-                          ...categorization, 
-                          compliance_concern: value === 'none' ? undefined : value,
-                          compliance_concern_other: value !== 'other' ? undefined : categorization.compliance_concern_other
-                        })}
-                      >
-                        <SelectTrigger id="compliance-concern">
-                          <SelectValue placeholder="Select compliance concern" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">None</SelectItem>
-                          <SelectItem value="jco">Joint Commission</SelectItem>
-                          <SelectItem value="dhcs">DHCS</SelectItem>
-                          <SelectItem value="carf">CARF</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    {/* Other Compliance Concern */}
-                    {categorization.compliance_concern === 'other' && (
-                      <div>
-                        <Label htmlFor="compliance-concern-other">Specify Other Compliance Concern</Label>
-                        <Input
-                          id="compliance-concern-other"
-                          value={categorization.compliance_concern_other || ''}
-                          onChange={(e) => setCategorization({ 
-                            ...categorization, 
-                            compliance_concern_other: e.target.value 
-                          })}
-                          disabled={isLoading}
-                          placeholder="Enter compliance concern"
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Tags */}
-                    <div>
-                      <Label htmlFor="tags">Tags</Label>
-                      <div className="flex gap-2 mb-2">
-                        <Input
-                          id="tags"
-                          value={tagInput}
-                          onChange={(e) => setTagInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              addTag();
-                            }
-                          }}
-                          disabled={isLoading}
-                          placeholder="Add tags"
-                          className="flex-1"
-                        />
-                        <Button 
-                          onClick={addTag} 
-                          disabled={isLoading || !tagInput.trim()}
-                          type="button"
-                          variant="outline"
-                        >
-                          Add
-                        </Button>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-2">
-                        {categorization.tags?.map((tag) => (
-                          <div 
-                            key={tag} 
-                            className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full flex items-center"
-                          >
-                            {tag}
-                            <button
-                              type="button"
-                              className="ml-1 text-gray-500 hover:text-gray-700"
-                              onClick={() => removeTag(tag)}
-                              disabled={isLoading}
-                            >
-                              <XMarkIcon className="h-3 w-3" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                <div>
+                  <Input
+                    placeholder="Document Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    required
+                  />
                 </div>
-              )}
-            </div>
-
-            {/* Modal Footer */}
-            <div className="border-t p-4 flex justify-between">
-              <Button 
-                onClick={onClose} 
-                disabled={isLoading}
-                variant="outline"
-              >
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleUpload} 
-                disabled={!selectedFile || isLoading}
-              >
-                {isLoading ? 'Uploading...' : 'Upload Document'}
-              </Button>
+                <div>
+                  <Select value={documentType} onValueChange={setDocumentType} required>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Document Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {DOCUMENT_TYPES.map((type) => (
+                        <SelectItem key={type} value={type}>
+                          {type}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Select value={complianceConcern} onValueChange={setComplianceConcern}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Compliance Concern" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COMPLIANCE_CONCERNS.map((concern) => (
+                        <SelectItem key={concern} value={concern}>
+                          {concern}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {complianceConcern === 'Other' && (
+                  <div>
+                    <Input
+                      placeholder="Specify Compliance Concern"
+                      value={complianceConcernOther}
+                      onChange={(e) => setComplianceConcernOther(e.target.value)}
+                      required
+                    />
+                  </div>
+                )}
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={handleClose}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={!file || isUploading}>
+                    {isUploading ? 'Uploading...' : 'Upload'}
+                  </Button>
+                </DialogFooter>
+              </form>
             </div>
           </div>
         </Transition.Child>

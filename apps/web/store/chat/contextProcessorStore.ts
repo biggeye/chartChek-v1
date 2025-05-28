@@ -2,12 +2,13 @@ import { create } from "zustand";
 import { KipuPatientEvaluation } from "types/kipu/kipuAdapter";
 import { adaptKipuEvaluation } from "types/kipu/kipuEvaluationEnhanced";
 import { PatientEvaluationParserService } from "~/lib/parse-evaluation";
-import { useEvaluationsStore } from "../patient/evaluationsStore";
-import { useContextQueueStore } from "~/store/chat/contextQueueStore"; // To add to the UI queue after successful API calls
+import { useContextQueueStore } from "~/store/chat/contextQueueStore";
 import { getCurrentUserId } from "~/utils/supabase/user";
 import type { PatientBasicInfo } from "types/kipu/kipuAdapter";
-import { useChatStore } from "./chatStore"; // To potentially get the current session ID
+import { useChatStore } from "./chatStore";
 import { fetchEvaluationDetails } from '~/lib/services/evaluationsService';
+// Add import for uuid if crypto.randomUUID is not available
+// import { v4 as uuidv4 } from 'uuid';
 
 // --- Types ---
 
@@ -20,8 +21,8 @@ interface ContextProcessorState {
   processAndAddKipuEvaluations: (
     patient: PatientBasicInfo,
     evaluationIds: string[],
-    sessionId?: string // Optional: Explicitly pass session ID if needed
-  ) => Promise<{ success: boolean; processedCount: number; error?: string }>; // Return status
+    sessionId?: string
+  ) => Promise<{ success: boolean; processedCount: number; error?: string }>;
   // Future actions for other sources can be added here:
   // processAndAddUserDocument: (documentId: string, sessionId?: string) => Promise<...>;
   // processAndAddUploadedFile: (file: File, sessionId?: string) => Promise<...>;
@@ -69,23 +70,22 @@ async function fetchApi(endpoint: string, options: RequestInit = {}) {
 
 const parserService = new PatientEvaluationParserService(); // Instantiate parser once
 
-export const useContextProcessorStore = create<ContextProcessorState>()(
-  (set, get) => ({
-    isProcessing: false,
-    error: null,
-    processedCount: 0,
+export const useContextProcessorStore = create<ContextProcessorState>()((set, get) => ({
+  isProcessing: false,
+  error: null,
+  processedCount: 0,
 
-    processAndAddKipuEvaluations: async (patient, evaluationIds, sessionId) => {
-      set({ isProcessing: true, error: null });
-      let successCount = 0;
-      const successfullyProcessedItemsForLocalQueue: { type: 'document', title: string, content: string }[] = [];
+  processAndAddKipuEvaluations: async (patient, evaluationIds, sessionId) => {
+    set({ isProcessing: true, error: null });
+    let successCount = 0;
+    const successfullyProcessedItemsForLocalQueue: Array<{ type: 'context' | 'evaluation'; title: string; content: string }> = [];
 
-      try {
-        // First, add patient basic info as context
-        const patientInfo: { type: 'document', title: string, content: string } = {
-          type: 'document',
-          title: `Patient Information - ${patient.firstName} ${patient.lastName}`,
-          content: `
+    try {
+      // Add patient info as context
+      const patientInfo = {
+        type: 'context',
+        title: `Patient Information - ${patient.firstName} ${patient.lastName}`,
+        content: `
 Patient ID: ${patient.patientId}
 Name: ${patient.firstName} ${patient.lastName}
 Date of Birth: ${patient.dateOfBirth || 'Not provided'}
@@ -115,186 +115,112 @@ Clinical Information:
 - Patient Statuses: ${JSON.stringify(patient.patient_statuses || [], null, 2)}
 - Patient Contacts: ${JSON.stringify(patient.patient_contacts || [], null, 2)}
 `.trim()
-        };
+      };
+      successfullyProcessedItemsForLocalQueue.push(patientInfo as { type: 'context'; title: string; content: string });
 
-        // Add patient info to the queue first
-        successfullyProcessedItemsForLocalQueue.push(patientInfo);
+      const userId = await getCurrentUserId();
+      const currentSessionId = sessionId || useChatStore.getState().currentSessionId;
 
-        // Create context item for patient info
-        const userId = await getCurrentUserId();
-        const currentSessionId = sessionId || useChatStore.getState().currentSessionId;
-
-        try {
-          const patientInfoResponse = await fetch('/api/llm/context/items', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              type: "document" as const,
-              title: patientInfo.title,
-              content: patientInfo.content,
-              metadata: {
-                patientId: patient.patientId,
-                source: "patient_info",
-                patientName: `${patient.firstName} ${patient.lastName}`,
-                ...(currentSessionId && { sessionId: currentSessionId })
-              },
-              userId: userId,
-            }),
-          });
-
-          if (!patientInfoResponse.ok) {
-            console.warn('Failed to add patient info to context, but continuing with evaluations');
-          }
-        } catch (error) {
-          console.warn('Error adding patient info to context, but continuing with evaluations:', error);
-        }
-
-        // Now process evaluations as before
-        const processedResults = await Promise.allSettled(
-          evaluationIds.map(async (evaluationId) => {
-            try {
-              // Directly fetch the evaluation details - we know this works
-              const rawEvaluation = await fetchEvaluationDetails(evaluationId);
-
-              if (!rawEvaluation) {
-                throw new Error(`Failed to get evaluation data for ID ${evaluationId}`);
-              }
-
-              const adaptedEvaluation = adaptKipuEvaluation(rawEvaluation);
-              console.log(
-                `[ContextProcessor] Adapted evaluation ${evaluationId}:`,
-                JSON.stringify(adaptedEvaluation, null, 2)
-              );
-              const { title, content } = parserService.parseEvaluation(adaptedEvaluation);
-              console.log(
-                `[ContextProcessor] Parsed evaluation ${evaluationId}: Title - ${title}, Content length - ${content.length}`
-              );
-
-              return {
-                id: evaluationId,
-                title,
-                content,
-                patientName: `${patient.firstName} ${patient.lastName}`,
-                patientId: patient.patientId,
-              };
-            } catch (error) {
-              console.error(`Error processing evaluation ${evaluationId}:`, error);
-              throw error;
-            }
-          })
-        );
-
-        // Filter out failures from parsing/fetching stage
-        const validResults = processedResults
-          .filter(result => result.status === 'fulfilled')
-          .map(result => (result as PromiseFulfilledResult<any>).value);
-
-        const fetchParseErrors = processedResults
-          .filter(result => result.status === 'rejected')
-          .map(result => (result as PromiseRejectedResult).reason?.message || 'Unknown fetch/parse error');
-
-        if (validResults.length === 0) {
-          const combinedError = `No KIPU evaluations could be fetched or parsed. Errors: ${fetchParseErrors.join(', ')}`;
-          throw new Error(combinedError);
-        }
-        if (fetchParseErrors.length > 0) {
-          console.warn(`[ContextProcessor] Some KIPU evaluations failed fetch/parse: ${fetchParseErrors.join(', ')}`);
-        }
-
-        console.log(`[ContextProcessor] Successfully fetched/parsed ${validResults.length} KIPU evaluations. Proceeding to API calls.`);
-
-        // 2. API Calls: Create Context Item and Attach (Generic Logic)
-        const apiResults = await Promise.allSettled(
-          validResults.map(async (result) => {
-            // --- Metadata specific to KIPU evaluations ---
-            const metadata = {
-              patientId: result.patientId,
-              evaluationId: result.id,
-              source: result.name, //
-              patientName: result.patientName,
-              // Add sessionId directly to metadata if it exists
-              ...(currentSessionId && { sessionId: currentSessionId })
+      // Process evaluations
+      const processedResults = await Promise.allSettled(
+        evaluationIds.map(async (evaluationId) => {
+          try {
+            const rawEvaluation = await fetchEvaluationDetails(evaluationId);
+            if (!rawEvaluation) throw new Error(`Failed to get evaluation data for ID ${evaluationId}`);
+            const adaptedEvaluation = adaptKipuEvaluation(rawEvaluation);
+            const { title, content } = parserService.parseEvaluation(adaptedEvaluation);
+            return {
+              id: evaluationId,
+              title,
+              content,
+              patientName: `${patient.firstName} ${patient.lastName}`,
+              patientId: patient.patientId,
             };
-            // ---------------------------------------------
-            const itemTitle = `${result.patientName} - ${result.name}`;
+          } catch (error) {
+            console.error(`Error processing evaluation ${evaluationId}:`, error);
+            throw error;
+          }
+        })
+      );
 
-            // API Call 1: Create Context Item (Now includes session info if available)
-            try {
-              const response = await fetch('/api/llm/context/items', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  type: "document",
-                  title: itemTitle,
-                  content: result.content,
-                  metadata: metadata, // Metadata now contains sessionId if available
-                  userId: userId,
-                }),
-              });
-              if (!response.ok) {
-                throw new Error(`API error: ${response.status} ${response.statusText}`);
-              }
-              const data = await response.json();
-              // Add to local UI queue after successful API call
-              successfullyProcessedItemsForLocalQueue.push({
-                type: 'document',
-                title: itemTitle,
-                content: result.content,
-              });
-              return { id: data.id, title: itemTitle }; // Return minimal info about success
-            } catch (apiError) {
-              console.error(`Failed to add context item for evaluation ${result.id}:`, apiError);
-              throw apiError;
-            }
-          })
-        );
+      const validResults = processedResults
+        .filter(result => result.status === 'fulfilled')
+        .map(result => (result as PromiseFulfilledResult<any>).value);
+      const fetchParseErrors = processedResults
+        .filter(result => result.status === 'rejected')
+        .map(result => (result as PromiseRejectedResult).reason?.message || 'Unknown fetch/parse error');
 
-        // 3. Update State and Add to UI Queue
-        const successfulApiItems = apiResults
-          .filter(result => result.status === 'fulfilled')
-          .map(result => (result as PromiseFulfilledResult<{ id: string; title: string }>).value);
-
-        const apiErrors = apiResults
-          .filter(result => result.status === 'rejected')
-          .map(result => (result as PromiseRejectedResult).reason?.message || 'Unknown API error');
-
-        successCount = successfulApiItems.length;
-        set({ processedCount: successCount });
-
-        if (apiErrors.length > 0) {
-          console.error(`[ContextProcessor] Errors during API calls for KIPU items: ${apiErrors.join(', ')}`);
-          set({ error: `Partial failure: ${apiErrors.length} KIPU items failed during API operations. Errors: ${apiErrors.join(', ')}` })
-        }
-
-        if (successCount > 0) {
-          successfullyProcessedItemsForLocalQueue.forEach(item => {
-            useContextQueueStore.getState().addItem(item);
-          });
-
-          return { success: true, processedCount: successCount };
-        } else {
-          const finalError = `All ${validResults.length} parsed KIPU evaluations failed during API operations. Errors: ${apiErrors.join(', ')}`;
-          throw new Error(finalError);
-        }
-
-      } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "An unknown error occurred during KIPU context processing";
-        console.error("[ContextProcessor] KIPU processing error:", errorMessage);
-        set({ error: errorMessage });
-        return { success: false, processedCount: 0, error: errorMessage };
-      } finally {
-        set({ isProcessing: false });
+      if (validResults.length === 0) {
+        throw new Error(`No KIPU evaluations could be fetched or parsed. Errors: ${fetchParseErrors.join(', ')}`);
       }
-    },
-    // Placeholder for future actions:
-    // processAndAddUserDocument: async (documentId, sessionId) => { /* ... */ },
-    // processAndAddUploadedFile: async (file, sessionId) => { /* ... */ },
-  })
-);
+      if (fetchParseErrors.length > 0) {
+        console.warn(`[ContextProcessor] Some KIPU evaluations failed fetch/parse: ${fetchParseErrors.join(', ')}`);
+      }
+
+      // Create context items for valid evaluations
+      const apiResults = await Promise.allSettled(
+        validResults.map(async (result) => {
+          const metadata = {
+            patientId: result.patientId,
+            evaluationId: result.id,
+            source: result.title,
+            patientName: result.patientName,
+            ...(currentSessionId && { sessionId: currentSessionId })
+          };
+          const itemTitle = `${result.patientName} - ${result.title}`;
+          try {
+            successfullyProcessedItemsForLocalQueue.push({
+              type: 'context' as 'context',
+              title: itemTitle,
+              content: result.content,
+            });
+            return { id: result.id, title: itemTitle };
+          } catch (apiError) {
+            console.error(`Failed to add context item for evaluation ${result.id}:`, apiError);
+            throw apiError;
+          }
+        })
+      );
+
+      const successfulApiItems = apiResults
+        .filter(result => result.status === 'fulfilled')
+        .map(result => (result as PromiseFulfilledResult<{ id: string; title: string }>));
+      const apiErrors = apiResults
+        .filter(result => result.status === 'rejected')
+        .map(result => (result as PromiseRejectedResult).reason?.message || 'Unknown API error');
+
+      successCount = successfulApiItems.length;
+      set({ processedCount: successCount });
+
+      if (apiErrors.length > 0) {
+        set({ error: `Partial failure: ${apiErrors.length} KIPU items failed during API operations. Errors: ${apiErrors.join(', ')}` })
+      }
+
+      if (successCount > 0) {
+        successfullyProcessedItemsForLocalQueue.forEach(item => {
+          useContextQueueStore.getState().addItem({
+            id: (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : Math.random().toString(36).slice(2),
+            type: 'context' as 'context',
+            title: item.title,
+            content: item.content,
+          });
+        });
+        return { success: true, processedCount: successCount };
+      } else {
+        throw new Error(`All ${validResults.length} parsed KIPU evaluations failed during API operations. Errors: ${apiErrors.join(', ')}`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred during KIPU context processing";
+      set({ error: errorMessage });
+      return { success: false, processedCount: 0, error: errorMessage };
+    } finally {
+      set({ isProcessing: false });
+    }
+  },
+  // Placeholder for future actions:
+  // processAndAddUserDocument: async (documentId, sessionId) => { /* ... */ },
+  // processAndAddUploadedFile: async (file, sessionId) => { /* ... */ },
+}));
 
 // Renamed selector hooks
 export const useIsProcessingContext = () => useContextProcessorStore((state) => state.isProcessing);

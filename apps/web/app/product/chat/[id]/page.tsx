@@ -5,9 +5,9 @@ import { Loader } from '~/components/loading';
 import { ChatPanel } from '../../../../components/chat/ChatPanel';
 
 export default function HistoricalChatPage() {
-  const { currentSessionId, contextString, ensureSession, isCreatingSession } = useSessionManager();
+  const { currentSessionId, ensureSession, isCreatingSession } = useSessionManager();
 
-  if (!currentSessionId || isCreatingSession) {
+  if (!currentSessionId || currentSessionId === 'undefined' || isCreatingSession) {
     return (
       <Loader
         showLogo={false}
@@ -17,12 +17,14 @@ export default function HistoricalChatPage() {
     );
   }
 
+  if (currentSessionId === 'undefined') {
+    console.error('[HistoricalChatPage] sessionId is undefined!');
+  }
+  console.log('[HistoricalChatPage] Rendering ChatPanel with sessionId:', currentSessionId);
+
   return (
     <div className="flex flex-col">
-      <ChatPanel
-        sessionId={currentSessionId}
-        contextString={contextString}
-      />
+      <ChatPanel sessionId={currentSessionId} />
     </div>
   );
 }

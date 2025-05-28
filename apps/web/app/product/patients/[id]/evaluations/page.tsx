@@ -56,38 +56,55 @@ export default function KipuPatientEvaluationsPage() {
             <p className="text-gray-500">No evaluations available.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-600 w-2/5">Name</th>
+                    <th className="px-2 py-2 text-left font-medium text-gray-500 w-1/6">Status</th>
+                    <th className="px-2 py-2 text-left font-medium text-gray-400 w-1/6">Created</th>
+                    <th className="px-2 py-2 text-left font-medium text-gray-400 w-1/6">Last Updated</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {patientEvaluations.map((evaluation) => (
-                    <tr key={evaluation.id}>
-                      <td className="px-3 py-2 whitespace-nowrap text-xs font-small text-gray-900">
-                        <Link href={`/product/patients/${patientId}/evaluations/${evaluation.id}`} className="hover:text-blue-600 hover:underline">
-                          {evaluation.name.length > 15 
-                            ? `${evaluation.name.substring(0, 15)}...` 
-                            : evaluation.name}
+                <tbody className="bg-white divide-y divide-gray-100">
+                  {patientEvaluations.map((evaluation, idx) => (
+                    <tr
+                      key={evaluation.id}
+                      className={
+                        idx % 2 === 0
+                          ? 'bg-white hover:bg-blue-50 transition-colors'
+                          : 'bg-gray-50 hover:bg-blue-50 transition-colors'
+                      }
+                    >
+                      <td className="px-4 py-2 whitespace-normal text-gray-900 max-w-xs">
+                        <Link
+                          href={`/product/patients/${patientId}/evaluations/${evaluation.id}`}
+                          className="hover:text-blue-600 hover:underline font-medium"
+                          title={evaluation.name}
+                        >
+                          <span className="truncate block" style={{ maxWidth: 220 }}>
+                            {evaluation.name.length > 30
+                              ? `${evaluation.name.substring(0, 30)}...`
+                              : evaluation.name}
+                          </span>
                         </Link>
                       </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-xs font-small text-gray-500">
-                        <span className={`px-2 inline-flex text-xxs leading-5 font-semibold rounded-full ${
-                          evaluation.status === 'Completed' ? 'bg-green-100 text-green-800' : 
-                          evaluation.status === 'in progress' ? 'bg-blue-100 text-blue-800' : 
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
+                      <td className="px-2 py-2 whitespace-nowrap">
+                        <span
+                          className={`px-2 py-0.5 inline-flex text-xs leading-5 font-semibold rounded-full shadow-sm
+                            ${evaluation.status === 'Completed'
+                              ? 'bg-green-100 text-green-700 border border-green-200'
+                              : evaluation.status === 'in progress'
+                              ? 'bg-blue-100 text-blue-700 border border-blue-200'
+                              : 'bg-yellow-100 text-yellow-700 border border-yellow-200'}
+                          `}
+                        >
                           {evaluation.status}
                         </span>
                       </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-2 py-2 whitespace-nowrap text-xs text-gray-500">
                         {new Date(evaluation.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-2 py-2 whitespace-nowrap text-xs text-gray-500">
                         {evaluation.updatedAt ? new Date(evaluation.updatedAt).toLocaleDateString() : 'N/A'}
                       </td>
                     </tr>

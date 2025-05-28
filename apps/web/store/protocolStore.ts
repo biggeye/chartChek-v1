@@ -19,29 +19,25 @@ interface ProtocolState {
   showSaveModal: boolean;
   protocolName: string;
   protocolDescription: string;
-  // Protocol List Actions
   fetchProtocols: () => Promise<void>;
   setProtocols: (protocols: ComplianceProtocol[]) => void;
   addProtocol: (protocol: ComplianceProtocol) => void;
-  updateProtocol: (id: string, protocol: Partial<ComplianceProtocol>) => void;
-  deleteProtocol: (id: string) => void;
-  // Protocol Selection Actions
+  updateProtocol: (id: string, payload: any) => Promise<void>;
+  deleteProtocol: (id: string) => Promise<void>;
   selectProtocol: (protocolId: string | null) => void;
   loadSelectedProtocol: () => void;
-  // Form Management
   setForm: (form: ProtocolForm | null) => void;
   updateFormField: <K extends keyof ProtocolForm>(field: K, value: ProtocolForm[K]) => void;
   resetForm: () => void;
-  // Modal Management
   setShowSaveModal: (show: boolean) => void;
   setProtocolName: (name: string) => void;
   setProtocolDescription: (description: string) => void;
-  // Status Management
   setError: (error: string | null) => void;
   setSuccess: (success: boolean) => void;
   setLoading: (loading: boolean) => void;
-  // Save Protocol
   saveProtocol: () => Promise<void>;
+  fetchProtocolById: (id: string) => Promise<any>;
+  fetchRequirementsForProtocol: (protocolId: string) => Promise<ProtocolRequirement[]>;
 }
 
 const DEFAULT_FORM: ProtocolForm = {
@@ -69,14 +65,10 @@ export const useProtocolStore = create<ProtocolState>((set, get) => ({
   fetchProtocols: async () => {
     set({ isLoading: true, error: null });
     try {
-      const supabase = createClient();
-      // Fetch protocols and join requirements
-      const { data, error } = await supabase
-        .from('compliance_protocols')
-        .select('*, requirements:compliance_protocol_requirements(*)')
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      set({ protocols: data || [], isLoading: false });
+      const res = await fetch('/api/compliance/protocols');
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error || 'Failed to fetch protocols');
+      set({ protocols: result.data || [], isLoading: false });
     } catch (error) {
       console.error('Error fetching protocols:', error);
       set({
@@ -89,22 +81,58 @@ export const useProtocolStore = create<ProtocolState>((set, get) => ({
 
   setProtocols: (protocols) => set({ protocols }),
   addProtocol: (protocol) => set((state) => ({ protocols: [protocol, ...state.protocols] })),
-  updateProtocol: (id, protocol) => set((state) => ({
-    protocols: state.protocols.map(p => p.id === id ? { ...p, ...protocol } : p)
-  })),
-  deleteProtocol: (id) => set((state) => ({
-    protocols: state.protocols.filter(p => p.id !== id)
-  })),
+  updateProtocol: async (id, payload) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`/api/compliance/protocols/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error || 'Failed to update protocol');
+      set({ success: true, isLoading: false, error: null });
+      await get().fetchProtocols();
+    } catch (error) {
+      console.error('Error updating protocol:', error);
+      set({
+        error: error instanceof Error ? error.message : 'An unexpected error occurred while updating the protocol',
+        isLoading: false,
+        success: false
+      });
+    }
+  },
+  deleteProtocol: async (id) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`/api/compliance/protocols/${id}`, {
+        method: 'DELETE',
+      });
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error || 'Failed to delete protocol');
+      set({ success: true, isLoading: false, error: null });
+      await get().fetchProtocols();
+    } catch (error) {
+      console.error('Error deleting protocol:', error);
+      set({
+        error: error instanceof Error ? error.message : 'An unexpected error occurred while deleting the protocol',
+        isLoading: false,
+        success: false
+      });
+    }
+  },
 
   selectProtocol: (protocolId) => set({ selectedProtocolId: protocolId }),
-  loadSelectedProtocol: () => {
+  loadSelectedProtocol: async () => {
     const state = get();
     const protocol = state.protocols.find(p => p.id === state.selectedProtocolId);
-    if (protocol && protocol.requirements) {
+    if (protocol) {
+      // Always fetch requirements fresh for the selected protocol
+      const requirements = await get().fetchRequirementsForProtocol(protocol.id);
       // Group requirements by type
-      const admission = protocol.requirements.filter(r => r.requirement === 'admission').map(r => r.evaluation_id);
-      const daily = protocol.requirements.filter(r => r.requirement === 'daily').map(r => r.evaluation_id);
-      const cyclic = protocol.requirements.filter(r => r.requirement === 'cyclic').map(r => r.evaluation_id);
+      const admission = requirements.filter(r => r.requirement === 'admission').map(r => r.evaluation_id);
+      const daily = requirements.filter(r => r.requirement === 'daily').map(r => r.evaluation_id);
+      const cyclic = requirements.filter(r => r.requirement === 'cyclic').map(r => r.evaluation_id);
       set({
         form: {
           admission,
@@ -136,42 +164,114 @@ export const useProtocolStore = create<ProtocolState>((set, get) => ({
   saveProtocol: async () => {
     const state = get();
     if (!state.form) return;
-    const requirements: { evaluation_id: number; requirement: RequirementType }[] = [
-      ...state.form.admission.map((evaluation_id) => ({ evaluation_id, requirement: 'admission' as RequirementType })),
-      ...state.form.daily.map((evaluation_id) => ({ evaluation_id, requirement: 'daily' as RequirementType })),
-      ...state.form.cyclic.map((evaluation_id) => ({ evaluation_id, requirement: 'cyclic' as RequirementType })),
-    ];
-    const supabase = createClient();
-    set({ isLoading: true, error: null });
+    if (!state.protocolName?.trim()) {
+      set({ error: 'Protocol name is required', isLoading: false });
+      return;
+    }
+    set({ isLoading: true, error: null, success: false });
     try {
-      let result;
-      if (state.selectedProtocolId) {
-        // Update protocol via RPC
-        result = await supabase.rpc('update_compliance_protocol', {
-          protocol_id: state.selectedProtocolId,
-          name: state.protocolName,
-          description: state.protocolDescription,
-          cycle_length: state.form.cycleLength,
-          requirements: requirements,
+      // Step 1: Create protocol (metadata only)
+      const protocolPayload = {
+        name: state.protocolName,
+        description: state.protocolDescription,
+        cycleLength: state.form.cycleLength
+      };
+      const res = await fetch('/api/compliance/protocols', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(protocolPayload)
+      });
+      const result = await res.json();
+      if (!result.success || !result.data?.id) throw new Error(result.error || 'Failed to create protocol');
+      const protocolId = result.data.id;
+
+      // Step 2: Add requirements (admission, daily, cyclic)
+      const requirements = [
+        ...state.form.admission.map((evaluationId) => ({ evaluationId, requirement: 'admission' })),
+        ...state.form.daily.map((evaluationId) => ({ evaluationId, requirement: 'daily' })),
+        ...state.form.cyclic.map((evaluationId) => ({ evaluationId, requirement: 'cyclic' }))
+      ];
+      if (requirements.length > 0) {
+        const reqRes = await fetch(`/api/compliance/protocols/${protocolId}/requirements`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ requirements })
         });
-      } else {
-        // Insert protocol via RPC
-        result = await supabase.rpc('insert_compliance_protocol', {
-          name: state.protocolName,
-          description: state.protocolDescription,
-          cycle_length: state.form.cycleLength,
-          requirements: requirements,
-        });
+        const reqResult = await reqRes.json();
+        if (!reqResult.success) throw new Error(reqResult.error || 'Failed to add requirements');
       }
-      const { error } = result;
-      if (error) throw error;
-      set({ success: true, isLoading: false });
+
+      set({ success: true, isLoading: false, error: null });
       await get().fetchProtocols();
     } catch (error) {
       console.error('Error saving protocol:', error);
-      set({ error: error instanceof Error ? error.message : 'Failed to save protocol', isLoading: false });
+      set({
+        error: error instanceof Error ? error.message : 'An unexpected error occurred while saving the protocol',
+        isLoading: false,
+        success: false
+      });
+    }
+  },
+
+  fetchProtocolById: async (id: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      const res = await fetch(`/api/compliance/protocols/${id}`);
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error || 'Failed to fetch protocol');
+      // Optionally, you can set a single protocol in state or return it
+      return result.data;
+    } catch (error) {
+      console.error('Error fetching protocol:', error);
+      set({ error: 'Failed to fetch protocol', isLoading: false });
+      return null;
     } finally {
       set({ isLoading: false });
     }
+  },
+
+  /**
+   * Fetch requirements for a given protocol ID from the API.
+   * Returns an array of ProtocolRequirement objects.
+   */
+  fetchRequirementsForProtocol: async (protocolId: string): Promise<ProtocolRequirement[]> => {
+    if (!protocolId) return [];
+    try {
+      const res = await fetch(`/api/compliance/protocols/${protocolId}/requirements`);
+      const result = await res.json();
+      if (!result.success) throw new Error(result.error || 'Failed to fetch requirements');
+      return result.data || [];
+    } catch (error) {
+      console.error('Error fetching requirements for protocol:', error);
+      return [];
+    }
   }
 }));
+
+// Custom hook for reading a single protocol by id
+import { useEffect, useState } from 'react';
+
+export function useProtocol(protocolId: string | null) {
+  const [protocol, setProtocol] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!protocolId) return;
+    setLoading(true);
+    setError(null);
+    fetch(`/api/compliance/protocols/${protocolId}`)
+      .then(res => res.json())
+      .then(result => {
+        if (!result.success) throw new Error(result.error || 'Failed to fetch protocol');
+        setProtocol(result.data);
+      })
+      .catch(err => {
+        setError(err.message || 'Failed to fetch protocol');
+        setProtocol(null);
+      })
+      .finally(() => setLoading(false));
+  }, [protocolId]);
+
+  return { protocol, loading, error };
+}

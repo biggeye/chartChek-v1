@@ -20,14 +20,15 @@ export default function DocumentsPage() {
     isLoading, 
     error, 
     refetch,
-    uploadAndProcessDocument
+    uploadUserDocument,
+    accountId
   } = useUserDocuments()
   
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
 
   // Handle document upload
-  const handleFileUpload = useCallback(async (file: File, categorization: DocumentCategorization): Promise<void> => {
+  const handleFileUpload = useCallback(async (file: File, categorization: any): Promise<void> => {
     logger.info('[DocumentsPage:handleFileUpload] Starting file upload process', {
       fileName: file.name,
       fileSize: file.size,
@@ -35,33 +36,28 @@ export default function DocumentsPage() {
       categorization
     })
 
-    if (file) {
+    if (file && accountId) {
       setUploadError(null)
       try {
-        // Upload and process the document
-        const result = await uploadAndProcessDocument(file, categorization)
-        
-        if (result) {
-          logger.info('[DocumentsPage:handleFileUpload] Upload successful', {
-            documentId: result.document_id,
-            status: result.processing_status
-          })
-          setIsUploadDialogOpen(false)
-          // Refresh the documents list
-          refetch()
-        } else {
-          logger.error('[DocumentsPage:handleFileUpload] Upload failed: No result returned')
-          setUploadError('Upload failed. Please try again.')
-        }
+        // Upload the document (no processing)
+        await uploadUserDocument({
+          file,
+          accountId,
+          title: file.name,
+          metadata: categorization
+        })
+        logger.info('[DocumentsPage:handleFileUpload] Upload successful')
+        setIsUploadDialogOpen(false)
+        refetch()
       } catch (error) {
         logger.error('[DocumentsPage:handleFileUpload] Upload error:', error)
         setUploadError((error as Error).message || 'Upload failed. Please try again.')
       }
     } else {
-      logger.error('[DocumentsPage:handleFileUpload] No file provided')
-      setUploadError('No file selected. Please select a file to upload.')
+      logger.error('[DocumentsPage:handleFileUpload] No file or accountId provided')
+      setUploadError('No file selected or user not authenticated.')
     }
-  }, [uploadAndProcessDocument, refetch])
+  }, [uploadUserDocument, refetch, accountId])
 
   // Log when documents or error state changes
   useEffect(() => {

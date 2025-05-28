@@ -86,8 +86,7 @@ export default function EvaluationParserTestPage() {
       setParsedResult('');
       
       // Fetch the complete evaluation with items
-     console.log('evaluationParser] evaluation.id:', evaluation.id)
-      const rawEvaluation = await selectPatientEvaluation(evaluation.id);
+        const rawEvaluation = await selectPatientEvaluation(evaluation.id);
      
       // Adapt the raw evaluation to our enhanced interface
       const adaptedEvaluation = adaptKipuEvaluation(rawEvaluation);

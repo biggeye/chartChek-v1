@@ -1,4 +1,3 @@
-
 /**
  * KIPU API Credentials
  */
@@ -941,6 +940,56 @@ export interface KipuEvaluation {
 }
 
 
-/* evaluation.data.evaluationitems.records.description[0] = "something something"
-   evaluation.data.evaluationitems.type = "textarea" | title | etc
+
+/*
+Patient Occupancy Data
 */
+// KIPU Occupancy Response Types (in-line for now)
+export interface KipuOccupancyBed {
+  bed_id: number;
+  bed_name: string;
+  enabled: boolean | string; // Sometimes string in beds, boolean in nested beds
+  status: string;
+  gender?: string;
+  gender_identity?: string;
+  casefile_id?: string;
+  first_name?: string;
+  last_name?: string;
+  admission_date?: string;
+  anticipated_discharge_date?: string | null;
+  dob?: string;
+  level_of_care?: string | null;
+  program?: string | null;
+}
+
+export interface KipuOccupancyRoom {
+  room_id: number;
+  room_name: string;
+  gender_rule: string | null;
+  beds: KipuOccupancyBed[];
+}
+
+export interface KipuOccupancyBuilding {
+  building_id: number;
+  building_name: string;
+  rooms: KipuOccupancyRoom[];
+}
+
+export interface KipuOccupancyLocation {
+  location_id: number | null;
+  location_name: string | null;
+  buildings: KipuOccupancyBuilding[];
+}
+
+export interface KipuOccupancy {
+  beds: Array<{
+    bed_id: number;
+    bed_name: string;
+    enabled: boolean | string;
+    status: string;
+  }>;
+  buildings: KipuOccupancyBuilding[];
+  locations: KipuOccupancyLocation[];
+}
+
+

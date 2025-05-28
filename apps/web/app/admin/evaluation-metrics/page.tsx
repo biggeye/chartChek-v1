@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useProtocolStore } from '~/store/protocolStore';
 import { usePatientStore } from '~/store/patient/patientStore';
-import { useFetchPatient, useFetchPatients } from '~/hooks/usePatients';
+import { useFetchPatient, useFetchPatientsOnFacilityChange, useFetchFacilityOccupancy } from '~/hooks/usePatients';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@kit/ui/select';
 
 interface ComplianceProtocol {
@@ -19,7 +19,6 @@ export default function EvaluationMetricsDevPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoadingProtocols, setIsLoadingProtocols] = useState(false);
   const { fetchProtocols, protocols } = useProtocolStore();
-  const [protocolsError, setProtocolsError] = useState<string | null>(null);
 
 /*
   const { protocols, isLoading: isLoadingProtocols, error: protocolsError, fetchProtocols } =
@@ -36,7 +35,8 @@ useEffect(() => {
   fetchProtocols();
 }, []);
 
-  useFetchPatients(); // unchanged
+  useFetchPatientsOnFacilityChange();
+  useFetchFacilityOccupancy();
   const { patients } = usePatientStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -49,13 +49,10 @@ useEffect(() => {
     setError(null);
     setMetrics(null);
     try {
-      const res = await fetch(
-        `/api/compliance/metrics?protocolId=${selectedProtocol}&patientId=${patientId}`
-      );
-      const json = await res.json();
-      if (!json.success) throw new Error(json.error || 'Failed to fetch metrics');
-      setMetrics(json.data);
-    } catch (err: any) {
+      const protocolState = useProtocolStore.getState().loadSelectedProtocol();
+      const data = await protocolState;
+      setMetrics(data);
+      } catch (err: any) {
       setError(err.message || 'An error occurred.');
     } finally {
       setLoading(false);
@@ -95,9 +92,7 @@ useEffect(() => {
                 )}
               </SelectContent>
             </Select>
-            {protocolsError && (
-              <div className="text-red-500 text-xs mt-1">{protocolsError}</div>
-            )}
+        
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Patient</label>

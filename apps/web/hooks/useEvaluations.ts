@@ -71,7 +71,8 @@ export const usePatientEvaluations = () => {
     error,
     fetchEvaluations, // Expose the function to trigger fetching
     selectPatientEvaluation,
-    clearSelectedPatientEvaluation
+    clearSelectedPatientEvaluation,
+    setIsLoadingEvaluations,
     // You might not need to expose setIsLoading, setError, setPatientEvaluations directly
     // if components only trigger fetches via fetchEvaluations
   };

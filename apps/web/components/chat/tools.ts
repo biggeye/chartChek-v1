@@ -11,14 +11,12 @@ export const fetchEvaluationTemplatesTool = createTool({
     per: z.number().optional().describe('Number of records per page'),
   }),
   async execute({ page, per }) {
-    // Get user from request context
-    const supabase = await createServer();
-    const { data: { user } } = await supabase.auth.getUser();
-    const ownerId = user?.id;
-    const credentials = await serverLoadKipuCredentialsFromSupabase(ownerId);
-    if (!credentials) throw new Error('No KIPU credentials found for this user/facility.');
-    const { kipuListEvaluationTemplates } = await import('~/lib/kipu/service/evaluation-template-service');
-    return await kipuListEvaluationTemplates(credentials, { page, per });
+    const params = new URLSearchParams();
+    if (page) params.append('page', String(page));
+    if (per) params.append('limit', String(per));
+    const res = await fetch(`/api/kipu/evaluations?${params.toString()}`);
+    if (!res.ok) throw new Error(`Failed to fetch evaluation templates: ${res.statusText}`);
+    return await res.json();
   },
 });
 
@@ -297,8 +295,8 @@ export const fetchConsentFormsTool = createTool({
     const ownerId = user?.id;
     const credentials = await serverLoadKipuCredentialsFromSupabase(ownerId);
     if (!credentials) throw new Error('No KIPU credentials found for this user/facility.');
-    const { kipuListConsentForms } = await import('~/lib/kipu/service/medical-records-service');
-    return await kipuListConsentForms(credentials, { page, limit });
+    const { kipuFetchConsentForms } = await import('~/lib/kipu/service/medical-records-service');
+    return await kipuFetchConsentForms(credentials, { page, limit });
   },
 });
 
@@ -313,8 +311,8 @@ export const fetchPatientDiagnosisHistoryTool = createTool({
     const ownerId = user?.id;
     const credentials = await serverLoadKipuCredentialsFromSupabase(ownerId);
     if (!credentials) throw new Error('No KIPU credentials found for this user/facility.');
-    const { kipuGetPatientDiagnosisHistory } = await import('~/lib/kipu/service/medical-records-service');
-    return await kipuGetPatientDiagnosisHistory(patientId, credentials);
+    const { kipuFetchDiagnosisHistory } = await import('~/lib/kipu/service/medical-records-service');
+    return await kipuFetchDiagnosisHistory(credentials, patientId);
   },
 });
 

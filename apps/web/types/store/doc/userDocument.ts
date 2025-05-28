@@ -9,30 +9,31 @@
 export interface UserDocument {
   document_id: string;
   account_id: string;
-  facility_id?: string; // UUID in the database
+  facility_id?: string;
   patient_id?: string;
   file_name: string;
   file_path: string;
-  file_type?: string;
-  file_size?: number;
+  file_type: string;
+  file_size: bigint;
   bucket: string;
   document_type?: string;
   compliance_concern?: string;
   compliance_concern_other?: string;
   tags?: string[];
-  metadata?: Record<string, any>;
+  metadata: Record<string, any>;
   openai_file_id?: string;
   gemini_file_id?: string;
-  has_embeddings?: boolean;
+  has_embeddings: boolean;
   embedding_model?: string;
-  processing_status?: string;
+  processing_status: string;
   processing_error?: string;
   extracted_text?: string;
   content_summary?: string;
-  created_at?: string;
-  updated_at?: string;
+  created_at: string;
+  updated_at: string;
   last_accessed_at?: string;
-  is_deleted?: boolean;
+  is_deleted: boolean;
+  title: string;
 }
 
 /**
@@ -66,4 +67,14 @@ export interface UserDocumentStoreState {
   uploadDocument: (file: File, categorization?: DocumentCategorization) => Promise<UserDocument | null>;
   uploadAndProcessDocument: (file: File, categorization?: DocumentCategorization) => Promise<UserDocument | null>;
   updateDocumentCategorization: (documentId: string, categorization: DocumentCategorization) => Promise<boolean>;
+}
+
+export interface DocumentUploadMetadata {
+  document_type?: string;
+  compliance_concern?: string;
+  compliance_concern_other?: string;
+  tags?: string[];
+  facility_id?: string;
+  patient_id?: string;
+  [key: string]: any;
 }

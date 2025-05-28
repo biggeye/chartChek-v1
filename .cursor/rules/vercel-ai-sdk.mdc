@@ -1,6 +1,6 @@
 ---
-description: 
-globs: /apps/web/app/api/*
+description: for creating new logic that requires openai, google, anthropic, llm providers
+globs: 
 alwaysApply: false
 ---
 [vercel-ai-sdk--reference.mdc](mdc:.cursor/rules/vercel-ai-sdk--reference.mdc)

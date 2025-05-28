@@ -1,135 +1,195 @@
-'use client';
+"use client";
 
-import { useEffect, useState, useMemo } from 'react';
-import { usePatientStore } from '~/store/patient/patientStore';
-import { PatientSearch } from '~/components/patient/PatientSearch';
-import { PatientBreadcrumb } from '~/components/patient/PatientBreadcrumb';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader } from '~/components/loading';
+import { usePatientStore } from '~/store/patient/patientStore';
+import { Input } from "@kit/ui/input";
+import { Button } from "@kit/ui/button";
+import { Badge } from "@kit/ui/badge";
+import { Card } from "@kit/ui/card";
+import { format } from 'date-fns';
+import { ChevronDown, ChevronRight, Search, ArrowUpDown } from 'lucide-react';
+import { processPatients, GroupedPatient } from '~/lib/services/patientService';
+
 export default function PatientsPage() {
-  const isLoadingPatients = usePatientStore((state => state.isLoadingPatients));
-  const { patients, error } = usePatientStore();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [dateRange, setDateRange] = useState<{ start: string | null; end: string | null }>({
-    start: null,
-    end: null
-  });
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // Or whatever default you prefer
-
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showActive, setShowActive] = useState(false);
+  const [sortBy, setSortBy] = useState<'status' | 'name' | 'date'>('status');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [expandedPatients, setExpandedPatients] = useState<Set<string>>(new Set());
+  const { patients, isLoadingPatients, error } = usePatientStore();
 
-  // Zustand stores (pure state access, no actions)
+  // Process patients using the service layer
+  const groupedPatients = useMemo(() => {
+    return processPatients(patients, {
+      searchTerm,
+      showActive,
+      sortBy,
+      sortDirection
+    });
+  }, [patients, searchTerm, showActive, sortBy, sortDirection]);
 
+  const toggleSort = (newSortBy: typeof sortBy) => {
+    if (sortBy === newSortBy) {
+      setSortDirection(current => current === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(newSortBy);
+      setSortDirection('desc');
+    }
+  };
 
-  // Memoize sorted and filtered patients
-  const filteredAndSortedPatients = useMemo(() => {
-    if (!patients) return [];
+  const toggleExpand = (patientMasterId: string) => {
+    const newExpanded = new Set(expandedPatients);
+    if (newExpanded.has(patientMasterId)) {
+      newExpanded.delete(patientMasterId);
+    } else {
+      newExpanded.add(patientMasterId);
+    }
+    setExpandedPatients(newExpanded);
+  };
 
-    return patients
-      .filter(patient => {
-        const matchesSearch =
-          searchQuery.trim() === '' ||
-          patient.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          patient.lastName?.toLowerCase().includes(searchQuery.toLowerCase());
+  const handlePatientSelect = (chartId: string) => {
+    router.push(`/product/patients/${chartId}`);
+  };
 
-        // Date range filter
-        const admissionDate = patient.admissionDate ? new Date(patient.admissionDate) : null;
-        let matchesDateRange = true;
-
-        if (admissionDate && (dateRange.start || dateRange.end)) {
-          if (dateRange.start && admissionDate < new Date(dateRange.start)) {
-            matchesDateRange = false;
-          }
-          if (dateRange.end && admissionDate > new Date(dateRange.end)) {
-            matchesDateRange = false;
-          }
-        }
-
-        return matchesSearch && matchesDateRange;
-      })
-      .sort((a, b) => (a.lastName || '').localeCompare(b.lastName || ''));
-  }, [patients, searchQuery, dateRange]);
-
-  const totalPages = Math.ceil(filteredAndSortedPatients.length / itemsPerPage);
-
-  const paginatedPatients = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredAndSortedPatients.slice(startIndex, endIndex);
-  }, [filteredAndSortedPatients, currentPage, itemsPerPage]);
-
-  const handlePatientSelect = (patientId: string) => {
-    router.push(`/product/patients/${patientId}`);
+  const formatDate = (date: string | undefined) => {
+    if (!date) return 'N/A';
+    try {
+      return format(new Date(date), 'MMM dd, yyyy');
+    } catch {
+      return 'Invalid Date';
+    }
   };
 
   return (
     <div className="container mx-auto p-4">
-      <PatientBreadcrumb
-        actionButtons={
-          <PatientSearch
-            searchQuery={searchQuery}
-            setSearchQuery={setSearchQuery}
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-          />
-        }
-      />
-
-      {isLoadingPatients ? (
-        <div className="flex justify-center items-center h-40 p-30">
-          <Loader
-          size="lg"
-          showLogo={false}
-          message="Loading patients..."
-          />
+      {/* Search and Filter Controls */}
+      <div className="mb-6 space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              type="text"
+              placeholder="Search patients..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+          <Button
+            variant={showActive ? "default" : "outline"}
+            onClick={() => setShowActive(!showActive)}
+            className="whitespace-nowrap"
+          >
+            {showActive ? "Show All" : "Active Only"}
+          </Button>
         </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => toggleSort('name')}
+            className="flex items-center gap-1"
+          >
+            Name
+            {sortBy === 'name' && <ArrowUpDown className="h-4 w-4" />}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => toggleSort('date')}
+            className="flex items-center gap-1"
+          >
+            Date
+            {sortBy === 'date' && <ArrowUpDown className="h-4 w-4" />}
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => toggleSort('status')}
+            className="flex items-center gap-1"
+          >
+            Status
+            {sortBy === 'status' && <ArrowUpDown className="h-4 w-4" />}
+          </Button>
+        </div>
+      </div>
+
+      {/* Patient List */}
+      {isLoadingPatients ? (
+        <div className="text-center py-8">Loading patients...</div>
       ) : error ? (
-        <p className="text-red-500">Error: {error}</p>
-      ) : filteredAndSortedPatients.length === 0 ? (
-        <p>No patients found.</p>
+        <div className="text-center py-8 text-red-500">{error}</div>
+      ) : groupedPatients.length === 0 ? (
+        <div className="text-center py-8">No patients found</div>
       ) : (
-        <>
-          <ul className="divide-y divide-gray-200">
-            {paginatedPatients.map(patient => (
-              <li
-                key={patient.patientId}
-                className="py-2 cursor-pointer hover:bg-gray-50"
-                onClick={() => handlePatientSelect(patient.patientId)}
+        <div className="space-y-4">
+          {groupedPatients.map((patient) => (
+            <Card key={patient.patientMasterId} className="p-4">
+              {/* Patient Header */}
+              <div 
+                className="flex items-center justify-between cursor-pointer"
+                onClick={() => toggleExpand(patient.patientMasterId)}
               >
-                <div className="flex items-center">
+                <div className="flex items-center gap-4">
+                  {expandedPatients.has(patient.patientMasterId) ? (
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <ChevronRight className="h-5 w-5 text-gray-400" />
+                  )}
                   <div>
-                    <p className="font-sm">
-                      {patient.lastName ? patient.lastName.charAt(0) : ''}, {patient.firstName}
-                    </p>
-                    <p className="text-xs text-gray-500">DOB: {patient.dateOfBirth} | MR: {patient.mrn}</p>
+                    <h3 className="text-lg font-semibold">
+                      {patient.currentChart.lastName}, {patient.currentChart.firstName}
+                    </h3>
+                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                      <span>MRN: {patient.currentChart.mrn || 'N/A'}</span>
+                      <span>•</span>
+                      <span>Charts: {patient.allCharts.length}</span>
+                      {patient.currentChart.program && (
+                        <>
+                          <span>•</span>
+                          <span>Current Program: {patient.currentChart.program}</span>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </li>
-            ))}
-          </ul>
-          {totalPages > 1 && (
-            <div className="mt-4 flex justify-center items-center space-x-2">
-              <button
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className="px-3 py-1 border rounded disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <span>
-                Page {currentPage} of {totalPages}
-              </span>
-              <button
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className="px-3 py-1 border rounded disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </>
+                <Badge variant={patient.isActive ? "success" : "secondary"}>
+                  {patient.isActive ? "Active" : "Inactive"}
+                </Badge>
+              </div>
+
+              {/* Expanded View - Treatment History */}
+              {expandedPatients.has(patient.patientMasterId) && (
+                <div className="mt-4 border-t pt-4">
+                  <h4 className="text-sm font-medium text-gray-500 mb-2">Treatment History</h4>
+                  <div className="space-y-2">
+                    {patient.allCharts.map((chart) => (
+                      <div
+                        key={chart.patientId}
+                        onClick={() => handlePatientSelect(chart.patientId)}
+                        className="flex items-center justify-between p-2 rounded-md hover:bg-gray-50 cursor-pointer"
+                      >
+                        <div>
+                          <div className="font-medium">
+                            {chart.program || 'Unknown Program'}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {formatDate(chart.admissionDate)} - {chart.dischargeDate ? formatDate(chart.dischargeDate) : 'Present'}
+                          </div>
+                        </div>
+                        <Badge variant={chart.dischargeDate ? "secondary" : "success"}>
+                          {chart.dischargeDate ? "Completed" : "Active"}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </Card>
+          ))}
+        </div>
       )}
     </div>
   );

@@ -5,15 +5,17 @@ import { Loader } from '~/components/loading';
 import { ChatPanel } from '../../../components/chat/ChatPanel';
 
 export default function ChatPage() {
-  const { currentSessionId, contextString, ensureSession, isCreatingSession } = useSessionManager();
+  const { currentSessionId, ensureSession, isCreatingSession } = useSessionManager();
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!currentSessionId && !isCreatingSession) {
+    if ((!currentSessionId || currentSessionId === 'undefined') && !isCreatingSession) {
+      console.warn('[ChatPage] No valid sessionId, calling ensureSession');
       ensureSession().catch(err => {
-        console.error('Failed to create session:', err);
         setError(err as Error);
       });
+    } else if (currentSessionId === 'undefined') {
+      console.error('[ChatPage] sessionId is undefined!');
     }
   }, [currentSessionId, ensureSession, isCreatingSession]);
 
@@ -25,7 +27,7 @@ export default function ChatPage() {
     );
   }
 
-  if (!currentSessionId || isCreatingSession) {
+  if (!currentSessionId || currentSessionId === 'undefined' || isCreatingSession) {
     return (
       <Loader
         showLogo={false}
@@ -35,5 +37,6 @@ export default function ChatPage() {
     );
   }
 
-  return <ChatPanel sessionId={currentSessionId} contextString={contextString} />;
+  console.log('[ChatPage] Rendering ChatPanel with sessionId:', currentSessionId);
+  return <ChatPanel sessionId={currentSessionId} />;
 }

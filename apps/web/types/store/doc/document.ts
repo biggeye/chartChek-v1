@@ -14,8 +14,7 @@ import * as z from 'zod';
  export interface DocumentCategorization {
     facility_id?: string;
     patient_id?: string;
-    compliance_concern?: ComplianceConcernType;
-    compliance_concern_other?: string;
+    category?: string;
   }
 
   

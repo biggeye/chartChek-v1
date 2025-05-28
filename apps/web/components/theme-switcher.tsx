@@ -14,9 +14,10 @@ import { useEffect, useState } from "react";
 
 interface ThemeSwitcherProps {
   className?: string;
+  variant?: 'dropdown' | 'switch';
 }
 
-const ThemeSwitcher = ({ className }: ThemeSwitcherProps = {}) => {
+const ThemeSwitcher = ({ className, variant = 'dropdown' }: ThemeSwitcherProps = {}) => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
 
@@ -30,6 +31,25 @@ const ThemeSwitcher = ({ className }: ThemeSwitcherProps = {}) => {
   }
 
   const ICON_SIZE = 16;
+
+  if (variant === 'switch') {
+    // Simple switch: toggles between light and dark only
+    const isDark = theme === 'dark';
+    return (
+      <button
+        type="button"
+        aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+        className={`inline-flex items-center justify-center h-8 w-8 rounded-full border border-border bg-background hover:bg-accent transition-colors ${className || ''}`}
+        onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      >
+        {isDark ? (
+          <Moon size={ICON_SIZE} className="text-muted-foreground" />
+        ) : (
+          <Sun size={ICON_SIZE} className="text-muted-foreground" />
+        )}
+      </button>
+    );
+  }
 
   return (
     <DropdownMenu>

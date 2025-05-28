@@ -18,13 +18,14 @@ const NO_CACHE_HEADERS = {
 interface SaveMessageBody {
   sessionId: string;
   messages: Message[];
+  promptId?: string;
 }
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createServer();
     const body = await req.json() as SaveMessageBody;
-    const { sessionId, messages } = body;
+    const { sessionId, messages, promptId } = body;
 
     if (!sessionId || !messages?.length) {
       return NextResponse.json({ error: 'Missing sessionId or messages' }, { 
@@ -57,13 +58,31 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Save the messages
+    // If promptId is provided, verify it exists and belongs to this user
+    if (promptId) {
+      const { data: prompt, error: promptError } = await supabase
+        .from('prompts')
+        .select('id')
+        .eq('id', promptId)
+        .eq('account_id', user.id)
+        .single();
+
+      if (promptError || !prompt) {
+        return NextResponse.json({ error: 'Prompt not found' }, { 
+          status: 404,
+          headers: NO_CACHE_HEADERS
+        });
+      }
+    }
+
+    // Save the messages with promptId if provided
     await saveChatMessages({
       sessionId,
       userId: user.id,
       messages: messages.map(msg => ({
         role: msg.role,
-        content: msg.content
+        content: msg.content,
+        promptId: promptId
       })) as CoreMessage[]
     });
 
@@ -84,6 +103,7 @@ export async function GET(req: NextRequest) {
     const supabase = await createServer();
     const { searchParams } = new URL(req.url);
     const sessionId = searchParams.get('sessionId');
+    const promptId = searchParams.get('promptId');
 
     if (!sessionId) {
       return NextResponse.json({ error: 'Missing sessionId' }, { 
@@ -116,13 +136,20 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Now get the messages
-    const { data: messages, error } = await supabase
+    // Build the query for messages
+    let query = supabase
       .from('chat_messages')
-      .select('id, role, content, created_at')
+      .select('id, role, content, created_at, prompt_id')
       .eq('session_id', sessionId)
-      .eq('account_id', user.id)
-      .order('created_at', { ascending: true });
+      .eq('account_id', user.id);
+
+    // If promptId is provided, filter by it
+    if (promptId) {
+      query = query.eq('prompt_id', promptId);
+    }
+
+    // Execute the query with ordering
+    const { data: messages, error } = await query.order('created_at', { ascending: true });
 
     if (error) {
       console.error('Error fetching messages:', error);

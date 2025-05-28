@@ -105,7 +105,7 @@ function formatDate(date: Date): string {
     console.error("Invalid date passed to formatDate:", date);
     throw new Error("Invalid date object received by formatDate");
   }
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split('T')[0] || '';
 }
 
 // Helper function to get date ranges for different periods
@@ -216,11 +216,19 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // Get facilityId from query param
+    const url = new URL(req.url);
+    let facilityId = url.searchParams.get('facilityId');
+    if (!facilityId || facilityId === '0' || facilityId === 'default') {
+      return NextResponse.json({ error: 'Missing or invalid facilityId. Please provide a valid KIPU location_id.' }, { status: 400 });
+    }
+
     const dateRanges = getDateRanges();
     
     // Fetch current census
+    console.log('[PatientStats] Fetching census for', facilityId);
     const censusResponse = await kipuServerGet<any>(
-      `/api/patients/census?end_date=${dateRanges.today}`,
+      `/api/patients/census?location_id=${facilityId}&end_date=${dateRanges.today}`,
       kipuCredentials
     );
     
@@ -233,49 +241,49 @@ export async function GET(req: NextRequest) {
     
     // Fetch daily admissions
     const dailyAdmissionsResponse = await kipuServerGet<any>(
-      `/api/patients/census?start_date=${dateRanges.yesterday}&end_date=${dateRanges.today}&status=admitted`,
+      `/api/patients/census?location_id=${facilityId}&start_date=${dateRanges.yesterday}&end_date=${dateRanges.today}&status=admitted`,
       kipuCredentials
     );
     
     // Fetch weekly admissions
     const weeklyAdmissionsResponse = await kipuServerGet<any>(
-      `/api/patients/census?start_date=${dateRanges.oneWeekAgo}&end_date=${dateRanges.today}&status=admitted`,
+      `/api/patients/census?location_id=${facilityId}&start_date=${dateRanges.oneWeekAgo}&end_date=${dateRanges.today}&status=admitted`,
       kipuCredentials
     );
     
     // Fetch monthly admissions
     const monthlyAdmissionsResponse = await kipuServerGet<any>(
-      `/api/patients/census?start_date=${dateRanges.oneMonthAgo}&end_date=${dateRanges.today}&status=admitted`,
+      `/api/patients/census?location_id=${facilityId}&start_date=${dateRanges.oneMonthAgo}&end_date=${dateRanges.today}&status=admitted`,
       kipuCredentials
     );
     
     // Fetch daily discharges
     const dailyDischargesResponse = await kipuServerGet<any>(
-      `/api/patients/census?start_date=${dateRanges.yesterday}&end_date=${dateRanges.today}&status=discharged`,
+      `/api/patients/census?location_id=${facilityId}&start_date=${dateRanges.yesterday}&end_date=${dateRanges.today}&status=discharged`,
       kipuCredentials
     );
     
     // Fetch weekly discharges
     const weeklyDischargesResponse = await kipuServerGet<any>(
-      `/api/patients/census?start_date=${dateRanges.oneWeekAgo}&end_date=${dateRanges.today}&status=discharged`,
+      `/api/patients/census?location_id=${facilityId}&start_date=${dateRanges.oneWeekAgo}&end_date=${dateRanges.today}&status=discharged`,
       kipuCredentials
     );
     
     // Fetch monthly discharges
     const monthlyDischargesResponse = await kipuServerGet<any>(
-      `/api/patients/census?start_date=${dateRanges.oneMonthAgo}&end_date=${dateRanges.today}&status=discharged`,
+      `/api/patients/census?location_id=${facilityId}&start_date=${dateRanges.oneMonthAgo}&end_date=${dateRanges.today}&status=discharged`,
       kipuCredentials
     );
     
     // Fetch patients for length of stay calculation
     const patientsForLOSResponse = await kipuServerGet<any>(
-      `/api/patients?discharge_start_date=${dateRanges.oneMonthAgo}&discharge_end_date=${dateRanges.today}`,
+      `/api/patients?location_id=${facilityId}&discharge_start_date=${dateRanges.oneMonthAgo}&discharge_end_date=${dateRanges.today}`,
       kipuCredentials
     );
     
     // Fetch patients for demographic distributions
     const patientsForDemographicsResponse = await kipuServerGet<any>(
-      `/api/patients?admission_start_date=${dateRanges.oneMonthAgo}&admission_end_date=${dateRanges.today}`,
+      `/api/patients?location_id=${facilityId}&admission_start_date=${dateRanges.oneMonthAgo}&admission_end_date=${dateRanges.today}`,
       kipuCredentials
     );
     
@@ -291,19 +299,19 @@ export async function GET(req: NextRequest) {
     
     // Fetch medication administrations for adherence rate
     const medicationAdministrationsResponse = await kipuServerGet<any>(
-      `/api/medication_administrations?start_date=${dateRanges.oneMonthAgo}&end_date=${dateRanges.today}`,
+      `/api/medication_administrations?location_id=${facilityId}&start_date=${dateRanges.oneMonthAgo}&end_date=${dateRanges.today}`,
       kipuCredentials
     );
     
     // Fetch discharges for treatment completion rate
     const dischargesResponse = await kipuServerGet<any>(
-      `/api/discharges?start_date=${dateRanges.oneMonthAgo}&end_date=${dateRanges.today}&completion_status=completed`,
+      `/api/discharges?location_id=${facilityId}&start_date=${dateRanges.oneMonthAgo}&end_date=${dateRanges.today}&completion_status=completed`,
       kipuCredentials
     );
     
     // Fetch projected availability
     const projectedAvailabilityResponse = await kipuServerGet<any>(
-      `/api/patient_census?expected_discharge_start=${dateRanges.today}&expected_discharge_end=${dateRanges.thirtyDaysLater}&app_id=${kipuCredentials.appId}`,
+      `/api/patient_census?location_id=${facilityId}&expected_discharge_start=${dateRanges.today}&expected_discharge_end=${dateRanges.thirtyDaysLater}`,
       kipuCredentials
     );
     

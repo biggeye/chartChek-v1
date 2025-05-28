@@ -20,7 +20,7 @@ export const usePatientStore = create<PatientStore>((set) => ({
   selectedPatient: null,
   isLoadingPatients: false,
   error: null,
-
+  occupancy: undefined,
   setPatients: (patients) => set({ patients }),
   selectPatient: (patient) => set({ selectedPatient: patient }),
   setIsLoadingPatients: (isLoadingPatients) => set({ isLoadingPatients }),

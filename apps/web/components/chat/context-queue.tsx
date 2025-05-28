@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useContextQueueStore } from "~/store/chat/contextQueueStore"
 import type { ContextItem } from "types/chat"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@kit/ui/tabs"
@@ -20,9 +20,29 @@ interface ContextQueueProps {
 }
 
 // Context Item Viewer Modal Component
-function ContextItemViewer({ item }: { item: ContextItem | null }) {
+function ContextItemViewer({ item }: { item: { id: string, type: string, title: string } | null }) {
+  const [content, setContent] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { items } = useContextQueueStore();
+
+  useEffect(() => {
+    if (!item) return;
+    setLoading(true);
+    setError(null);
+    setContent(null);
+    try {
+      const found = items.find((queueItem) => queueItem.id === item.id);
+      setContent(found?.content || '[No content found]');
+    } catch (err: any) {
+      setError('Failed to load content');
+    } finally {
+      setLoading(false);
+    }
+  }, [item, items]);
+
   if (!item) return null;
-  
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -31,41 +51,36 @@ function ContextItemViewer({ item }: { item: ContextItem | null }) {
           {item.type}
         </Badge>
         <p className="text-sm text-muted-foreground">
-          Added on {new Date(item.createdAt).toLocaleString()}
+          ID: {item.id}
         </p>
       </div>
-      
       <ScrollArea className="h-[350px] border rounded-md p-4">
-        <pre className="whitespace-pre-wrap text-sm">{item.content}</pre>
+        {loading ? (
+          <div className="text-sm text-muted-foreground">Loading...</div>
+        ) : error ? (
+          <div className="text-sm text-red-500">{error}</div>
+        ) : (
+          <pre className="whitespace-pre-wrap text-sm">{content}</pre>
+        )}
       </ScrollArea>
     </div>
   );
 }
 
 export function ContextQueue({ compact = false }: ContextQueueProps) {
-  const { items, toggleItem, removeItem, toggleEvaluationItemDetail, clearQueue } = useContextQueueStore()
+  const { items, toggleItem, removeItem, clearQueue } = useContextQueueStore()
   const { selectedPatient } = usePatientStore();
   const patient = selectedPatient;
-  const documents = items.filter((item) => item.type === "document")
-  const uploads = items.filter((item) => item.type === "upload")
-  const evaluations = items.filter((item) => item.type === "evaluation")
-  const [viewingItem, setViewingItem] = useState<ContextItem | null>(null);
+  const [viewingItem, setViewingItem] = useState<{ id: string, type: string, title: string } | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const selectedCount = items.filter((item) => item.selected).length
-  
+
   // Function to handle viewing an item
-  const handleViewItem = (item: ContextItem) => {
+  const handleViewItem = (item: { id: string, type: string, title: string }) => {
     setViewingItem(item);
     setIsViewerOpen(true);
-  };
-  
-  // Function to toggle all evaluations
-  const toggleAllEvaluations = (checked: boolean) => {
-    evaluations.forEach(item => {
-      toggleItem(item.id, checked);
-    });
   };
 
   // If compact mode and no items, show a simple message
@@ -97,13 +112,11 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
             )}
           </button>
         </div>
-        
-        {/* Content that slides up/down */}
+        {/* Tag row for context items */}
         <div className={cn(
           "transition-all duration-300 ease-in-out overflow-hidden",
           isCollapsed ? "h-0" : "h-auto"
         )}>
-          {/* Tag row for context items */}
           <div className="flex flex-wrap items-center gap-2">
             {items.map((item) => (
               <span
@@ -111,10 +124,8 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
                 className="flex items-center bg-muted border border-border rounded-full px-2 py-1 text-xs font-medium shadow-sm max-w-xs truncate"
                 title={item.title}
               >
-                {item.type === 'document' && <FileText className="h-3 w-3 mr-1 text-muted-foreground" />}
-                {item.type === 'upload' && <Upload className="h-3 w-3 mr-1 text-muted-foreground" />}
-                {item.type === 'evaluation' && <ClipboardList className="h-3 w-3 mr-1 text-muted-foreground" />}
-                <span className="truncate max-w-[120px]">{item.title}</span>
+                <TypeBadge type={item.type} />
+                <span className="truncate max-w-[120px] ml-1">{item.title}</span>
                 <Button
                   size="icon"
                   variant="ghost"
@@ -147,7 +158,7 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
     )
   }
 
-  // Regular full-size mode
+  // Regular full-size mode: single list with type badges
   return (
     <Card className="w-full">
       <CardHeader className="pb-3">
@@ -157,110 +168,19 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
             {selectedCount} selected
           </Badge>
         </div>
-        <CardDescription>Add documents, uploads, and evaluations to provide context for your chat</CardDescription>
+        <CardDescription>Add documents, uploads, evaluations, and context items to provide context for your chat</CardDescription>
       </CardHeader>
-
-      <Tabs defaultValue="documents" className="w-full">
-        <TabsList className="grid grid-cols-3 mb-2 mx-4">
-          <TabsTrigger value="documents" className="flex items-center gap-1">
-            <FileText className="h-4 w-4" />
-            <span>Documents</span>
-            {documents.length > 0 && (
-              <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
-                {documents.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="uploads" className="flex items-center gap-1">
-            <Upload className="h-4 w-4" />
-            <span>Uploads</span>
-            {uploads.length > 0 && (
-              <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
-                {uploads.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="evaluations" className="flex items-center gap-1">
-            <ClipboardList className="h-4 w-4" />
-            <span>Evaluations</span>
-            {evaluations.length > 0 && (
-              <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
-                {evaluations.length}
-              </Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="documents" className="m-0">
-          <ScrollArea className="h-[350px] px-4">
-            <div className="space-y-2 pb-4">
-              {documents.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground">No documents added</div>
-              ) : (
-                documents.map((item) => (
-                  <ContextItemCard key={item.id} item={item} onToggle={toggleItem} onRemove={removeItem} onView={handleViewItem} />
-                ))
-              )}
-            </div>
-          </ScrollArea>
-        </TabsContent>
-
-        <TabsContent value="uploads" className="m-0">
-          <ScrollArea className="h-[350px] px-4">
-            <div className="space-y-2 pb-4">
-              {uploads.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground">No uploads added</div>
-              ) : (
-                uploads.map((item) => (
-                  <ContextItemCard key={item.id} item={item} onToggle={toggleItem} onRemove={removeItem} onView={handleViewItem} />
-                ))
-              )}
-            </div>
-          </ScrollArea>
-        </TabsContent>
-
-        <TabsContent value="evaluations" className="m-0">
-          <ScrollArea className="h-[350px] px-4">
-            <div className="space-y-2 pb-4">
-              {evaluations.length === 0 ? (
-                <div className="text-center py-6 text-muted-foreground">No evaluations added</div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between py-2">
-                    <div className="flex items-center gap-2">
-                      <Checkbox 
-                        id="select-all-evaluations"
-                        checked={evaluations.every(item => item.selected)}
-                        onCheckedChange={(checked) => toggleAllEvaluations(!!checked)}
-                      />
-                      <label 
-                        htmlFor="select-all-evaluations" 
-                        className="text-sm font-medium cursor-pointer"
-                      >
-                        Select All
-                      </label>
-                    </div>
-                    <Badge className="border border-input bg-background text-foreground px-2 py-0.5 rounded-md text-xs font-medium">
-                      {evaluations.filter(item => item.selected).length}/{evaluations.length}
-                    </Badge>
-                  </div>
-                  
-                  {evaluations.map((item) => (
-                    <ContextItemCard 
-                      key={item.id} 
-                      item={item} 
-                      onToggle={toggleItem} 
-                      onRemove={removeItem}
-                      onView={handleViewItem}
-                    />
-                  ))}
-                </>
-              )}
-            </div>
-          </ScrollArea>
-        </TabsContent>
-      </Tabs>
-
+      <ScrollArea className="h-[350px] px-4">
+        <div className="space-y-2 pb-4">
+          {items.length === 0 ? (
+            <div className="text-center py-6 text-muted-foreground">No context items added</div>
+          ) : (
+            items.map((item) => (
+              <ContextItemCard key={item.id} item={item} onToggle={toggleItem} onRemove={removeItem} onView={handleViewItem} />
+            ))
+          )}
+        </div>
+      </ScrollArea>
       <CardFooter className="flex justify-between pt-0">
         <Button 
           className="bg-red-500 hover:bg-red-600 text-white rounded-md px-3 py-1.5 text-sm"
@@ -270,7 +190,6 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
           Clear All
         </Button>
       </CardFooter>
-      
       {/* Context Item Viewer Dialog */}
       <Dialog open={isViewerOpen} onOpenChange={setIsViewerOpen}>
         <DialogContent className="max-w-3xl">
@@ -285,10 +204,10 @@ export function ContextQueue({ compact = false }: ContextQueueProps) {
 }
 
 interface ContextItemCardProps {
-  item: ContextItem
-  onToggle: (id: string, selected: boolean) => void
-  onRemove: (id: string) => void
-  onView?: (item: ContextItem) => void
+  item: { id: string, type: string, title: string, selected: boolean };
+  onToggle: (id: string, selected: boolean) => void;
+  onRemove: (id: string) => void;
+  onView?: (item: { id: string, type: string, title: string }) => void;
 }
 
 function ContextItemCard({ item, onToggle, onRemove, onView }: ContextItemCardProps) {
@@ -302,7 +221,6 @@ function ContextItemCard({ item, onToggle, onRemove, onView }: ContextItemCardPr
       />
       <div className="flex-1 min-w-0 overflow-hidden">
         <div className="font-medium truncate pr-2">{item.title}</div>
-        <div className="text-sm text-muted-foreground truncate">{item.content.substring(0, 100)}</div>
       </div>
       <div className="flex items-center gap-1 flex-shrink-0">
         {onView && (
@@ -325,161 +243,14 @@ function ContextItemCard({ item, onToggle, onRemove, onView }: ContextItemCardPr
   )
 }
 
-// New compact context item component
-interface CompactContextItemProps {
-  item: ContextItem
-  onToggle: (id: string, selected: boolean) => void
-  onRemove: (id: string) => void
-  onToggleSection?: (itemId: string, sectionId: string, selected: boolean) => void
-  onView?: (item: ContextItem) => void
-}
-
-function CompactContextItem({ item, onToggle, onRemove, onToggleSection, onView }: CompactContextItemProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  
-  // For evaluation items with sections
-  const isEvaluation = item.type === "evaluation" && "sections" in item && Array.isArray((item as any).sections);
-  
+// Helper component for type badge
+function TypeBadge({ type }: { type: string }) {
+  let color = "bg-gray-200 text-gray-700";
+  if (type === "document") color = "bg-blue-100 text-blue-800";
+  else if (type === "upload") color = "bg-green-100 text-green-800";
+  else if (type === "evaluation") color = "bg-purple-100 text-purple-800";
+  else if (type === "context") color = "bg-yellow-100 text-yellow-800";
   return (
-    <div className="border rounded-md bg-card text-sm">
-      <div className="flex items-center gap-1 p-2">
-        <Checkbox
-          id={`compact-item-${item.id}`}
-          checked={item.selected}
-          onCheckedChange={(checked) => onToggle(item.id, !!checked)}
-          className="h-3.5 w-3.5"
-        />
-        <div className="flex-1 min-w-0 truncate text-xs">{item.title}</div>
-        {isEvaluation && (
-          <Button 
-            className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-5 w-5"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-          </Button>
-        )}
-        <div className="flex items-center">
-          {onView && (
-            <Button 
-              className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-5 w-5"
-              onClick={() => onView(item)} 
-              title="View content"
-            >
-              <Eye className="h-3 w-3" />
-            </Button>
-          )}
-          <Button 
-            className="bg-red-500 hover:bg-red-600 text-white rounded-md h-5 w-5"
-            onClick={() => onRemove(item.id)}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        </div>
-      </div>
-      
-      {isEvaluation && isOpen && onToggleSection && (
-        <CollapsibleContent forceMount className="border-t px-2 py-1">
-          <div className="space-y-1">
-            {((item as any).sections || []).map((section: any) => (
-              <div key={section.id} className="flex items-center gap-1">
-                <Checkbox
-                  id={`section-${section.id}`}
-                  checked={section.selected}
-                  onCheckedChange={(checked) => 
-                    onToggleSection(item.id, section.id, !!checked)
-                  }
-                  className="h-3 w-3"
-                />
-                <label 
-                  htmlFor={`section-${section.id}`}
-                  className="text-xs truncate flex-1"
-                >
-                  {section.title}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CollapsibleContent>
-      )}
-    </div>
-  )
-}
-
-// Define our own interface that matches what we're using
-interface EvaluationContextItem extends Omit<ContextItem, 'type'> {
-  type: "evaluation";
-  id: string;
-  title: string;
-  evaluationType: string;
-  evaluationDate: Date;
-  sections: any[];
-  selected: boolean;
-}
-
-interface EvaluationCardProps {
-  item: EvaluationContextItem
-  onToggle: (id: string, selected: boolean) => void
-  onRemove: (id: string) => void
-  onToggleSection: (itemId: string, sectionId: string, selected: boolean) => void
-}
-
-function EvaluationCard({ item, onToggle, onRemove, onToggleSection }: EvaluationCardProps) {
-  const [isOpen, setIsOpen] = useState(false)
-
-  return (
-    <div className="border rounded-md bg-card">
-      <div className="flex items-start gap-2 p-3">
-        <Checkbox
-          id={`item-${item.id}`}
-          checked={item.selected}
-          onCheckedChange={(checked) => onToggle(item.id, !!checked)}
-          className="flex-shrink-0"
-        />
-        <div className="flex-1 min-w-0 overflow-hidden">
-          <div className="font-medium truncate pr-2">{item.title}</div>
-          <div className="text-sm text-muted-foreground truncate">
-            {item.evaluationType} • {item.evaluationDate.toLocaleDateString()}
-          </div>
-        </div>
-        <div className="flex items-center gap-1 flex-shrink-0">
-          <Button
-            className="bg-gray-200 hover:bg-gray-300 text-gray-600 rounded-md h-7 w-7"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? "Collapse sections" : "Expand sections"}
-          >
-            {isOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </Button>
-          <Button 
-            className="bg-red-500 hover:bg-red-600 text-white rounded-md h-7 w-7"
-            onClick={() => onRemove(item.id)}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-        <CollapsibleContent className="border-t px-3 py-2">
-          <div className="space-y-2">
-            {item.sections.map((section: any) => (
-              <div key={section.id} className="flex items-center gap-2">
-                <Checkbox
-                  id={`section-${section.id}`}
-                  checked={section.selected}
-                  onCheckedChange={(checked) => onToggleSection(item.id, section.id, !!checked)}
-                  className="flex-shrink-0"
-                />
-                <label
-                  htmlFor={`section-${section.id}`}
-                  className="flex-1 text-sm cursor-pointer hover:underline truncate"
-                >
-                  {section.title}
-                </label>
-              </div>
-            ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </div>
-  )
+    <span className={`rounded px-2 py-0.5 text-xs font-semibold ${color}`}>{type}</span>
+  );
 }

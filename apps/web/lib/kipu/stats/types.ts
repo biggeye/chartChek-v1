@@ -1,5 +1,84 @@
 // lib/kipu/stats/types.ts
 
+/**
+ * KIPU API Response Types
+ */
+export interface KipuPagination {
+  current_page: number;
+  total_pages: number;
+  records_per_page: number;
+  total_records: number;
+}
+
+export interface KipuError {
+  code: string;
+  message: string;
+  details?: any;
+}
+
+export interface KipuApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: KipuError;
+  pagination?: KipuPagination;
+}
+
+/**
+ * KIPU Status Enums
+ */
+export enum TreatmentStatus {
+  Completed = 'completed',
+  DischargedEarly = 'discharged_early',
+  Active = 'active',
+  Pending = 'pending'
+}
+
+export enum StaffStatus {
+  Available = 'available',
+  Unavailable = 'unavailable',
+  OnLeave = 'on_leave'
+}
+
+export enum RoleType {
+  Clinical = 'clinical',
+  Administrative = 'administrative',
+  Support = 'support'
+}
+
+export enum ResourceType {
+  TherapyRoom = 'therapy_room',
+  GroupRoom = 'group_room',
+  Office = 'office'
+}
+
+/**
+ * KIPU Data Types
+ */
+export interface KipuTreatment {
+  id: string;
+  status: TreatmentStatus;
+  admission_date?: string;
+  discharge_date?: string;
+  primary_diagnosis?: string;
+  program?: string;
+  is_readmission?: boolean;
+}
+
+export interface KipuStaffMember {
+  id: string;
+  role_type: RoleType;
+  provider_type?: string;
+  status: StaffStatus;
+  assigned_patients?: string[];
+}
+
+export interface KipuResource {
+  id: string;
+  type: ResourceType;
+  scheduled_minutes?: number;
+  available_minutes?: number;
+}
+
 export interface KipuPatientData {
     patients: Array<any>;
     pagination?: any;

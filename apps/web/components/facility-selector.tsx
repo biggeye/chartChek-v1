@@ -44,7 +44,6 @@ export function FacilitySelector({ variant = 'sidebar', className, onSelect }: F
   // Fetch facilities on component mount if the list is empty
   useEffect(() => {
     if (facilities.length === 0 && !isLoading) {
-      console.log('[FacilitySelector] Facilities empty, fetching...');
       fetchFacilities();
     }
     // Dependencies are stable references now
@@ -54,7 +53,6 @@ export function FacilitySelector({ variant = 'sidebar', className, onSelect }: F
   // Memoize the handler to prevent unnecessary rerenders if passed down
   const handleSelectFacility = useCallback((facilityId: number | null) => {
     const newFacilityId = facilityId === null ? 0 : facilityId;
-    console.log('[FacilitySelector] Changing facility context to:', newFacilityId);
     changeFacilityWithContext(newFacilityId);
     setIsModalOpen(false);
     onSelect?.(); // Call onSelect callback if provided

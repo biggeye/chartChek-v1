@@ -1,4 +1,5 @@
 import { google } from '@ai-sdk/google';
+import { openai } from '@ai-sdk/openai';
 import { streamText, CoreMessage } from 'ai';
 import { createServer } from '~/utils/supabase/server';
 import { ChatContext } from '~/types/chat/context';
@@ -9,10 +10,18 @@ interface ChatRequestBody {
   sessionId: string;
   messages: CoreMessage[];
   systemPrompt?: string;
-  context?: string;
+  context?: string | { content: string }[];
+  promptId?: string;
 }
 
 interface ContextItemResponse {
+  context_items: {
+    content: string;
+    created_at: string;
+  };
+}
+
+interface PromptContextItemResponse {
   context_items: {
     content: string;
     created_at: string;
@@ -33,30 +42,25 @@ const NO_CACHE_HEADERS = {
 
 export async function POST(req: Request) {
   const supabase = await createServer();
-  const { sessionId, messages, systemPrompt, context } = (await req.json()) as ChatRequestBody;
-  
+  const body = await req.json();
+  const { sessionId, messages, systemPrompt, context } = body as ChatRequestBody;
+
   logger.info('[chat/route] Processing chat request', { 
     sessionId,
     hasContext: !!context,
-    contextLength: context?.length,
+    contextLength: Array.isArray(context) ? context.length : (context?.length ?? 0),
     messageCount: messages.length
   });
 
   try {
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
+    // Authenticate user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       logger.error('[chat/route] Authentication error', authError);
-      return new Response('Unauthorized', {
-        status: 401,
-        headers: NO_CACHE_HEADERS
-      });
+      return new Response('Unauthorized', { status: 401, headers: NO_CACHE_HEADERS });
     }
 
-    // First verify the session exists and belongs to this user
+    // Validate session ownership
     const { data: session, error: sessionError } = await supabase
       .from('chat_sessions')
       .select('id')
@@ -65,60 +69,46 @@ export async function POST(req: Request) {
       .single();
 
     if (sessionError || !session) {
-      logger.error('[chat/route] Session error', { sessionError });
-      return new Response('Session not found or unauthorized', {
-        status: 404,
-        headers: NO_CACHE_HEADERS
+      logger.error('[chat/route] Session not found or unauthorized', { sessionError });
+      return new Response('Session not found or unauthorized', { status: 404, headers: NO_CACHE_HEADERS });
+    }
+
+    // Build contextContent array
+    let contextContent: string[] = [];
+    if (Array.isArray(context)) {
+      contextContent = context.map(item => typeof item === 'string' ? item : item.content).filter(Boolean);
+    } else if (typeof context === 'string' && context.trim() !== '') {
+      contextContent = [context];
+    }
+
+    // Validate context
+    if (contextContent.some(c => typeof c !== 'string' || c.trim() === '')) {
+      logger.error('[chat/route] Malformed contextContent', { contextContent });
+      return new Response(JSON.stringify({ error: 'All context items must be non-empty strings.' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json', ...NO_CACHE_HEADERS },
       });
     }
 
-    // Get context items for this session using a join
-    const { data: contextItems, error: contextError } = await supabase
-      .from('session_context')
-      .select(`
-        context_items (
-          content,
-          created_at
-        )
-      `)
-      .eq('session_id', sessionId)
-      .order('context_items.created_at', { ascending: true }) as { data: ContextItemResponse[] | null, error: any };
+    const combinedContext = contextContent.join('\n\n');
 
-    if (contextError) {
-      logger.error('[chat/route] Context error', { contextError });
-      // Continue without context if there's an error
-    }
+    // Compose system prompt
+    const defaultSystemPrompt = `
+Role & Scope
+- Act as a psychiatrist specializing in behavioral health and substance‑use disorder treatment.
 
-    // Extract content from the nested structure
-    const contextContent = contextItems?.map(item => item.context_items.content).filter(Boolean) || [];
+Permitted Functions
+- Provide clinical‑decision support, such as:
+  • Summaries of a patient's treatment history
+  • Symptom overviews
+  • Evidence‑based insights and considerations
+- Deliver comprehensive, context‑aware analyses of the patient's condition and treatments.
 
-    // Combine database context with provided context
-    const combinedContext = [
-      ...contextContent,
-      context
-    ].filter(Boolean).join('\n\n');
+Data Handling & Privacy
+- Do not store or retain patient information between sessions.
+- Use only the information supplied in the current request and cite it when relevant.
 
-    logger.debug('[chat/route] Combined context', { 
-      contextLength: combinedContext.length,
-      numContextItems: contextContent.length
-    });
-
-    const system = systemPrompt ?? `
-      Role & Scope  
-- Act as a psychiatrist specializing in behavioral health and substance‑use disorder treatment.   
-
-Permitted Functions  
-- Provide clinical‑decision support, such as:  
-  • Summaries of a patient's treatment history  
-  • Symptom overviews  
-  • Evidence‑based insights and considerations  
-- Deliver comprehensive, context‑aware analyses of the patient's condition and treatments.  
-
-Data Handling & Privacy  
-- Do not store or retain patient information between sessions.  
-- Use only the information supplied in the current request and cite it when relevant.  
-
-Hallucination & Uncertainty Policy  
+Hallucination & Uncertainty Policy
 - Never fabricate, speculate, or guess.
 - When information is missing:
   • Explicitly list the gaps before responding.
@@ -126,34 +116,52 @@ Hallucination & Uncertainty Policy
 - All dates, measurements, and clinical details MUST come from the provided context.
 - If asked about information not in the context, state "That information is not available in the current context."
 
-Response Style  
+Response Style
 - Be concise, clinically precise, and reference provided context where possible.
 
-${combinedContext}`;
+${combinedContext}`.trim();
 
-    logger.debug('[chat/route] Initializing stream', {
-      systemPromptLength: system.length
-    });
+    const system = systemPrompt ?? defaultSystemPrompt;
 
-    // Get the stream from the AI SDK and return it directly
-    const result = streamText({
-      model: google('gemini-2.5-pro-exp-03-25'),
-      messages,
-      system,
-      temperature: 0.7,
-      maxTokens: 64000,
-      maxSteps: 5,
+    logger.debug('[chat/route] Final system prompt length:', { length: system.length });
+
+    // Choose model
+    const model = google('gemini-2.5-pro-exp-03-25');
+
+    // NOTE: Gemini may not support system prompts like OpenAI
+    if (model.provider === 'google' && systemPrompt) {
+      logger.warn('[chat/route] Gemini model does not support system prompts. Ignoring systemPrompt.');
+    }
+
+    // Only pass role and content to the model
+    const minimalMessages = messages.map((msg: any) => ({
+      role: msg.role,
+      content: msg.content
+    }));
+
+    const result = await streamText({
+      model,
+      messages: minimalMessages,
+      ...(model.provider === 'openai' ? { system } : {}),
+      maxSteps: 5
     });
 
     return result.toDataStreamResponse();
+
   } catch (error) {
     logger.error('[chat/route] Error processing request:', error);
-    return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }), {
+    if (error instanceof Error && error.stack) {
+      logger.error('[chat/route] Error stack:', error.stack);
+    }
+
+    // TEMP: Return error message and stack for debugging
+    return new Response(JSON.stringify({
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      details: error
+    }), {
       status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        ...NO_CACHE_HEADERS
-      },
+      headers: { 'Content-Type': 'application/json', ...NO_CACHE_HEADERS }
     });
   }
 }

@@ -8,7 +8,6 @@ interface SessionManagerReturn {
   currentSessionId: string | undefined;
   sessions: any[];
   contextItems: any[];
-  contextString: string | undefined;
   ensureSession: () => Promise<string>;
   loadSessions: () => void;
   isCreatingSession: boolean;
@@ -19,7 +18,7 @@ export function useSessionManager(): SessionManagerReturn {
   const { id: urlSessionId } = useParams();
   const { currentSessionId, setCurrentSession, createSession, isCreatingSession } = useChatStore();
   const { loadSessions, sessions } = useHistoryStore();
-  const { items: contextItems, getSelectedContent, clearQueue, loadContextFromSession } = useContextQueueStore();
+  const { items: contextItems, clearQueue } = useContextQueueStore();
 
   // Load sessions if not loaded
   useEffect(() => {
@@ -33,16 +32,11 @@ export function useSessionManager(): SessionManagerReturn {
     if (urlSessionId && urlSessionId !== currentSessionId) {
       // First clear existing context
       clearQueue();
-      
       // Set the new session
       setCurrentSession(urlSessionId as string);
-      
-      // Load context for the new session
-      loadContextFromSession(urlSessionId as string).catch(error => {
-        console.error('Failed to load context for session:', error);
-      });
+      // No longer loading context for the new session from Supabase
     }
-  }, [urlSessionId, currentSessionId, setCurrentSession, clearQueue, loadContextFromSession]);
+  }, [urlSessionId, currentSessionId, setCurrentSession, clearQueue]);
 
   // Memoize ensureSession to prevent recreation on every render
   const ensureSession = useCallback(async () => {
@@ -82,14 +76,11 @@ export function useSessionManager(): SessionManagerReturn {
     }
   }, [urlSessionId, currentSessionId, sessions, createSession, router, setCurrentSession, isCreatingSession]);
 
-  // Get the context string from the selected items
-  const contextString = getSelectedContent();
 
   return {
     currentSessionId: urlSessionId ? String(urlSessionId) : currentSessionId || undefined,
     sessions,
     contextItems,
-    contextString,
     ensureSession,
     loadSessions,
     isCreatingSession

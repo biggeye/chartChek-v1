@@ -1,8 +1,8 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { usePatientStore } from '~/store/patient/patientStore';
-import { fetchPatients, fetchPatientById } from '~/lib/services/patientService';
+import { fetchPatients, fetchPatientById, fetchPatientOccupancy } from '~/lib/services/patientService';
 import { useFacilityStore } from '~/store/patient/facilityStore';
-import { PatientBasicInfo } from '~/types/kipu/kipuAdapter';
+import { PatientBasicInfo, KipuOccupancy } from '~/types/kipu/kipuAdapter';
 // Remove Patient type import if not used directly in this file
 // import { Patient } from '~/types/kipu/kipuAdapter';
 
@@ -83,3 +83,37 @@ export const useFetchPatient = (patientId: string) => {
     fetchPatientDetails(patientId);
   }, [patientId, fetchPatientDetails]);
 };
+
+/**
+ * Hook to fetch patient occupancy data from the KIPU occupancy endpoint.
+ * Returns: { occupancy, isLoading, error, fetchOccupancy }
+ */
+export const useFetchFacilityOccupancy = () => {
+  const setIsLoading = useFacilityStore(useCallback(state => state.setIsLoading, []));
+  const setError = useFacilityStore(useCallback(state => state.setError, []));
+  const setOccupancy = useFacilityStore(useCallback(state => state.setOccupancy, []));
+  const occupancy = useFacilityStore(state => state.occupancy);
+
+  const fetchOccupancy = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data: KipuOccupancy = await fetchPatientOccupancy();
+      setOccupancy(data);
+    } catch (error: any) {
+      setError(error?.message || 'Failed to fetch occupancy data.');
+      setOccupancy(undefined);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setIsLoading, setError, setOccupancy]);
+
+  return {
+    occupancy,
+    isLoading: useFacilityStore(state => state.isLoading),
+    error: useFacilityStore(state => state.error),
+    fetchOccupancy,
+  };
+};
+
+

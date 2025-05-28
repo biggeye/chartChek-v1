@@ -1,15 +1,17 @@
 import { createServer } from '~/utils/supabase/server';
 import { CoreMessage } from 'ai';
 
+interface SaveChatMessagesParams {
+  sessionId: string;
+  userId: string;
+  messages: (CoreMessage & { promptId?: string })[];
+}
+
 export const saveChatMessages = async ({
   sessionId,
   userId,
   messages,
-}: {
-  sessionId: string;
-  userId: string;
-  messages: CoreMessage[];
-}) => {
+}: SaveChatMessagesParams) => {
   const supabase = await createServer();
 
   if (!userId || !sessionId) {
@@ -34,6 +36,7 @@ export const saveChatMessages = async ({
     account_id: userId,
     role: msg.role,
     content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
+    prompt_id: msg.promptId
   }));
 
   const { error } = await supabase.from('chat_messages').insert(formattedMessages);

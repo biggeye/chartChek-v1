@@ -20,6 +20,15 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <Link href="/admin/evaluation-parser" className="text-gray-600 hover:text-gray-900">
                   Evaluation Parser
                 </Link>
+                <Link href="/admin/knowledge" className="text-gray-600 hover:text-gray-900">
+                  Knowledge
+                </Link>
+                <Link href="/admin/transformations" className="text-gray-600 hover:text-gray-900">
+                  Transformations
+                </Link>
+                <Link href="/admin/compliance" className="text-gray-600 hover:text-gray-900">
+                  Compliance
+                </Link>
               </nav>
             </div>
             <div className="flex items-center">

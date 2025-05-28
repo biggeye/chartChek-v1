@@ -9,6 +9,7 @@ import { Send, FileUp, User as UserIcon, FileText as FileTextIcon, ChevronUp } f
 import { cn } from "@kit/ui/utils";
 import useSidebarStores from "~/store/sidebarStore";
 import { useContextQueueStore } from "~/store/chat/contextQueueStore";
+import { usePatientContextActions } from '~/hooks/usePatientContextActions';
 
 import { PatientContextModalAnim } from "./patient-context-modal-anim";
 import { ContextQueue } from "./context-queue";
@@ -28,6 +29,8 @@ export function MessageInput({ input, onInputChange, onSubmit, disabled }: Messa
   const [modalShouldClose, setModalShouldClose] = useState(false);
   const [showContextQueueRow, setShowContextQueueRow] = useState(false);
 
+  const { items: contextQueueItems } = usePatientContextActions();
+
   const handleModalProcessed = () => {
     setModalShouldClose(true);
     setTimeout(() => {
@@ -35,8 +38,6 @@ export function MessageInput({ input, onInputChange, onSubmit, disabled }: Messa
       setModalShouldClose(false);
     }, 350);
   };
-
-  const contextQueueItems = useContextQueueStore((state) => state.items);
 
   return (
     <div className={cn(

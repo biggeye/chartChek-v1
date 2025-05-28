@@ -42,7 +42,7 @@ export function ChatHistory({ isMobileMenu, onMobileMenuClose }: ChatHistoryProp
 
   const handleNewChat = async () => {
     const newSessionId = await createSession();
-    router.push('/product/chat');
+    router.push(`/product/chat/${newSessionId}`);
     setIsOpen(false);
     onMobileMenuClose?.();
   };
@@ -68,8 +68,8 @@ export function ChatHistory({ isMobileMenu, onMobileMenuClose }: ChatHistoryProp
       // If already on chat route, just update the chat ID
       router.replace(`/product/chat/${chatId}`);
     }
-    
-    // Close mobile menu if applicable
+    // Always collapse the panel after navigation
+    setIsOpen(false);
     if (isMobileMenu && onMobileMenuClose) {
       onMobileMenuClose();
     }

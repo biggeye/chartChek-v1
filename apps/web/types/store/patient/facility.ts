@@ -17,6 +17,8 @@ export interface Pagination {
   pages: number;
 }
 
+import { KipuOccupancy } from '~/types/kipu/kipuAdapter';
+
 export interface FacilityStore {
   // --- STATE ---
   facilities: Facility[];
@@ -25,6 +27,7 @@ export interface FacilityStore {
   pagination: Pagination | null;
   isLoading: boolean;
   error: string | null;
+  occupancy?: KipuOccupancy;
 
   // --- ACTIONS ---
   /**
@@ -55,6 +58,10 @@ export interface FacilityStore {
    * While "internal", it needs to be in the type definition for TypeScript.
    */
   _fetchAndSetCapacity: (facilityId: number) => Promise<void>;
+
+  setOccupancy: (data: KipuOccupancy | undefined) => void;
+  setIsLoading: (isLoading: boolean) => void;
+  setError: (error: string | null) => void;
 }
 
 // Kipu-specific types

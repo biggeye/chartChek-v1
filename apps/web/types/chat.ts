@@ -32,7 +32,7 @@ export interface ChatSession {
   updatedAt: Date
 }
 
-export type ContextItemType = "document" | "upload" | "evaluation"
+export type ContextItemType = "document" | "upload" | "evaluation" | "context"
 
 export interface BaseContextItem {
   id: string
@@ -44,7 +44,7 @@ export interface BaseContextItem {
 }
 
 export interface DocumentContextItem extends BaseContextItem {
-  type: "document"
+  type: ContextItemType
   fileUrl: string
   fileType: string
   fileSize: number

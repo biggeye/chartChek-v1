@@ -22,10 +22,8 @@ export function PatientBreadcrumb({
   const router = useRouter();
   const pathname = usePathname();
   const { selectedPatient } = usePatientStore();
-  
-  // Use provided patient name or get from store
-  const displayName = patientName || 
-    (selectedPatient ? `${selectedPatient.lastName}, ${selectedPatient.firstName}` : "Patient");
+
+  const breadcrumbName = patientName;
   
   // Determine if we're on the patients listing or a specific patient page
   const isPatientListing = !patientId;
@@ -60,7 +58,7 @@ export function PatientBreadcrumb({
                     href={`/product/patients/${patientId}`}
                     className={`ml-4 text-sm font-medium ${currentPage ? 'text-gray-500 hover:text-gray-700' : 'text-gray-900'}`}
                   >
-                    {displayName}
+                    {breadcrumbName}
                   </Link>
                 </div>
               </li>
@@ -81,9 +79,6 @@ export function PatientBreadcrumb({
       </div>
       <div className="mt-2 md:flex md:items-center md:justify-between">
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg/7 font-bold text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-            {isPatientListing ? "Patients" : displayName}
-          </h2>
         </div>
         {actionButtons && (
           <div className="mt-4 flex shrink-0 md:mt-0 md:ml-4">

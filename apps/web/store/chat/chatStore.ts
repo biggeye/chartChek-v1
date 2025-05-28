@@ -4,6 +4,14 @@ export type ChatMessage = {
   role: 'user' | 'assistant' | 'system';
   content: string;
   createdAt: string;
+  promptId?: string;
+};
+
+export type ChatPrompt = {
+  id: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type ChatSession = {
@@ -12,6 +20,7 @@ export type ChatSession = {
   messages: ChatMessage[];
   createdAt: string;
   updatedAt: string;
+  currentPromptId?: string;
 };
 
 import { create } from 'zustand';
@@ -24,14 +33,18 @@ const supabase = createClient();
 export interface ChatState {
   currentSessionId: string | null;
   isCreatingSession: boolean;
+  currentPromptId: string | null;
   setCurrentSession: (sessionId: string) => void;
   createSession: (title?: string) => Promise<string>;
   clearCurrentSession: () => void;
+  setCurrentPrompt: (promptId: string | null) => void;
+  createPrompt: (title?: string) => Promise<string>;
 }
 
 export const useChatStore = create<ChatState>((set, get) => ({
   currentSessionId: null,
   isCreatingSession: false,
+  currentPromptId: null,
 
   setCurrentSession: (sessionId: string) => {
     if (get().currentSessionId !== sessionId) {
@@ -89,5 +102,43 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   clearCurrentSession: () => {
     set({ currentSessionId: null, isCreatingSession: false });
+  },
+
+  setCurrentPrompt: (promptId: string | null) => {
+    set({ currentPromptId: promptId });
+  },
+
+  createPrompt: async (title?: string) => {
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !user) {
+        throw new Error('Authentication required');
+      }
+
+      const promptId = uuidv4();
+      const now = new Date().toISOString();
+
+      const { error } = await supabase
+        .from('prompts')
+        .insert({
+          id: promptId,
+          account_id: user.id,
+          title: title || 'New Prompt',
+          created_at: now,
+          updated_at: now
+        });
+
+      if (error) {
+        console.error('Failed to create prompt:', error);
+        throw error;
+      }
+
+      set({ currentPromptId: promptId });
+      return promptId;
+    } catch (error) {
+      console.error('Error in createPrompt:', error);
+      throw error;
+    }
   },
 }));

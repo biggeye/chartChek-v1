@@ -1,20 +1,31 @@
 import { NextResponse } from "next/server"
+import { getFacilityStatistics, generateDateRanges } from "~/lib/kipu/stats/statisticsService"
+import { serverLoadKipuCredentialsFromSupabase } from "~/lib/kipu/auth/server"
+import { KipuCredentials } from "types/kipu/kipuAdapter"
 
 export async function POST(request: Request) {
   try {
-    const { dateRange, facilityId } = await request.json()
-
-    // This is a mock implementation since we can't directly use the statistics service
-    // In a real implementation, you would use the KipuStatisticsService here
-
-    // Return mock data for demonstration
-    return NextResponse.json({
-      success: true,
-      data: getMockStatistics(),
-    })
+    console.log("[API] /api/kipu/statistics - POST called");
+    const { facilityId, dateRange } = await request.json();
+    console.log("[API] Request body:", { facilityId, dateRange });
+    const credentials = await serverLoadKipuCredentialsFromSupabase();
+    console.log("[API] Loaded credentials:", credentials ? { appId: credentials.appId, accessId: credentials.accessId, baseUrl: credentials.baseUrl } : null);
+    if (!credentials || !credentials.appId || !credentials.accessId || !credentials.secretKey || !credentials.baseUrl) {
+      console.error("[API] Missing or invalid credentials");
+      return NextResponse.json({ success: false, error: "Missing or invalid credentials" }, { status: 400 });
+    }
+    if (!facilityId) {
+      console.error("[API] Missing facilityId");
+      return NextResponse.json({ success: false, error: "Missing facilityId" }, { status: 400 });
+    }
+    const range = dateRange || generateDateRanges();
+    console.log("[API] Using date range:", range);
+    const stats = await getFacilityStatistics(credentials as KipuCredentials, facilityId, range);
+    console.log("[API] getFacilityStatistics result:", stats);
+    return NextResponse.json({ success: true, data: stats });
   } catch (error) {
-    console.error("Error in statistics API route:", error)
-    return NextResponse.json({ success: false, error: "Failed to fetch statistics" }, { status: 500 })
+    console.error("[API] Error in statistics API route:", error);
+    return NextResponse.json({ success: false, error: "Failed to fetch statistics" }, { status: 500 });
   }
 }
 

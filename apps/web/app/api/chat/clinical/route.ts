@@ -5,8 +5,7 @@ import { downloadPDFServer } from '~/lib/services/toolCallService';
 import { tools as kipuTools } from '~/components/chat/tools';
 
 export async function POST(req: Request) {
-  console.log('Received POST request');
-  const body = await req.json();
+   const body = await req.json();
   const model = body.model;
   const messages = body.messages;
   const system = body.systemPrompt ?? `You are the lead secretary for a large corporate psychiatric firm.  You are the editor-in-chief for all reports that go out.
@@ -24,7 +23,5 @@ export async function POST(req: Request) {
     temperature: 0.7,
     topP: 0.4,
   });
-  console.log('Streaming result:', result);
-
-  return (await result).text;
+   return (await result).text;
 }

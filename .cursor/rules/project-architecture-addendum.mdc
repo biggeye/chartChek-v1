@@ -1,0 +1,199 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# ChartChek Architecture Addendum
+
+This document serves as a living addendum to the main architectural patterns and defines how new Cursor rules should be created and managed.
+
+## Rule Creation Guidelines
+
+### Rule Types
+1. **Always** (e.g., project-architecture.mdc)
+   - Global architectural patterns
+   - Core conventions
+   - Example: This file and project-architecture.mdc
+
+2. **Auto-attached**
+   - Requires file pattern designation
+   - Format: `glob_pattern: path/to/files/**/*.{ts,tsx}`
+   - Example for admin rules:
+     ```
+     glob_pattern: apps/web/app/admin/**/*.{ts,tsx}
+     ```
+
+3. **Agent-requested**
+   - Available to AI when relevant
+   - Must include clear description of when to use
+   - Example:
+     ```markdown
+     Rule Name: admin-layout-pattern
+     Type: Agent-requested
+     Description: Use when modifying or creating admin interface layouts
+     Context: This pattern ensures consistent admin UI structure
+     ```
+
+### Rule Creation Template
+```markdown
+# Rule Name: [name]
+Type: [Auto-attached|Agent-requested]
+
+## Pattern Matching (for Auto-attached)
+glob_pattern: [pattern]
+
+## Description
+[Clear description of the rule's purpose]
+
+## When to Use
+[Specific scenarios when this rule applies]
+
+## Pattern
+```typescript
+// Code example
+```
+
+## Key Requirements
+- Requirement 1
+- Requirement 2
+
+## Examples
+1. Example usage 1
+2. Example usage 2
+```
+
+## Current Implementation Details
+
+### Transformation Monitoring Pattern
+```typescript
+// Metric Collection Pattern
+export async function collectTransformationMetric(metric: TransformationMetric): Promise<void> {
+  try {
+    await fetch('/api/dev/transformations/metrics', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(metric)
+    });
+  } catch (error) {
+    console.warn('[TransformationMonitoring] Failed to collect metric:', error);
+  }
+}
+
+// Aggregation Pattern
+function calculateAggregates(metrics: TransformationMetric[]): TransformationAggregates {
+  return {
+    total: metrics.length,
+    successful: metrics.filter(m => m.success).length,
+    failed: metrics.length - successful,
+    averageDuration: metrics.length > 0 ? totalDuration / metrics.length : 0,
+    errorTypes: {} // Populated with error type counts
+  };
+}
+```
+
+### Date Range Pattern
+This pattern is used consistently across statistics and monitoring:
+```typescript
+interface DateRange {
+  daily: {
+    start: string;
+    end: string;
+  };
+  weekly: {
+    start: string;
+    end: string;
+  };
+  monthly: {
+    start: string;
+    end: string;
+  };
+}
+```
+
+### Admin Interface Pattern
+Admin interfaces follow this layout structure:
+```typescript
+export default function AdminLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white shadow">
+        <nav className="mx-auto max-w-7xl px-4">
+          {/* Navigation items */}
+        </nav>
+      </header>
+      <main className="mx-auto max-w-7xl px-4 py-6">
+        {children}
+      </main>
+    </div>
+  );
+}
+```
+
+## Pending Rules
+Each rule proposal must include:
+1. Rule name/identifier
+2. Rule type (Auto-attached or Agent-requested)
+3. Pattern matching (if Auto-attached)
+4. Description and usage context
+5. Priority (High/Medium/Low)
+6. Status (Proposed/In Review/Approved)
+
+Current pending rules:
+
+1. **Admin Layout Pattern**
+   - Type: Auto-attached
+   - Pattern: `apps/web/app/admin/**/*.{ts,tsx}`
+   - Description: Standardize admin interface layouts
+   - Priority: High
+   - Status: Proposed
+   ```typescript
+   // Example pattern
+   interface AdminPageProps {
+     title: string;
+     actions?: ReactNode;
+     children: ReactNode;
+   }
+   ```
+
+2. **API Error Handler**
+   - Type: Agent-requested
+   - Description: Error handling pattern for API endpoints
+   - Context: Use when creating or modifying API routes
+   - Priority: High
+   - Status: Proposed
+   ```typescript
+   // Example pattern
+   interface APIErrorResponse {
+     error: string;
+     code: string;
+     details?: Record<string, unknown>;
+   }
+   ```
+
+3. **Store Action Pattern**
+   - Type: Auto-attached
+   - Pattern: `apps/web/store/**/*.ts`
+   - Description: Zustand store action naming and structure
+   - Priority: Medium
+   - Status: Proposed
+
+## Rule Addition Process
+1. Identify pattern or convention in use
+2. Determine appropriate rule type:
+   - If path-specific: Auto-attached
+   - If context-specific: Agent-requested
+3. Create rule using template above
+4. For Auto-attached rules:
+   - Define precise glob pattern
+   - Test pattern against existing files
+5. For Agent-requested rules:
+   - Define clear usage context
+   - Provide specific examples
+6. Review with team
+7. Add to appropriate rules directory with correct type designation
+
+## Version History
+- v1.0: Initial addendum creation
+- v1.1: Added rule type specifications and creation guidelines
+
+

@@ -3,6 +3,10 @@ description: Language model middleware is a way to enhance the behavior of langu
 globs: 
 alwaysApply: false
 ---
+[ChatPanel.tsx](mdc:apps/web/components/chat/ChatPanel.tsx)
+[chatStore.ts](mdc:apps/web/store/chat/chatStore.ts)
+[chatHistory.ts](mdc:apps/web/lib/ai/chatHistory.ts)
+
 Language Model Middleware
 Language model middleware is a way to enhance the behavior of language models by intercepting and modifying the calls to the language model.
 

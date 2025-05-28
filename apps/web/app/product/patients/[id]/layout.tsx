@@ -16,8 +16,23 @@ import {
 } from '@kit/ui/dropdown-menu';
 import { MoreVertical } from 'lucide-react';
 import { ScrollArea } from '@kit/ui/scroll-area';
+import { Badge } from "@kit/ui/badge";
+import { AlertCircle } from 'lucide-react';
 
 type ActiveTabType = 'overview' | 'evaluations' | 'appointments' | 'vitals' | 'orders' | 'treatmentPlan' | 'utilizationReview';
+
+const getStatusColor = (status: string | undefined) => {
+  switch (status?.toLowerCase()) {
+    case 'active':
+      return 'bg-green-100 text-green-800 border-green-200';
+    case 'discharged':
+      return 'bg-gray-100 text-gray-800 border-gray-200';
+    case 'pending':
+      return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    default:
+      return 'bg-blue-100 text-blue-800 border-blue-200';
+  }
+};
 
 export default function PatientLayout({ children }: { children: React.ReactNode }) {
   // Get the patient ID from the route params and current pathname
@@ -84,25 +99,64 @@ export default function PatientLayout({ children }: { children: React.ReactNode 
         patientId={patientId}
         patientName={patientName} 
         currentPage={activeTab !== 'overview' ? patientNavigation.find(item => item.current)?.name : undefined}
-        actionButtons={
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="ml-auto">
-                <MoreVertical className="h-5 w-5" />
-                <span className="sr-only">Patient Actions</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => alert('Navigate to Patient Details...')}>
-                Patient Details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => alert('Open Add Note modal...')}>
-                Add Note
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        }
+        
       />
+
+      {/* Patient Header Section */}
+      {selectedPatient && (
+        <div className="bg-white shadow-sm rounded-lg p-2">
+          {/* Header row: initials left, kebab right (mobile only) */}
+          <div className="flex flex-row items-center justify-between w-full mb-2">
+            {/* Patient initials avatar */}
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-lg">
+                {selectedPatient.firstName && selectedPatient.lastName
+                  ? `${selectedPatient.firstName[0]}${selectedPatient.lastName[0]}`.toUpperCase()
+                  : 'PT'}
+              </div>
+            </div>
+            {/* Mobile three-dot menu */}
+            <div className="flex justify-end md:hidden">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" aria-label="Open patient menu">
+                    <MoreVertical className="w-5 h-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {patientNavigation.map((item) => (
+                    <DropdownMenuItem asChild key={item.name}>
+                      <Link href={item.href} className={classNames(item.current ? 'text-indigo-600 font-semibold' : '', 'w-full block')}>{item.name}</Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          {/* Badges and MRN info row */}
+          <div className="flex items-center gap-2 mt-2">
+            {selectedPatient.status && (
+              <Badge variant="outline" className={getStatusColor(selectedPatient.status)}>
+                {selectedPatient.status}
+              </Badge>
+            )}
+            {selectedPatient.levelOfCare && (
+              <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
+                {selectedPatient.levelOfCare}
+              </Badge>
+            )}
+            {selectedPatient.sobrietyDate && (
+              <Badge variant="outline" className="bg-green-100 text-green-800 border-green-200">
+                {selectedPatient.sobrietyDate}
+              </Badge>
+            )}
+            {selectedPatient.mrn && (
+              <span className="text-sm text-gray-500">MRN: {selectedPatient.mrn}</span>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-row w-full">
         {/* Sidebar Navigation */}
         <nav aria-label="Sidebar" className="md:flex w-48 flex-shrink-0 pr-4 border-r border-gray-200 hidden">

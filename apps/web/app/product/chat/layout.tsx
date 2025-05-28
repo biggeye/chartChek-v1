@@ -24,6 +24,10 @@ export default function ChatLayout({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  useEffect(() => {
+    console.log('[ChatLayout] Rendering layout. isMobile:', isMobile);
+  });
+
   return (
     <div className="relative flex">
       {children}

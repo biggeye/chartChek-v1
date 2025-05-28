@@ -1,0 +1,158 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# ChartChek Architectural Pattern
+
+This document defines the architectural patterns and conventions for the ChartChek application.
+
+## Core Architecture
+
+### Service Layer Organization
+- **Client Services** (`/lib/services/*`)
+  - Handle internal API interactions
+  - Use camelCase naming
+  - Follow service->store->hook pattern
+  - Example: `usePatientService.ts`
+
+- **Server Services** (`/lib/kipu/service/*`)
+  - Handle KIPU EMR API interactions
+  - Use hyphen-case for endpoints
+  - Maintain clear separation from internal routes
+  - Example: `patientStatistics.ts`
+
+### Transformation Layer
+The transformation layer is critical for EMR data enhancement and future extensibility:
+
+```typescript
+// Pattern for transformation monitoring
+interface TransformationMetric {
+  id: string;
+  source: string;  // EMR source identifier
+  targetModel: string;
+  timestamp: string;
+  duration: number;
+  success: boolean;
+  errorType?: string;
+  errorMessage?: string;
+}
+
+// Usage with HOC pattern
+const transformedFunction = withTransformationMonitoring(
+  originalTransform,
+  'TargetModel'
+);
+```
+
+### State Management
+- Zustand is the exclusive store provider
+- Stores should only handle state, not business logic
+- Follow the pattern:
+  ```typescript
+  // Store definition
+  interface Store {
+    state: State;
+    actions: Actions;
+  }
+  
+  // Hook usage
+  const { state, actions } = useStore();
+  ```
+
+### API Routes
+- Clear separation between external (EMR) and internal routes
+- Facility ID "0" universally designates "All Facilities" operations
+- Routes follow Next.js App Router conventions
+- API endpoints use hyphen-case
+
+### Statistics Services Pattern
+Follow the established statistics service pattern for new monitoring implementations:
+
+1. Define types:
+```typescript
+interface Statistics {
+  metrics: {
+    daily: Aggregates;
+    weekly: Aggregates;
+    monthly: Aggregates;
+  };
+  additional_data: AdditionalData;
+}
+```
+
+2. Implement service:
+```typescript
+async function calculateStatistics(
+  credentials: Credentials,
+  dateRange: DateRange
+): Promise<Statistics> {
+  // Fetch data
+  const [daily, weekly, monthly] = await Promise.all([
+    fetchData(dateRange.daily),
+    fetchData(dateRange.weekly),
+    fetchData(dateRange.monthly)
+  ]);
+
+  // Process and return
+  return {
+    metrics: {
+      daily: processData(daily),
+      weekly: processData(weekly),
+      monthly: processData(monthly)
+    },
+    additional_data: processAdditionalData(data)
+  };
+}
+```
+
+### Error Handling
+- Use typed error responses
+- Implement consistent error boundaries
+- Log errors with appropriate context
+- Transform external errors to internal format
+
+### Testing
+- Unit tests for transformation functions
+- Integration tests for API routes
+- E2E tests for critical paths
+- Mock external EMR responses
+
+## Best Practices
+
+### Code Organization
+- Group related functionality in feature directories
+- Use barrel exports (index.ts) for public APIs
+- Keep transformation logic separate from UI
+- Follow SRP (Single Responsibility Principle)
+
+### Naming Conventions
+- Client-side: camelCase
+- Server-side: hyphen-case
+- Clear, descriptive names that indicate purpose
+- Consistent prefix/suffix for related items
+
+### Type Safety
+- Use TypeScript strict mode
+- Define interfaces for all data structures
+- Use discriminated unions for complex states
+- Avoid any unless absolutely necessary
+
+### Performance
+- Implement appropriate caching strategies
+- Use React.memo for expensive components
+- Batch related state updates
+- Optimize API calls with proper date ranges
+
+### Security
+- Validate all inputs
+- Sanitize EMR data
+- Use proper authentication checks
+- Follow HIPAA compliance requirements
+
+## Future Considerations
+- Support for multiple EMR systems
+- Extensible transformation pipeline
+- Enhanced monitoring capabilities
+
+- Automated testing improvements 

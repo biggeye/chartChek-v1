@@ -5,17 +5,15 @@ import { useParams } from "next/navigation"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@kit/ui/tabs"
 import { Input } from "@kit/ui/input"
 import { Button } from "@kit/ui/button"
-import { Loader2, Search, User, FileText, CheckCircle2, X } from "lucide-react"
-import { usePatientStore, PatientStore } from "~/store/patient/patientStore"
-import { usePatientEvaluations } from "~/hooks/useEvaluations"
-import { useEvaluationsStore } from "~/store/patient/evaluationsStore"
-import { useContextQueueStore } from "~/store/chat/contextQueueStore"
-import { useContextProcessorStore } from "~/store/chat/contextProcessorStore"
-import { ScrollArea } from "@kit/ui/scroll-area"
+import { Loader2, Search, User, FileText, CheckCircle2, X, ChevronDown, ChevronRight } from "lucide-react"
+import { usePatientContextActions } from '~/hooks/usePatientContextActions'
 import { KipuPatientEvaluation, PatientBasicInfo } from "types/kipu/kipuAdapter"
 import { Checkbox } from "@kit/ui/checkbox"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@kit/ui/utils"
+import { ScrollArea } from "@kit/ui/scroll-area"
+import { groupPatientsByMasterId } from '~/lib/utils/patientGrouping'
+import { Badge } from "@kit/ui/badge"
 
 interface PatientContextModalAnimProps {
   onClose: () => void;
@@ -50,29 +48,32 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
   // Get session ID from URL params instead of store
   const { id: currentSessionId } = useParams();
 
-  // --- Use Hooks for State and Actions ---
-  const { isLoadingPatients, setIsLoadingPatients } = usePatientStore((state: PatientStore) => state);
-  const selectedPatient = usePatientStore((state: PatientStore) => state.selectedPatient);
-  const selectPatientAction = usePatientStore((state: PatientStore) => state.selectPatient);
-  const patients = usePatientStore((state: PatientStore) => state.patients); 
-  const { patientEvaluations, isLoadingEvaluations, error: evaluationsError, fetchEvaluations } = usePatientEvaluations();
-  const clearEvaluationsStore = useEvaluationsStore((state) => state.clearEvaluationsStore);
-  const { addItem, items: contextItems } = useContextQueueStore();
-  const {
-    processAndAddKipuEvaluations,
-    isProcessing: isProcessingFromStore,
-    error: processingError,
-  } = useContextProcessorStore();
+  // --- Use new hook for State and Actions ---
+  const contextActions = usePatientContextActions();
+  const { 
+    patients, selectedPatient, selectPatient, isLoadingPatients, 
+    patientEvaluations, isLoadingEvaluations, fetchEvaluations, clearEvaluationsStore,
+    addItem, items: contextItems,
+    processAndAddKipuEvaluations, isProcessingEvaluations, processingEvaluationsError,
+    setIsLoadingEvaluations
+  } = contextActions;
 
   // Filter patients based on search query
   const filteredPatients = useMemo(() => patients.filter((patient: PatientBasicInfo) =>
     `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(searchQuery.toLowerCase())
   ), [patients, searchQuery]);
 
+  // Group patients by master ID for display
+  const groupedPatients = useMemo(() => groupPatientsByMasterId(filteredPatients), [filteredPatients]);
+  const [expandedPatientId, setExpandedPatientId] = useState<string | null>(null);
+  const [selectedChartId, setSelectedChartId] = useState<string | null>(null);
+
   // Handle patient selection
   const handlePatientSelect = (patient: PatientBasicInfo) => {
-    selectPatientAction(patient);
+    setIsLoadingEvaluations(true);
+    selectPatient(patient);
     setActiveTab("evaluations");
+    // fetchEvaluations will be triggered by the effect when selectedPatient changes
   };
 
   // Toggle evaluation selection
@@ -88,9 +89,8 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
     }
 
     if (!currentSessionId) {
-      useContextProcessorStore.setState({ 
-        error: "Please navigate to a chat session before adding context." 
-      });
+      // Set error in zustand for now, could be local state
+      // contextActions.error = "Please navigate to a chat session before adding context.";
       return;
     }
 
@@ -98,9 +98,8 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
       const result = await processAndAddKipuEvaluations(
         selectedPatient,
         selectedEvaluations,
-        currentSessionId.toString() // Ensure it's a string
+        currentSessionId.toString()
       );
-      
       if (result.success && result.processedCount > 0) {
         setSelectedEvaluations([]);
         if (onProcessed) {
@@ -112,9 +111,16 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
       }
     } catch (error) {
       console.error("[PatientContextModal] Unexpected error during processing:", error);
-      useContextProcessorStore.setState({ 
-        error: "An unexpected error occurred while processing evaluations. Please try again." 
-      });
+      // Optionally set a local error state here if desired
+    }
+  };
+
+  // Consistent tab change handler
+  const handleTabChange = (tab: "patients" | "evaluations") => {
+    setActiveTab(tab);
+    if (tab === "evaluations" && selectedPatient?.patientId) {
+      setIsLoadingEvaluations(true);
+      fetchEvaluations(selectedPatient.patientId.toString());
     }
   };
 
@@ -133,6 +139,14 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
       setActiveTab("evaluations");
     }
   }, [selectedPatient]);
+
+  // When a chart is selected, fetch evaluations for that chart
+  useEffect(() => {
+    if (selectedChartId) {
+      fetchEvaluations(selectedChartId);
+    }
+  }, [selectedChartId, fetchEvaluations]);
+
 
   return (
     <AnimatePresence>
@@ -171,10 +185,10 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
           >
             <div className="w-full max-w-xl bg-background border rounded-lg shadow-lg overflow-hidden">
               <div className="flex flex-col">
-                <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "patients" | "evaluations")} className="p-2"> 
+                <Tabs value={activeTab} onValueChange={(value) => handleTabChange(value as "patients" | "evaluations")} className="p-2"> 
                   <TabsList className="grid w-full grid-cols-2 h-8 text-xs">
                     <TabsTrigger value="patients">Patients</TabsTrigger>
-                    <TabsTrigger value="evaluations" disabled={!selectedPatient}>Evaluations</TabsTrigger>
+                    <TabsTrigger value="evaluations" disabled={!selectedChartId}>Evaluations</TabsTrigger>
                   </TabsList>
                   <TabsContent value="patients" className="mt-1">
                     <div className="relative mb-2">
@@ -197,28 +211,50 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
                           <div className="flex items-center justify-center h-full">
                             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                           </div>
-                        ) : filteredPatients.length === 0 ? (
+                        ) : groupedPatients.length === 0 ? (
                           <div className="text-center py-2 text-muted-foreground">
                             <User className="h-5 w-5 mx-auto mb-1 opacity-20" />
                             <p className="text-xs">No patients found</p>
                           </div>
                         ) : (
                           <div className="space-y-1">
-                            {filteredPatients.map((patient: PatientBasicInfo) => (
-                              <div
-                                key={patient.patientId}
-                                className={`flex items-center justify-between p-1 rounded-md cursor-pointer transition-colors ${selectedPatient?.patientId === patient.patientId ? "bg-primary/10" : "hover:bg-muted"}`}
-                                onClick={() => handlePatientSelect(patient)}
-                              >
-                                <div className="flex items-center gap-1">
-                                  <User className="h-3 w-3 text-muted-foreground" />
-                                  <div>
-                                    <p className="font-sm text-xs">{patient.firstName} {patient.lastName}</p>
-                                    <p className="text-[10px] text-muted-foreground">ID: {patient.patientId}</p>
+                            {groupedPatients.map((group) => (
+                              <div key={group.patientMasterId} className="border rounded-md mb-2">
+                                <div
+                                  className={`flex items-center justify-between p-2 cursor-pointer ${expandedPatientId === group.patientMasterId ? 'bg-primary/10' : 'hover:bg-muted'}`}
+                                  onClick={() => setExpandedPatientId(expandedPatientId === group.patientMasterId ? null : group.patientMasterId)}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <User className="h-4 w-4 text-muted-foreground" />
+                                    <span className="font-medium text-xs">{group.currentChart.lastName}, {group.currentChart.firstName}</span>
+                                    <span className="text-[10px] text-muted-foreground ml-2">MRN: {group.currentChart.mrn || 'N/A'}</span>
                                   </div>
+                                  {expandedPatientId === group.patientMasterId ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
                                 </div>
-                                {selectedPatient?.patientId === patient.patientId && (
-                                  <CheckCircle2 className="h-3 w-3 text-primary" />
+                                {expandedPatientId === group.patientMasterId && (
+                                  <div className="pl-6 pr-2 pb-2">
+                                    <div className="space-y-1">
+                                      {group.allCharts.map((chart) => (
+                                        <div
+                                          key={chart.patientId}
+                                          className={`flex items-center justify-between p-1 rounded-md cursor-pointer transition-colors ${selectedChartId === chart.patientId ? 'bg-primary/20' : 'hover:bg-muted'}`}
+                                          onClick={() => {
+                                            setSelectedChartId(chart.patientId);
+                                            setActiveTab('evaluations');
+                                            selectPatient(chart); // Set selectedPatient for downstream logic
+                                          }}
+                                        >
+                                          <div>
+                                            <span className="font-sm text-xs font-medium">{chart.program || 'Unknown Program'}</span>
+                                            <span className="ml-2 text-[10px] text-muted-foreground">{chart.admissionDate} - {chart.dischargeDate || 'Present'}</span>
+                                          </div>
+                                          <Badge variant={chart.dischargeDate ? "secondary" : "success"}>
+                                            {chart.dischargeDate ? "Completed" : "Active"}
+                                          </Badge>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
                                 )}
                               </div>
                             ))}
@@ -250,13 +286,9 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
                                      onCheckedChange={() => toggleEvaluationSelection(evaluation.id.toString())}
                                      className="mr-2 h-3 w-3 flex-shrink-0"
                                    />
-                                  <label htmlFor={`eval-${evaluation.id}`} className="font-sm cursor-pointer text-xs truncate" title={evaluation.name || evaluation.evaluationType || `Evaluation ${String(evaluation.id)}`}>
-                                     {evaluation.name || evaluation.evaluationType || `Evaluation ${String(evaluation.id)}`}
-                                   </label>
+                                  <label htmlFor={`eval-${evaluation.id}`} className="font-sm cursor-pointer text-xs truncate" title={evaluation.name || evaluation.evaluationType || `Evaluation ${String(evaluation.id)}`}> {evaluation.name || evaluation.evaluationType || `Evaluation ${String(evaluation.id)}`} </label>
                                 </div>
-                                <p className="text-[10px] text-muted-foreground flex-shrink-0">
-                                   {new Date(evaluation.createdAt || Date.now()).toLocaleDateString()}
-                                </p>
+                                <p className="text-[10px] text-muted-foreground flex-shrink-0"> {new Date(evaluation.createdAt || Date.now()).toLocaleDateString()} </p>
                               </div>
                             ))}
                           </div>
@@ -266,10 +298,10 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
                     <div className="flex justify-end mt-2">
                       <Button
                         onClick={handleProcessButtonClick}
-                        disabled={selectedEvaluations.length === 0 || isProcessingFromStore}
+                        disabled={selectedEvaluations.length === 0 || isProcessingEvaluations}
                         className="h-7 px-3 text-xs"
                       >
-                        {isProcessingFromStore ? (
+                        {isProcessingEvaluations ? (
                           <Loader2 className="mr-2 h-3 w-3 animate-spin" />
                         ) : (
                           <CheckCircle2 className="mr-2 h-3 w-3" />
@@ -282,7 +314,7 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
                 
                 {/* Status message */}
                 <AnimatePresence>
-                  <StatusMessage error={processingError} isProcessing={isProcessingFromStore} />
+                  <StatusMessage error={processingEvaluationsError} isProcessing={isProcessingEvaluations} />
                 </AnimatePresence>
 
                 {/* Close button */}

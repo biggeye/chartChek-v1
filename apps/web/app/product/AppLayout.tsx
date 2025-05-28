@@ -38,11 +38,10 @@ import Loading from '~/admin/loading';
 import { ChatHistory } from '~/components/chat/chat-history';
 
 const navigation = [
-  { name: 'Dashboard', href: '#', icon: HomeIcon },
+  { name: 'Dashboard', href: '/product', icon: HomeIcon },
   { name: 'Chat', href: '/product/chat', icon: ChatBubbleBottomCenterIcon },
   { name: 'Patients', href: '/product/patients', icon: UsersIcon },
   { name: 'Documents', href: '/product/documents', icon: FolderIcon },
-  { name: 'Records', href: '/product/records', icon: FileLockIcon },
 ]
 
 function classNames(...classes: (string | boolean | undefined)[]) {
@@ -55,13 +54,15 @@ interface AppLayoutProps {
   account_id: string;
   username: string;
   avatarUrl: string | null;
+  email: string | null;
 }
 
 export default function AppLayout({
   children,
   account_id,
   username,
-  avatarUrl
+  avatarUrl,
+  email
 }: AppLayoutProps) {
   const isLoadingPatients = usePatientStore(useCallback(state => state.isLoadingPatients, []));
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -159,7 +160,7 @@ export default function AppLayout({
                                   aria-hidden="true"
                                   className={classNames(
                                     isActive ? 'text-primary dark:text-primary' : 'text-indigo_dye-300 group-hover:text-primary dark:text-mint_green-700 dark:group-hover:text-primary',
-                                    'size-6 shrink-0',
+                                    'size-9 shrink-0',
                                   )}
                                 />
                                 {item.name}
@@ -277,23 +278,18 @@ export default function AppLayout({
         </div>
         <div
           className={cn(
-            'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-all duration-300 ease-in-out relative', // Added relative positioning
-            isDesktopSidebarCollapsed ? 'lg:w-20' : 'lg:w-72'
+            'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-all duration-300 ease-in-out relative',
+            isDesktopSidebarCollapsed ? 'lg:w-20' : 'lg:w-54'
           )}
         >
-
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r border-border bg-background px-6 pb-4">
-            <div className="flex h-16 shrink-0 items-center">
-              <AppLogo className="h-14" />
-
+          <div className="flex grow flex-col gap-y-3 overflow-y-auto border-r border-border bg-background px-3 pb-2">
+            <div className="flex h-14 shrink-0 items-center">
+              <AppLogo className="h-10" />
             </div>
-            {!isDesktopSidebarCollapsed && (
-              <FacilitySelector variant='sidebar' />
-            )}
             <nav className="flex flex-1 flex-col">
-              <ul role="list" className="flex flex-1 flex-col gap-y-7">
+              <ul role="list" className="flex flex-1 flex-col gap-y-4">
                 <li>
-                  <ul role="list" className="-mx-2 space-y-1">
+                  <ul role="list" className="-mx-1 space-y-1">
                     {navigation.map((item) => {
                       const isActive = item.href === '#' ? pathname === '/product' : pathname.startsWith(item.href);
 
@@ -305,14 +301,14 @@ export default function AppLayout({
                               isActive
                                 ? 'bg-mint_green-600 text-primary dark:bg-indigo_dye-400 dark:text-primary'
                                 : 'text-indigo_dye-400 hover:bg-mint_green-700 hover:text-primary dark:text-mint_green-700 dark:hover:bg-indigo_dye-300 dark:hover:text-primary',
-                              'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                              'group flex gap-x-2 rounded-md p-1.5 text-sm font-semibold items-center',
                             )}
                           >
                             <item.icon
                               aria-hidden="true"
                               className={classNames(
                                 isActive ? 'text-primary dark:text-primary' : 'text-indigo_dye-300 group-hover:text-primary dark:text-mint_green-700 dark:group-hover:text-primary',
-                                'size-6 shrink-0',
+                                'h-5 w-5 shrink-0',
                               )}
                             />
                             {!isDesktopSidebarCollapsed && <span className="truncate">{item.name}</span>}
@@ -323,25 +319,38 @@ export default function AppLayout({
                     }
                   </ul>
                 </li>
+                {!isDesktopSidebarCollapsed && (
+                  <>
+                    <li className="my-2">
+                      <hr className="border-border" />
+                    </li>
+                    <li>
+                      <FacilitySelector variant='sidebar' />
+                    </li>
+                  </>
+                )}
               </ul>
             </nav>
             {!isDesktopSidebarCollapsed && (
-              <ul role="list" className="mt-auto">
-                <li className="-mx-6">
+              <div className="mt-auto mb-2 flex items-center justify-center gap-x-2">
+                <div className="relative group">
                   <Link
-                    href="/product/settings" // Updated href from /product/profile
-                    className="flex items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-foreground hover:bg-accent"
+                    href="/product/settings"
+                    className="flex items-center justify-center h-10 w-10 rounded-full bg-secondary border border-border hover:bg-accent transition-colors"
                   >
                     {avatarUrl ? (
-                      <img src={avatarUrl} alt="Your profile picture" className="h-8 w-8 rounded-full bg-secondary object-cover" />
+                      <img src={avatarUrl} alt="Your profile picture" className="h-7 w-7 rounded-full object-cover" />
                     ) : (
-                      <UserCircleIcon className="h-8 w-8 rounded-full bg-secondary text-muted-foreground" />
+                      <UserCircleIcon className="h-7 w-7 rounded-full text-primary" />
                     )}
                     <span className="sr-only">Your profile</span>
-                    <span aria-hidden="true">{username}</span>
                   </Link>
-                </li>
-              </ul>
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block px-2 py-1 rounded bg-black text-white text-xs whitespace-nowrap z-50">
+                    {email || 'No email'}
+                  </div>
+                </div>
+                <ThemeSwitcher variant="switch" />
+              </div>
             )}
           </div>
           {!isDesktopSidebarCollapsed && (
@@ -366,7 +375,7 @@ export default function AppLayout({
   
           <main className={cn(
             'transition-all duration-3000 ease-in-out bg-background h-[90vh] pt-5',
-            isDesktopSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-72'
+            isDesktopSidebarCollapsed ? 'lg:pl-20' : 'lg:pl-54'
           )}>
             <div className="h-[calc(100%-4rem)] lg:h-full px-4 sm:px-6 lg:px-8">{children}</div>
           </main>

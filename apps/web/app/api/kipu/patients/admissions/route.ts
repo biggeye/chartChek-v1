@@ -39,7 +39,7 @@ export async function GET(request: NextRequest) {
     const end_date = searchParams.get('end_date');
 
     const pageNumber = Number(searchParams.get('page')) || 1;
-    const response = await kipuGetPatientsAdmissions(kipuCredentials, pageNumber, 20, start_date || '1990-01-01', end_date || '2030-12-31');
+    const response = await kipuGetPatientsAdmissions(kipuCredentials, pageNumber, 20, start_date || "1980-01-01", end_date || "2030-12-31");
   
     if (!response.success || !response.data) {
       return NextResponse.json(

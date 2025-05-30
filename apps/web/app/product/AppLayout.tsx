@@ -135,7 +135,7 @@ export default function AppLayout({
               {/* Sidebar component, swap this element with another sidebar if you like */}
               <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-accent/20 px-6 pb-2">
                 <div className="flex h-16 shrink-0 items-center">
-                  <AppLogo className="h-8 w-auto" />
+                  <AppLogo className="h-6" />
                 </div>
                 <nav className="flex flex-1 flex-col">
                   <ul role="list" className="flex flex-1 flex-col gap-y-7">
@@ -279,10 +279,10 @@ export default function AppLayout({
         <div
           className={cn(
             'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:flex-col transition-all duration-300 ease-in-out relative',
-            isDesktopSidebarCollapsed ? 'lg:w-20' : 'lg:w-54'
+            isDesktopSidebarCollapsed ? 'lg:w-12' : 'lg:w-35'
           )}
         >
-          <div className="flex grow flex-col gap-y-3 overflow-y-auto border-r border-border bg-background px-3 pb-2">
+          <div className="flex grow flex-col gap-y-3 overflow-y-auto border-r border-border bg-background px-2 pb-2">
             <div className="flex h-14 shrink-0 items-center">
               <AppLogo className="h-10" />
             </div>
@@ -292,7 +292,6 @@ export default function AppLayout({
                   <ul role="list" className="-mx-1 space-y-1">
                     {navigation.map((item) => {
                       const isActive = item.href === '#' ? pathname === '/product' : pathname.startsWith(item.href);
-
                       return (
                         <li key={item.name}>
                           <Link
@@ -358,7 +357,7 @@ export default function AppLayout({
               onClick={() => setIsDesktopSidebarCollapsed(true)}
               className="absolute top-1/2 right-0 transform -translate-y-1/2 translate-x-1/2 z-50 bg-background border border-border rounded-full p-1.5 shadow-md hover:bg-accent"
             >
-              <span className="sr-only">Collapse Sidebar</span>
+              <span className="sr-only">Collapse Sidebar</span> 
               <ChevronLeftIcon className="h-5 w-5 text-foreground" />
             </button>
           )}

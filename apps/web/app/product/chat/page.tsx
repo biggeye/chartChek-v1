@@ -37,6 +37,5 @@ export default function ChatPage() {
     );
   }
 
-  console.log('[ChatPage] Rendering ChatPanel with sessionId:', currentSessionId);
   return <ChatPanel sessionId={currentSessionId} />;
 }

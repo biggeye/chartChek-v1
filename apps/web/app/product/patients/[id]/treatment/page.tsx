@@ -112,6 +112,18 @@ export default function PatientTreatmentPlan() {
     // We don't need selectedPatient here unless we filter activities by it
     // if (!selectedPatient) return;
     
+    // --- DEBUG LOGS ---
+    console.log('--- DEBUG: Raw patientEvaluations ---', patientEvaluations);
+    console.log('--- DEBUG: Requirements ---', requirements);
+    // --- END DEBUG LOGS ---
+
+    // Helper to normalize status
+    const isCompleted = (status: string | undefined) => {
+      if (!status) return false;
+      const s = status.toLowerCase();
+      return s === 'completed' || s === 'complete';
+    };
+    
     const activities: TimelineActivity[] = [];
     // const evaluations = useEvaluationsStore.getState().patientEvaluations; // Remove direct store access
     
@@ -144,7 +156,19 @@ export default function PatientTreatmentPlan() {
     activities.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort newest first
     
     setTimelineActivities(activities);
-  }, [patientEvaluations]); // Run effect when evaluations data changes
+
+    // --- DEBUG: Compliance mapping for each type ---
+    ['admission', 'daily', 'cyclic'].forEach((type) => {
+      const reqs = requirements.filter(r => r.requirement === type);
+      reqs.forEach(req => {
+        const matches = patientEvaluations.filter(ev =>
+          String(ev.evaluationId) === String(req.evaluation_id) && isCompleted(ev.status)
+        );
+        console.log(`[DEBUG] Type: ${type}, Requirement:`, req, 'Normalized Matches:', matches);
+      });
+    });
+    // --- END DEBUG ---
+  }, [patientEvaluations, requirements]); // Run effect when evaluations data changes
 
   // Normalize patientEvaluations for dashboard
   const normalizedPatientEvaluations = (patientEvaluations || []).map(ev => ({
@@ -225,26 +249,37 @@ export default function PatientTreatmentPlan() {
               {['admission', 'daily', 'cyclic'].map((type) => {
                 // Requirements for this type
                 const reqs = requirements.filter(r => r.requirement === type);
-                let required = 0;
                 let completed = 0;
-                if (type === 'admission') {
-                  required = reqs.length;
-                  completed = reqs.filter(req =>
-                    patientEvaluations.some(ev => (ev.evaluationId || ev.id) === req.evaluation_id && ev.status === 'completed')
-                  ).length;
-                } else {
-                  reqs.forEach(req => {
-                    if (type === 'daily') {
-                      required = daysSinceAdmission;
-                      completed += patientEvaluations.filter(ev => (ev.evaluationId || ev.id) === req.evaluation_id && ev.status === 'completed').length;
-                    } else if (type === 'cyclic') {
-                      required = Math.floor(daysSinceAdmission / cycleLength);
-                      completed += patientEvaluations.filter(ev => (ev.evaluationId || ev.id) === req.evaluation_id && ev.status === 'completed').length;
-                    }
-                  });
+                let open = 0;
+                let missing = 0;
+                reqs.forEach(req => {
+                  const matches = patientEvaluations.filter(ev => String(ev.evaluationId) === String(req.evaluation_id));
+                  if (matches.length === 0) {
+                    missing++;
+                  } else if (matches.some(ev => {
+                    const s = (ev.status || '').toLowerCase();
+                    return s === 'completed' || s === 'complete';
+                  })) {
+                    completed++;
+                  } else if (matches.some(ev => (ev.status || '').toLowerCase() === 'open')) {
+                    open++;
+                  } else {
+                    missing++;
+                  }
+                });
+                const required = reqs.length;
+                const percent = required > 0 ? ((completed + open) / required) * 100 : 0;
+                // Color logic
+                let color = '#e5e7eb'; // gray by default
+                if (missing > 0) {
+                  color = '#e5e7eb'; // gray if any missing
+                } else if (completed === required) {
+                  color = '#10b981'; // green if all completed
+                } else if (open === required) {
+                  color = '#fbbf24'; // yellow if all open
+                } else if (completed + open === required) {
+                  color = '#fbbf24'; // yellow if mix of open and completed
                 }
-                // Avoid division by zero
-                const percent = required > 0 ? (completed / required) * 100 : 0;
                 return (
                   <div key={type} className="flex flex-col items-center">
                     <div className="mb-2 font-semibold capitalize">{type}</div>
@@ -253,7 +288,7 @@ export default function PatientTreatmentPlan() {
                         <circle cx="40" cy="40" r="36" stroke="#e5e7eb" strokeWidth="8" fill="none" />
                         <circle
                           cx="40" cy="40" r="36"
-                          stroke={type === 'admission' ? '#10b981' : type === 'daily' ? '#3b82f6' : '#f59e42'}
+                          stroke={color}
                           strokeWidth="8"
                           fill="none"
                           strokeDasharray={2 * Math.PI * 36}
@@ -263,7 +298,7 @@ export default function PatientTreatmentPlan() {
                       </svg>
                       <span className="text-lg font-bold z-10">{Math.round(percent)}%</span>
                     </div>
-                    <div className="text-xs text-gray-500 mt-1">{completed} / {required} completed</div>
+                    <div className="text-xs text-gray-500 mt-1">{completed + open} / {required} completed or open</div>
                   </div>
                 );
               })}

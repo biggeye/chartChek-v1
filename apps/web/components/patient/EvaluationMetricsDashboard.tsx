@@ -71,38 +71,63 @@ export default function EvaluationMetricsDashboard({ patientEvaluations, require
 
   // Group requirements by type
   const types: Array<'admission' | 'daily' | 'cyclic'> = ['admission', 'daily', 'cyclic'];
-  const typeColors: Record<'admission' | 'daily' | 'cyclic', string> = {
-    admission: '#10b981', // emerald-500
-    daily: '#3b82f6',     // blue-500
-    cyclic: '#f59e42',    // amber-500
+
+  // Status helpers
+  const getKipuStatus = (status: string | undefined) => {
+    if (!status) return '';
+    const s = status.toLowerCase();
+    if (s === 'completed' || s === 'complete') return 'Complete';
+    if (s === 'open') return 'In Progress';
+    return s.charAt(0).toUpperCase() + s.slice(1);
   };
 
-  // Get completed evaluations by type
-  const completedByType: Record<string, number> = { admission: 0, daily: 0, cyclic: 0 };
-  types.forEach(type => {
-    completedByType[type] = safePatientEvaluations.filter(
-      (e: any) => e.type === type && e.status === 'completed'
-    ).length;
-  });
+  // For each type, calculate progress and color
+  const progressByType: Record<'admission' | 'daily' | 'cyclic', { percent: number; color: string; completed: number; open: number; missing: number; total: number }> = {
+    admission: { percent: 0, color: '#e5e7eb', completed: 0, open: 0, missing: 0, total: 0 },
+    daily: { percent: 0, color: '#e5e7eb', completed: 0, open: 0, missing: 0, total: 0 },
+    cyclic: { percent: 0, color: '#e5e7eb', completed: 0, open: 0, missing: 0, total: 0 },
+  };
 
-  // Get required counts by type
-  const requiredByType: Record<string, number> = { admission: 0, daily: 0, cyclic: 0 };
   types.forEach(type => {
-    requiredByType[type] = safeRequirements.filter(r => r.requirement === type).length;
-  });
-
-  // Calculate percent complete for each type
-  const percentByType: Record<string, number> = { admission: 0, daily: 0, cyclic: 0 };
-  types.forEach(type => {
-    const required = requiredByType[type] ?? 1;
-    percentByType[type] = required > 0
-      ? ((completedByType[type] ?? 0) / required) * 100
-      : 0;
+    const reqs = safeRequirements.filter(r => r.requirement === type);
+    let completed = 0;
+    let open = 0;
+    let missing = 0;
+    reqs.forEach(req => {
+      const matches = safePatientEvaluations.filter(ev => String(ev.evaluationId) === String(req.evaluation_id));
+      if (matches.length === 0) {
+        missing++;
+      } else if (matches.some(ev => getKipuStatus(ev.status) === 'Complete')) {
+        completed++;
+      } else if (matches.some(ev => getKipuStatus(ev.status) === 'In Progress')) {
+        open++;
+      } else {
+        // If there are matches but none are "Complete" or "In Progress", treat as missing
+        missing++;
+      }
+    });
+    const total = reqs.length;
+    let percent = 0;
+    if (total > 0) {
+      percent = ((completed + open) / total) * 100;
+    }
+    // Color logic
+    let color = '#e5e7eb'; // gray by default
+    if (missing > 0) {
+      color = '#e5e7eb'; // gray if any missing
+    } else if (completed === total) {
+      color = '#10b981'; // green if all completed
+    } else if (open === total) {
+      color = '#fbbf24'; // yellow if all open
+    } else if (completed + open === total) {
+      color = '#fbbf24'; // yellow if mix of open and completed
+    }
+    progressByType[type] = { percent, color, completed, open, missing, total };
   });
 
   // Calculate overall completion percentage
   const totalRequired = safeRequirements.length;
-  const totalCompleted = types.reduce((sum, type) => sum + (completedByType[type] ?? 0), 0);
+  const totalCompleted = types.reduce((sum, type) => sum + progressByType[type].completed, 0);
   const completionPercentage = totalRequired > 0 ? (totalCompleted / totalRequired) * 100 : 0;
 
   // Determine completion status color
@@ -177,9 +202,9 @@ export default function EvaluationMetricsDashboard({ patientEvaluations, require
           {types.map(type => (
             <CircleProgress
               key={type}
-              percent={percentByType[type] ?? 0}
+              percent={progressByType[type].percent}
               label={type.charAt(0).toUpperCase() + type.slice(1)}
-              color={typeColors[type] as string}
+              color={progressByType[type].color}
               onClick={() => setModalType(type)}
             />
           ))}

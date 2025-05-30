@@ -20,8 +20,6 @@ export default function HistoricalChatPage() {
   if (currentSessionId === 'undefined') {
     console.error('[HistoricalChatPage] sessionId is undefined!');
   }
-  console.log('[HistoricalChatPage] Rendering ChatPanel with sessionId:', currentSessionId);
-
   return (
     <div className="flex flex-col">
       <ChatPanel sessionId={currentSessionId} />

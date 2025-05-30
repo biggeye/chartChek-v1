@@ -47,9 +47,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { sessionId, messages, systemPrompt, context } = body as ChatRequestBody;
 
-
-
-  logger.info('[chat/route] Processing chat request', {
+  logger.info('[chat/route] Processing chat request', { 
     sessionId,
     hasContext: !!context,
     contextLength: Array.isArray(context) ? context.length : (context?.length ?? 0),
@@ -64,7 +62,9 @@ export async function POST(req: Request) {
       return new Response('Unauthorized', { status: 401, headers: NO_CACHE_HEADERS });
     }
 
-
+    
+    console.log('/api/chat] sessionId: ', sessionId);
+    console.log('/api/chat] user: ', userId);
     // Validate session ownership
     const { data: session, error: sessionError } = await supabase
       .from('chat_sessions')
@@ -108,8 +108,6 @@ Permitted Functions
   • Symptom overviews
   • Evidence‑based insights and considerations
 - Deliver comprehensive, context‑aware analyses of the patient's condition and treatments.
-- Create any document that the user requests using the provided context.
-- If the data is not available in the context, do not generate hypothetical data, instead ask the user to provide the required information.
 
 Data Handling & Privacy
 - Do not store or retain patient information between sessions.
@@ -133,7 +131,7 @@ ${combinedContext}`.trim();
     logger.debug('[chat/route] Final system prompt length:', { length: system.length });
 
     // Choose model
-    const model = openai('gpt-4.1-2025-04-14');
+    const model = google('gemini-2.5-pro-exp-03-25');
 
 
     // Only pass role and content to the model

@@ -1,6 +1,6 @@
 import { useUser } from '@kit/supabase/hooks/use-user';
 import { usePatientContextActions } from '~/hooks/usePatientContextActions';
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { MessageList } from '~/components/chat/message-list';
 import { MessageInput } from '~/components/chat/message-input';
 import { useEffect, useState, useCallback, useMemo } from 'react';
@@ -8,6 +8,7 @@ import { createClient } from '~/utils/supabase/client';
 import { Message } from 'ai';
 import { Loader } from '../loading';
 import { toast } from 'sonner';
+import { ContextQueue } from './context-queue';
 
 interface ChatPanelProps {
   sessionId: string;
@@ -54,7 +55,7 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
       toast.error('Could not save chat message.');
     }
   }, [sessionId]);
-
+  
   const {
     messages,
     input,
@@ -66,6 +67,10 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   } = useChat({
     api: '/api/chat',
     id: sessionId,
+    body: {
+      sessionId: sessionId,
+      context: getSelectedContent()
+    },
     onFinish: handleFinish,
     onError: (error) => {
       // TEMP: Log full error details

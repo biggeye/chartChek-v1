@@ -352,14 +352,45 @@ export const fetchUsersTool = createTool({
   },
 });
 
-export const tools = {
+export const generatePDFTool = createTool({
+  description: 'Generate a PDF for a patient. If a templateId is provided, use the structured evaluation template. Otherwise, generate a summary or narrative PDF.',
+  parameters: z.object({
+    patientId: z.string(),
+    requestText: z.string(),
+    templateId: z.string().optional(),
+  }),
+  async execute({ patientId, requestText, templateId }) {
+    // --- FORK LOGIC ---
+    if (templateId) {
+      // Structured path: fetch evaluation, render template as markdown
+      // TODO: Implement real evaluation fetching and markdown rendering
+      return {
+        previewMarkdown: `# Structured PDF Preview\n\nTemplate: ${templateId}\nPatient: ${patientId}\n\n`,
+        type: 'structured',
+        templateId,
+        patientId,
+      };
+    } else {
+      // Unstructured path: generate summary markdown
+      // TODO: Implement real summary generation from patient chart/context
+      return {
+        previewMarkdown: `Patient: ${patientId}\n\nSummary of request: ${requestText}\n\n`,
+        type: 'unstructured',
+        patientId,
+        requestText,
+      };
+    }
+  }
+});
+
+// Central registry for all chat tools
+export const toolRegistry = {
   fetchEvaluationTemplates: fetchEvaluationTemplatesTool,
   fetchPatientEvaluations: fetchPatientEvaluationsTool,
   createPatientEvaluation: createPatientEvaluationTool,
   fetchPatientAdmissions: fetchPatientAdmissionsTool,
   fetchPatientCensus: fetchPatientCensusTool,
   fetchPatientDetails: fetchPatientDetailsTool,
-  // New tools
   fetchAppointments: fetchAppointmentsTool,
   fetchAppointmentTypes: fetchAppointmentTypesTool,
   fetchCiwaArs: fetchCiwaArsTool,
@@ -371,4 +402,5 @@ export const tools = {
   fetchPatientDiagnosisHistory: fetchPatientDiagnosisHistoryTool,
   fetchProviders: fetchProvidersTool,
   fetchUsers: fetchUsersTool,
+  generatePDF: generatePDFTool,
 };

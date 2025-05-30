@@ -3,76 +3,93 @@ import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const NonMemoizedMarkdown = ({ children }: { children: string }) => {
+const BusinessMarkdown = ({ children }: { children: string }) => {
   const components = {
-    code: ({ node, inline, className, children, ...props }: any) => {
-      const match = /language-(\w+)/.exec(className || "");
-      return !inline && match ? (
-        <pre
-          {...props}
-          className={`${className} text-sm w-[80dvw] md:max-w-[500px] overflow-x-scroll bg-zinc-100 p-2 rounded mt-2 dark:bg-zinc-800`}
-        >
-          <code className={match[1]}>{children}</code>
-        </pre>
+    a: ({ node, children, ...props }: any) => (
+      <Link
+        className="text-blue-600 underline hover:text-blue-800"
+        target="_blank"
+        rel="noreferrer"
+        {...props}
+      >
+        {children}
+      </Link>
+    ),
+    table: ({ node, ...props }: any) => (
+      <table className="min-w-full border border-border my-4" {...props} />
+    ),
+    th: ({ node, ...props }: any) => (
+      <th className="border border-border px-3 py-2 bg-muted font-semibold" {...props} />
+    ),
+    td: ({ node, ...props }: any) => (
+      <td className="border border-border px-3 py-2" {...props} />
+    ),
+    blockquote: ({ node, ...props }: any) => (
+      <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-4" {...props} />
+    ),
+    img: ({ node, ...props }: any) => (
+      <img className="rounded-md my-4 max-w-full" {...props} />
+    ),
+    ul: ({ node, ...props }: any) => (
+      <ul className="list-disc ml-6 my-2" {...props} />
+    ),
+    ol: ({ node, ...props }: any) => (
+      <ol className="list-decimal ml-6 my-2" {...props} />
+    ),
+    li: ({ node, ...props }: any) => (
+      <li className="mb-1" {...props} />
+    ),
+    strong: ({ node, ...props }: any) => (
+      <strong className="font-semibold" {...props} />
+    ),
+    em: ({ node, ...props }: any) => (
+      <em className="italic" {...props} />
+    ),
+    h1: ({ node, ...props }: any) => (
+      <h1 className="text-4xl font-semibold mt-10 mb-4" {...props} />
+    ),
+    h2: ({ node, ...props }: any) => (
+      <h2 className="text-2xl font-semibold mt-8 mb-3" {...props} />
+    ),
+    h3: ({ node, ...props }: any) => (
+      <h3 className="text-xl font-semibold mt-6 mb-2" {...props} />
+    ),
+    h4: ({ node, ...props }: any) => (
+      <h4 className="text-lg font-medium mt-4 mb-2" {...props} />
+    ),
+    h5: ({ node, ...props }: any) => (
+      <h5 className="text-base font-medium mt-3 mb-1" {...props} />
+    ),
+    h6: ({ node, ...props }: any) => (
+      <h6 className="text-sm font-normal mt-2 mb-1" {...props} />
+    ),
+    p: ({ node, ...props }: any) => (
+      <p className="mb-4 leading-7" {...props} />
+    ),
+    code: ({ node, inline, className, children, ...props }: any) => (
+      inline ? (
+        <code className="px-1 py-0.5 bg-muted/50 rounded text-sm font-mono" {...props}>{children}</code>
       ) : (
-        <code
-          className={`${className} text-sm bg-zinc-100 dark:bg-zinc-800 py-0.5 px-1 rounded`}
-          {...props}
-        >
-          {children}
-        </code>
-      );
-    },
-    ol: ({ node, children, ...props }: any) => {
-      return (
-        <ol className="list-decimal list-outside ml-4" {...props}>
-          {children}
-        </ol>
-      );
-    },
-    li: ({ node, children, ...props }: any) => {
-      return (
-        <li className="py-1" {...props}>
-          {children}
-        </li>
-      );
-    },
-    ul: ({ node, children, ...props }: any) => {
-      return (
-        <ul className="list-decimal list-outside ml-4" {...props}>
-          {children}
-        </ul>
-      );
-    },
-    strong: ({ node, children, ...props }: any) => {
-      return (
-        <span className="font-semibold" {...props}>
-          {children}
-        </span>
-      );
-    },
-    a: ({ node, children, ...props }: any) => {
-      return (
-        <Link
-          className="text-blue-500 hover:underline"
-          target="_blank"
-          rel="noreferrer"
-          {...props}
-        >
-          {children}
-        </Link>
-      );
-    },
+        <pre className="overflow-x-auto bg-muted/50 rounded-md border p-4 text-sm font-mono my-4" {...props}>
+          <code>{children}</code>
+        </pre>
+      )
+    ),
+    hr: ({ node, ...props }: any) => (
+      <hr className="my-8 border-border" {...props} />
+    ),
   };
 
   return (
-    <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-      {children}
-    </ReactMarkdown>
+    <div className="markdoc">
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+        {children}
+      </ReactMarkdown>
+    </div>
   );
 };
 
 export const Markdown = React.memo(
-  NonMemoizedMarkdown,
+  BusinessMarkdown,
   (prevProps, nextProps) => prevProps.children === nextProps.children,
 );

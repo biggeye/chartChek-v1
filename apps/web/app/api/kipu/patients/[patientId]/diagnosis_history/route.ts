@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { serverLoadKipuCredentialsFromSupabase } from '~/lib/kipu/auth/server';
 import { createServer } from '~/utils/supabase/server';

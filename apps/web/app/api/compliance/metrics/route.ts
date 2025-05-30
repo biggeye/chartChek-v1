@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServer } from '~/utils/supabase/server';
 import { ComplianceMetricsResponse, ComplianceMetricsQueryParams } from '~/types/database';

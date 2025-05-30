@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextResponse } from "next/server"
 import { getFacilityStatistics, generateDateRanges } from "~/lib/kipu/stats/statisticsService"
 import { serverLoadKipuCredentialsFromSupabase } from "~/lib/kipu/auth/server"

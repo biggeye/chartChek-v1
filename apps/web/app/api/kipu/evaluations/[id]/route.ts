@@ -1,4 +1,5 @@
-  import { NextRequest, NextResponse } from 'next/server';
+export const runtime = 'nodejs';
+import { NextRequest, NextResponse } from 'next/server';
 import { serverLoadKipuCredentialsFromSupabase } from '~/lib/kipu/auth/server';
 import { KipuApiResponse } from '~/types/kipu/kipuAdapter';
 import { kipuServerGet } from '~/lib/kipu/auth/server';

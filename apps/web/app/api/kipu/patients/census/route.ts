@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServer } from '~/utils/supabase/server';
 import { kipuGetPatientsCensus } from '~/lib/kipu/service/patient-service';

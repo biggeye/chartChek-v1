@@ -4,6 +4,8 @@ import { kipuGetPatientsAdmissions } from '~/lib/kipu/service/patient-service';
 import { serverLoadKipuCredentialsFromSupabase } from '~/lib/kipu/auth/server';
 import { mapKipuPatientToPatientBasicInfo } from '~/lib/kipu/mapping';
 
+export const runtime = 'nodejs';
+
 /**
  * GET handler for listing patients in a facility
  * 

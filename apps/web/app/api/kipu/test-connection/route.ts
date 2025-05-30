@@ -10,6 +10,8 @@ import { kipuServerGet } from '~/lib/kipu/auth/server';
 import { createServer } from '~/utils/supabase/server';
 import { serverLoadKipuCredentialsFromSupabase } from '~/lib/kipu/auth/server';
 
+export const runtime = 'nodejs';
+
 /**
  * GET handler for testing KIPU API connection
  */

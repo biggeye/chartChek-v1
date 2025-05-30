@@ -1,5 +1,5 @@
-export const runtime = 'nodejs';
 'use server'
+export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { kipuListFacilities } from '~/lib/kipu/service/facility-service';
 import { createServer } from '~/utils/supabase/server';

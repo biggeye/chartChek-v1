@@ -14,6 +14,7 @@ import { cn } from "@kit/ui/utils"
 import { ScrollArea } from "@kit/ui/scroll-area"
 import { groupPatientsByMasterId } from '~/lib/utils/patientGrouping'
 import { Badge } from "@kit/ui/badge"
+import { useSessionManager } from "~/hooks/useSessionManager"
 
 interface PatientContextModalAnimProps {
   onClose: () => void;
@@ -44,9 +45,10 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
   const [activeTab, setActiveTab] = useState<"patients" | "evaluations">("patients")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedEvaluations, setSelectedEvaluations] = useState<string[]>([])
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  // Get session ID from URL params instead of store
-  const { id: currentSessionId } = useParams();
+  // Use the proper session manager for reliable session ID handling
+  const { currentSessionId } = useSessionManager();
 
   // --- Use new hook for State and Actions ---
   const contextActions = usePatientContextActions();
@@ -84,22 +86,35 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
 
   // Process selected evaluations and add to context queue
   const handleProcessButtonClick = async () => {
+    setLocalError(null);
+    console.log("[PatientContextModal] Button clicked", {
+      selectedPatient,
+      selectedEvaluations,
+      currentSessionId,
+      isProcessingEvaluations
+    });
+
     if (!selectedPatient || selectedEvaluations.length === 0) {
+      console.log("[PatientContextModal] Missing required data", { selectedPatient, selectedEvaluations });
+      setLocalError("Please select a patient and at least one evaluation.");
       return;
     }
 
     if (!currentSessionId) {
-      // Set error in zustand for now, could be local state
-      // contextActions.error = "Please navigate to a chat session before adding context.";
+      console.log("[PatientContextModal] No session ID found");
+      setLocalError("Please navigate to a chat session before adding context.");
       return;
     }
 
     try {
+      console.log("[PatientContextModal] Starting evaluation processing");
       const result = await processAndAddKipuEvaluations(
         selectedPatient,
         selectedEvaluations,
         currentSessionId.toString()
       );
+      console.log("[PatientContextModal] Processing result:", result);
+      
       if (result.success && result.processedCount > 0) {
         setSelectedEvaluations([]);
         if (onProcessed) {
@@ -108,10 +123,11 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
         onClose();
       } else if (result.error) {
         console.error("[PatientContextModal] Processing failed:", result.error);
+        setLocalError(result.error);
       }
     } catch (error) {
       console.error("[PatientContextModal] Unexpected error during processing:", error);
-      // Optionally set a local error state here if desired
+      setLocalError(error instanceof Error ? error.message : "An unexpected error occurred during processing.");
     }
   };
 
@@ -314,7 +330,10 @@ export function PatientContextModalAnim({ onClose, isOpen, onProcessed }: Patien
                 
                 {/* Status message */}
                 <AnimatePresence>
-                  <StatusMessage error={processingEvaluationsError} isProcessing={isProcessingEvaluations} />
+                  <StatusMessage 
+                    error={localError || processingEvaluationsError} 
+                    isProcessing={isProcessingEvaluations} 
+                  />
                 </AnimatePresence>
 
                 {/* Close button */}

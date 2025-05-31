@@ -28,7 +28,7 @@ Each instance of chartChek can be customized with facility-specific information.
 
 ---
 
-## ✨ Key Features
+## ✨ Key Features  (SOME UPCOMING MILESTONES)
 
 ### 🧠 AI-Powered Assistance
 - Vendor-agnostic

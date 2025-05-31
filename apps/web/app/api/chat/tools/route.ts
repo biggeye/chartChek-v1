@@ -1,6 +1,5 @@
+export const runtime = 'nodejs';
 import { toolRegistry } from '~/components/chat/tools';
-
-export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 

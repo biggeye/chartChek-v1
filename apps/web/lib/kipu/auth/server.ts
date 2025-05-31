@@ -1,3 +1,4 @@
+export const runtime = 'nodejs';
 /**
  * KIPU API Authentication Utilities
  * 

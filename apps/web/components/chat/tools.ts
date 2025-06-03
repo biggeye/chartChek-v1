@@ -67,7 +67,40 @@ export const createPatientEvaluationTool = createTool({
     if (!credentials) throw new Error('No KIPU credentials found for this user/facility.');
     const { createPatientEvaluationInKipu } = await import('~/lib/kipu/service/create-patient-evaluation');
     // File handling not supported in tool calls (for now)
-    return await createPatientEvaluationInKipu({ evaluationId, patientId, notes, items }, {});
+    return await createPatientEvaluationInKipu({ evaluationId, patientId, notes, items }, {}, credentials);
+  },
+});
+
+// --- AI: Complete Patient Evaluation Using LLM ---
+export const completePatientEvaluationWithAITool = createTool({
+  description: 'Use AI to automatically complete a patient evaluation based on available patient context and clinical information.',
+  parameters: z.object({
+    evaluationId: z.string().describe('The evaluation template ID to complete'),
+    patientId: z.string().describe('The patient ID to complete the evaluation for'),
+    contextSummary: z.string().optional().describe('Optional additional context or instructions for completion'),
+    reviewMode: z.boolean().optional().describe('If true, generates a draft for review rather than submitting immediately'),
+  }),
+  async execute({ evaluationId, patientId, contextSummary, reviewMode = false }) {
+    const supabase = await createServer();
+    const { data: { user } } = await supabase.auth.getUser();
+    const ownerId = user?.id;
+    
+    if (!ownerId) throw new Error('User not authenticated');
+    
+    const credentials = await serverLoadKipuCredentialsFromSupabase(ownerId);
+    if (!credentials) throw new Error('No KIPU credentials found for this user/facility.');
+    
+    // Import required services
+    const { completeEvaluationWithAI } = await import('~/lib/ai/evaluation-completion-service');
+    
+    return await completeEvaluationWithAI({
+      evaluationId,
+      patientId,
+      contextSummary,
+      reviewMode,
+      credentials,
+      ownerId
+    });
   },
 });
 
@@ -403,4 +436,5 @@ export const toolRegistry = {
   fetchProviders: fetchProvidersTool,
   fetchUsers: fetchUsersTool,
   generatePDF: generatePDFTool,
+  completePatientEvaluationWithAI: completePatientEvaluationWithAITool,
 };

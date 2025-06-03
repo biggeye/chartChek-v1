@@ -38,14 +38,34 @@ type DocumentMetadata = {
 
 // Helper function to dynamically load PDF.js
 async function loadPdfJs() {
-  // Only import PDF.js on the client side
-  if (typeof window === 'undefined') {
-    throw new Error('PDF parsing can only be performed in browser environments');
-  }
-  
   // Dynamic import of pdfjs-dist; type safety handled at runtime
   const pdfjs = await import('pdfjs-dist');
-  pdfjs.GlobalWorkerOptions.workerSrc = `${window.location.origin}/pdf.worker.min.mjs`;
+  
+  // Configure worker based on environment
+  const isServer = typeof window === 'undefined';
+  const pdfjsVersion = pdfjs.version || '3.11.174';
+  
+  if (isServer) {
+    // Server-side: Disable worker and use main thread processing
+    console.log(`[PDF Parser] Running in server environment with PDF.js version ${pdfjsVersion}`);
+    console.log('[PDF Parser] Using main thread processing for server-side PDF parsing');
+    
+    // Disable worker for server-side processing - this forces PDF.js to run in the main thread
+    pdfjs.GlobalWorkerOptions.workerSrc = false as any;
+    
+  } else {
+    // Client-side: Use web worker
+    console.log(`[PDF Parser] Running in browser environment with PDF.js version ${pdfjsVersion}`);
+    
+    try {
+      // Use a reliable CDN source with proper CORS headers
+      pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsVersion}/build/pdf.worker.min.js`;
+      console.log(`[PDF Parser] Using jsdelivr CDN worker for browser`);
+    } catch (workerError) {
+      console.warn('[PDF Parser] Worker setup issue, PDF.js will fall back to main thread processing');
+    }
+  }
+  
   return pdfjs;
 }
 
@@ -54,15 +74,31 @@ export async function parseAndChunkPdf(
   chunkSize: number,
   chunkOverlap: number,
 ): Promise<{ chunks: Chunk[]; metadata: DocumentMetadata }> {
+  const isServer = typeof window === 'undefined';
+  console.log(`[PDF Parser] Starting to parse PDF: ${file.name}, size: ${file.size} bytes (${isServer ? 'server' : 'client'} environment)`);
+  
   // Load PDF.js dynamically
   const pdfjs = await loadPdfJs();
 
   // Convert the file to an ArrayBuffer
   const arrayBuffer = await file.arrayBuffer()
 
-  // Load the PDF document
-  const loadingTask = pdfjs.getDocument({ data: arrayBuffer })
+  // Load the PDF document with configuration appropriate for the environment
+  const loadingTask = pdfjs.getDocument({ 
+    data: arrayBuffer,
+    verbosity: 0, // Reduce console spam
+    useSystemFonts: true,
+    disableFontFace: true, // Helps with compatibility
+    // Additional options for server-side processing
+    ...(isServer && {
+      disableAutoFetch: true,
+      disableStream: true,
+    })
+  })
+  
   const pdfDocument = await loadingTask.promise
+
+  console.log(`[PDF Parser] PDF loaded successfully. Pages: ${pdfDocument.numPages}`);
 
   // Extract metadata
   const metadata = await pdfDocument.getMetadata() as PDFMetadata
@@ -76,32 +112,50 @@ export async function parseAndChunkPdf(
     modificationDate: metadata.info?.ModDate ? new Date(metadata.info.ModDate) : undefined,
   }
 
+  console.log(`[PDF Parser] Extracted metadata:`, documentMetadata);
+
   // Extract text from each page
   const chunks: Chunk[] = []
 
   for (let pageNum = 1; pageNum <= pdfDocument.numPages; pageNum++) {
-    const page = await pdfDocument.getPage(pageNum)
-    const textContent = await page.getTextContent()
+    try {
+      console.log(`[PDF Parser] Processing page ${pageNum}/${pdfDocument.numPages}`);
+      
+      const page = await pdfDocument.getPage(pageNum)
+      const textContent = await page.getTextContent()
 
-    // Concatenate the text items
-    let pageText = textContent.items.map((item: any) => ("str" in item ? item.str : "")).join(" ")
+      // Concatenate the text items
+      let pageText = textContent.items.map((item: any) => ("str" in item ? item.str : "")).join(" ")
 
-    // Clean up the text (remove excessive whitespace)
-    pageText = pageText.replace(/\s+/g, " ").trim()
+      // Clean up the text (remove excessive whitespace)
+      pageText = pageText.replace(/\s+/g, " ").trim()
 
-    // Chunk the text
-    const pageChunks = chunkText(pageText, chunkSize, chunkOverlap)
+      console.log(`[PDF Parser] Page ${pageNum} text length: ${pageText.length} characters`);
 
-    // Add metadata to each chunk
-    pageChunks.forEach((text) => {
-      chunks.push({
-        text,
-        metadata: {
-          pageNumber: pageNum,
-        },
-      })
-    })
+      // Only process if there's meaningful content
+      if (pageText.length > 10) {
+        // Chunk the text
+        const pageChunks = chunkText(pageText, chunkSize, chunkOverlap)
+
+        // Add metadata to each chunk
+        pageChunks.forEach((text) => {
+          chunks.push({
+            text,
+            metadata: {
+              pageNumber: pageNum,
+            },
+          })
+        })
+      } else {
+        console.log(`[PDF Parser] Page ${pageNum} has minimal content, skipping`);
+      }
+    } catch (pageError) {
+      console.error(`[PDF Parser] Error processing page ${pageNum}:`, pageError);
+      // Continue with other pages even if one fails
+    }
   }
+
+  console.log(`[PDF Parser] Successfully created ${chunks.length} chunks from ${pdfDocument.numPages} pages`);
 
   return { chunks, metadata: documentMetadata }
 }

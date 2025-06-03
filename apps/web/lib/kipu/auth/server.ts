@@ -1,4 +1,3 @@
-
 /**
  * KIPU API Authentication Utilities
  * 
@@ -10,6 +9,8 @@ import { KipuCredentials, KipuApiResponse } from 'types/kipu/kipuAdapter';
 import { generateKipuAuthHeaders } from './signature';
 import { createServer } from '~/utils/supabase/server';
 import crypto from 'crypto';
+import { logger } from '~/lib/logger';
+import { Database } from '~/lib/database.types';
 
 // Flag to indicate if we're running on the server
 const isServer = typeof window === 'undefined';
@@ -170,6 +171,11 @@ export async function kipuServerGet<T>(
   }
 }
 
+// Helper function to generate MD5 hash for Content-MD5 header
+function generateMD5Hash(content: string): string {
+  return crypto.createHash('md5').update(content, 'utf8').digest('base64');
+}
+
 /**
  * Makes a POST request to the KIPU API
  * @param endpoint - API endpoint (without base URL)
@@ -194,20 +200,45 @@ export async function kipuServerPost<T>(
       ? formattedEndpoint 
       : `${formattedEndpoint}${separator}app_id=${credentials.appId}`;
     
-    // Convert body to JSON string
-    const bodyString = JSON.stringify(body);
+    let bodyString: string;
+    let contentType: string;
+    
+    // Handle FormData vs JSON
+    if (body instanceof FormData) {
+      // For FormData, we need to convert to string for MD5 calculation
+      const entries: string[] = [];
+      for (const [key, value] of body.entries()) {
+        if (value instanceof File) {
+          entries.push(`${key}=[FILE: ${value.name}]`);
+        } else {
+          entries.push(`${key}=${value}`);
+        }
+      }
+      bodyString = entries.join('&');
+      contentType = 'multipart/form-data'; // Note: boundary will be added by browser
+    } else {
+      // Convert body to JSON string
+      bodyString = JSON.stringify(body);
+      contentType = 'application/json';
+    }
+    
+    // Generate MD5 hash of the body content
+    const contentMD5 = generateMD5Hash(bodyString);
     
     // Generate authentication headers with body content
     const headers = generateKipuAuthHeaders('POST', endpointWithAppId, credentials, bodyString);
     
-    // Add content-type header
-    headers['Content-Type'] = 'application/json';
+    // Add required headers
+    headers['Content-MD5'] = contentMD5;
+    if (!(body instanceof FormData)) {
+      headers['Content-Type'] = contentType;
+    }
     
     // Make the request
     const response = await fetch(`${credentials.baseUrl}${endpointWithAppId}`, {
       method: 'POST',
       headers,
-      body: bodyString
+      body: body instanceof FormData ? body : bodyString
     });
     
     // Parse the response

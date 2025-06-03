@@ -114,6 +114,8 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
+    console.log('[API Route] POST /api/kipu/patient_evaluations - Starting');
+    
     // For multipart form data, we need to parse it differently
     const formData = await request.formData()
 
@@ -122,60 +124,74 @@ export async function POST(request: NextRequest) {
     const patientId = formData.get("patientId") as string
     const notes = formData.get("notes") as string
 
+    console.log('[API Route] Extracted form data:', { evaluationId, patientId, notes: notes?.length || 0 });
+
     // Validate required fields
     if (!evaluationId) {
+      console.log('[API Route] Missing evaluationId');
       return NextResponse.json({ error: "Evaluation ID is required" }, { status: 400 })
     }
 
     if (!patientId) {
+      console.log('[API Route] Missing patientId');
       return NextResponse.json({ error: "Patient ID is required" }, { status: 400 })
     }
 
-    // DEPRECATED: getKipuAuthHeaders/fetch. Use serverLoadKipuCredentialsFromSupabase + kipuServerPost
+    // Get credentials
+    console.log('[API Route] Loading KIPU credentials...');
     const credentials = await serverLoadKipuCredentialsFromSupabase();
     if (!credentials) {
+      console.log('[API Route] No KIPU credentials found');
       return NextResponse.json({ error: 'No KIPU credentials found for user/facility' }, { status: 500 });
     }
+
     // Parse items from formData if present
     let items: any[] = [];
     const itemsJson = formData.get('items');
     if (typeof itemsJson === 'string') {
       try {
         items = JSON.parse(itemsJson);
-      } catch {
+        console.log('[API Route] Parsed items:', { count: items.length, sample: items.slice(0, 2) });
+      } catch (error) {
+        console.warn('[API Route] Failed to parse items JSON:', error);
         items = [];
       }
     }
-    // Prepare JSON payload (not multipart)
-    const payload = {
+
+    // Extract files from formData (if any)
+    const files: Record<string, File> = {};
+    for (const [key, value] of formData.entries()) {
+      if (value instanceof File && key.startsWith('items.')) {
+        files[key] = value;
+      }
+    }
+    
+    console.log('[API Route] Files extracted:', Object.keys(files));
+
+    // Use the proper KIPU service function that has correct endpoint + document structure
+    console.log('[API Route] Calling createPatientEvaluationInKipu service...');
+    const { createPatientEvaluationInKipu } = await import('~/lib/kipu/service/create-patient-evaluation');
+    
+    const result = await createPatientEvaluationInKipu({
       evaluationId,
       patientId,
       notes,
       items,
-    };
-    const kipuRes = await kipuServerPost('/api/patient_evaluations', payload, credentials);
-    if (!kipuRes.success) {
-      console.error('KIPU API error:', kipuRes.error);
-      return NextResponse.json({ error: 'Failed to create patient evaluation in KIPU API', details: kipuRes.error }, { status: 502 });
-    }
-    // Explicitly type data as any
-    const data: any = kipuRes.data;
-    // Transform the response to match our application's format
-    const patientEvaluation = {
-      id: data?.patient_evaluation?.id?.toString(),
-      name: data?.patient_evaluation?.name,
-      status: data?.patient_evaluation?.status,
-      patientId: data?.patient_evaluation?.patient_id,
-      evaluationId: data?.patient_evaluation?.evaluation_id,
-      createdAt: data?.patient_evaluation?.created_at,
-      createdBy: data?.patient_evaluation?.created_by,
-      attachments: data?.patient_evaluation?.attachments || [],
-    };
+    }, files, credentials);
 
-    return NextResponse.json(patientEvaluation);
+    console.log('[API Route] Service call successful:', { 
+      id: result.id, 
+      name: result.name, 
+      status: result.status 
+    });
+
+    return NextResponse.json(result);
   } catch (error) {
-    console.error("Error creating patient evaluation:", error)
-    return NextResponse.json({ error: "Failed to create patient evaluation" }, { status: 500 })
+    console.error("[API Route] Error creating patient evaluation:", error)
+    return NextResponse.json({ 
+      error: "Failed to create patient evaluation",
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
   }
 }
 

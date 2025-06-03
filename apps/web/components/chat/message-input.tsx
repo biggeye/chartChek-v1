@@ -5,11 +5,14 @@ import type React from "react";
 import { useState, useRef } from "react";
 import { Button } from "@kit/ui/button";
 import { Textarea } from "@kit/ui/textarea";
-import { Send, FileUp, User as UserIcon, FileText as FileTextIcon, ChevronUp } from "lucide-react";
+import { Send, FileUp, User as UserIcon, FileText as FileTextIcon, ChevronUp, Loader2 } from "lucide-react";
 import { cn } from "@kit/ui/utils";
 import useSidebarStores from "~/store/sidebarStore";
 import { useContextQueueStore } from "~/store/chat/contextQueueStore";
 import { usePatientContextActions } from '~/hooks/usePatientContextActions';
+import { useFileUpload } from '~/hooks/useFileUpload';
+import { PdfGenerationButton } from '~/components/pdf/PdfGenerationButton';
+import type { ContextItem } from '~/lib/services/pdfService';
 
 import { PatientContextModalAnim } from "./patient-context-modal-anim";
 import { ContextQueue } from "./context-queue";
@@ -24,17 +27,26 @@ interface MessageInputProps {
 export function MessageInput({ input, onInputChange, onSubmit, disabled }: MessageInputProps) {
   const { isDesktopSidebarCollapsed } = useSidebarStores();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isContextPanelOpen, setIsContextPanelOpen] = useState(false);
   const [modalShouldClose, setModalShouldClose] = useState(false);
   const [showContextQueueRow, setShowContextQueueRow] = useState(false);
-  const [showPdfPreview, setShowPdfPreview] = useState(false);
-  const [pdfPreviewContent, setPdfPreviewContent] = useState<string | null>(null);
-  const [isPdfLoading, setIsPdfLoading] = useState(false);
-  const [pdfError, setPdfError] = useState<string | null>(null);
 
   const { items: contextQueueItems } = usePatientContextActions();
-  const { items: selectedContextItems, getSelectedIds } = useContextQueueStore();
+  const { getSelectedIds } = useContextQueueStore();
+  
+  // Use the file upload hook
+  const { 
+    isProcessing: isProcessingFile, 
+    lastError: fileProcessingError, 
+    processFile, 
+    clearError 
+  } = useFileUpload({
+    maxFileSize: 25 * 1024 * 1024, // 25MB limit for medical documents
+    chunkSize: 1500,
+    chunkOverlap: 200,
+  });
 
   const handleModalProcessed = () => {
     setModalShouldClose(true);
@@ -44,95 +56,50 @@ export function MessageInput({ input, onInputChange, onSubmit, disabled }: Messa
     }, 350);
   };
 
-  // Handler for PDF button
-  const handlePdfButtonClick = async () => {
-    setPdfError(null);
-    const selectedIds = getSelectedIds();
-    const selectedItems = contextQueueItems.filter(item => selectedIds.includes(item.id));
-    if (selectedItems.length === 0) return;
-    if (selectedItems.length === 1 && selectedItems[0] && selectedItems[0].type === 'evaluation') {
-      // Call generatePDFTool for structured path
-      setIsPdfLoading(true);
-      try {
-        const res = await fetch('/api/chat/tools', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            toolName: 'generatePDF',
-            parameters: {
-              patientId: selectedItems[0].id, // or use patientId if available
-              requestText: selectedItems[0].title,
-              templateId: selectedItems[0].id, // using id as templateId for now
-            },
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.result) throw new Error(data.error || 'Failed to generate PDF preview');
-        setPdfPreviewContent(data.result.previewMarkdown);
-      } catch (err: any) {
-        setPdfError(err.message || 'Unknown error');
-        setPdfPreviewContent(null);
-      } finally {
-        setIsPdfLoading(false);
-        setShowPdfPreview(true);
-      }
-    } else {
-      // Call generatePDFTool for unstructured (summary) path
-      setIsPdfLoading(true);
-      try {
-        const summaryText = selectedItems.map(item => `## ${item.title}\n\n${item.content || ''}`).join('\n\n');
-        const res = await fetch('/api/chat/tools', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            toolName: 'generatePDF',
-            parameters: {
-              patientId: selectedItems[0]?.id || 'unknown',
-              requestText: summaryText,
-            },
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok || !data.result) throw new Error(data.error || 'Failed to generate PDF preview');
-        setPdfPreviewContent(data.result.previewMarkdown);
-      } catch (err: any) {
-        setPdfError(err.message || 'Unknown error');
-        setPdfPreviewContent(null);
-      } finally {
-        setIsPdfLoading(false);
-        setShowPdfPreview(true);
-      }
+  // Handle file upload
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    if (!file) return;
+
+    const result = await processFile(file);
+    
+    if (result.success) {
+      console.log('[MessageInput] File successfully added to context queue');
+    } else if (result.error) {
+      console.error('[MessageInput] File upload failed:', result.error.message);
+      // Error is already handled by the hook
+    }
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
-  // Handler for final PDF generation
-  const handleGeneratePdf = async () => {
-    if (!pdfPreviewContent) return;
-    setIsPdfLoading(true);
-    setPdfError(null);
-    try {
-      const res = await fetch('/api/generate-pdf', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: pdfPreviewContent }),
-      });
-      if (!res.ok) throw new Error('Failed to generate PDF');
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = 'output.pdf';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-      setShowPdfPreview(false);
-    } catch (err: any) {
-      setPdfError(err.message || 'Unknown error');
-    } finally {
-      setIsPdfLoading(false);
-    }
+  // Trigger file input
+  const handleFileUploadClick = () => {
+    fileInputRef.current?.click();
   };
+
+  // Convert context queue items to PDF service format
+  const convertToPdfContextItems = (): ContextItem[] => {
+    const selectedIds = getSelectedIds();
+    return contextQueueItems
+      .filter(item => selectedIds.includes(item.id))
+      .map(item => ({
+        id: item.id,
+        title: item.title,
+        content: item.content || '',
+        type: item.type || 'document',
+      }));
+  };
+
+  const pdfContextItems = convertToPdfContextItems();
+  // Extract patientId from first item if available
+  const patientId = pdfContextItems.length > 0 && pdfContextItems[0] ? pdfContextItems[0].id : undefined;
 
   return (
     <div className={cn(
@@ -141,6 +108,32 @@ export function MessageInput({ input, onInputChange, onSubmit, disabled }: Messa
       isDesktopSidebarCollapsed ? "lg:left-24" : "lg:left-[calc(18rem+1rem)]",
       "xl:right-[calc(24rem+1rem)]"
     )}>
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,.txt,application/pdf,text/plain"
+        onChange={handleFileUpload}
+        className="hidden"
+        disabled={isProcessingFile}
+      />
+
+      {/* File processing error display */}
+      {fileProcessingError && (
+        <div className="mx-2 mt-2 p-2 bg-destructive/10 text-destructive text-xs rounded-md border border-destructive/20">
+          <div className="flex items-center justify-between">
+            <span>{fileProcessingError.message}</span>
+            <button 
+              onClick={clearError}
+              className="ml-2 hover:text-destructive/80 font-bold"
+              aria-label="Dismiss error"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       {contextQueueItems.length > 0 ? (
         <ContextQueue compact />
       ) : (
@@ -159,58 +152,66 @@ export function MessageInput({ input, onInputChange, onSubmit, disabled }: Messa
           {showContextQueueRow && (
             <div className="w-full flex flex-col gap-1 px-2 pt-2 pb-1 animate-slide-up">
               <div className="flex flex-col items-center justify-center text-xs text-muted-foreground py-2">
-                <span>No context items yet. Use the patient context panel to add documents/evaluations.</span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="mt-2"
-                  onClick={() => {
-                    setShowContextQueueRow(false);
-                    setIsContextPanelOpen(true);
-                  }}
-                >
-                  Open Patient Context
-                </Button>
+                <span>No context items yet. Use the patient context panel or upload files to add context.</span>
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowContextQueueRow(false);
+                      setIsContextPanelOpen(true);
+                    }}
+                  >
+                    Open Patient Context
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setShowContextQueueRow(false);
+                      handleFileUploadClick();
+                    }}
+                    disabled={isProcessingFile}
+                  >
+                    {isProcessingFile ? 'Processing...' : 'Upload File'}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
         </>
       )}
-      {/* PDF Button: Only show if context queue is non-empty */}
+      
+      {/* PDF Generation Button: Only show if context queue is non-empty */}
       {contextQueueItems.length > 0 && (
         <div className="flex justify-end px-2 pt-2">
-          <Button
-            // TODO: Use custom styling for PDF button if needed
+          <PdfGenerationButton
+            contextItems={pdfContextItems}
+            patientId={patientId}
             variant="secondary"
             size="sm"
-            className="bg-green-600 text-white hover:bg-green-700"
-            onClick={handlePdfButtonClick}
-            disabled={isPdfLoading}
-          >
-            {isPdfLoading ? 'Loading...' : 'PDF'}
-          </Button>
+          />
         </div>
       )}
-      {/* PDF Preview Modal (now with real preview) */}
-      {showPdfPreview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-lg w-full">
-            <h2 className="text-lg font-bold mb-2">PDF Preview</h2>
-            {pdfError && <div className="text-red-600 text-xs mb-2">{pdfError}</div>}
-            <pre className="whitespace-pre-wrap text-xs bg-gray-100 p-2 rounded max-h-96 overflow-auto">{pdfPreviewContent}</pre>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button variant="outline" onClick={() => setShowPdfPreview(false)} disabled={isPdfLoading}>Cancel</Button>
-              <Button variant="secondary" onClick={handleGeneratePdf} disabled={!!pdfError || isPdfLoading}>
-                {isPdfLoading ? 'Generating...' : 'Generate PDF'}
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+
       <div className="flex items-center w-full gap-2 p-1">
         <div className="flex items-center gap-1 flex-shrink-0">
-          <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-accent/50">
-            <FileUp className="h-4 w-4" />
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={cn(
+              "rounded-full h-8 w-8 hover:bg-accent/50 transition-transform duration-200",
+              isProcessingFile && "scale-90 text-primary"
+            )}
+            onClick={handleFileUploadClick}
+            disabled={isProcessingFile}
+            title={isProcessingFile ? "Processing file..." : "Upload PDF or TXT file"}
+          >
+            {isProcessingFile ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileUp className="h-4 w-4" />
+            )}
           </Button>
           <Button
             variant="ghost"

@@ -34,11 +34,18 @@ export function ChatHistory({ isMobileMenu, onMobileMenuClose }: ChatHistoryProp
   const [isOpen, setIsOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
   
-  const { sessions, isLoading, loadSessions, deleteSession, createSession } = useHistoryStore();
+  const { sessions, isLoading, loadSessions, deleteSession, createSession, cleanupEmptySessions } = useHistoryStore();
 
   useEffect(() => {
     loadSessions();
-  }, [loadSessions]);
+    
+    // Run cleanup of empty sessions periodically (every 5 minutes)
+    const cleanupInterval = setInterval(() => {
+      cleanupEmptySessions();
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(cleanupInterval);
+  }, [loadSessions, cleanupEmptySessions]);
 
   const handleNewChat = async () => {
     const newSessionId = await createSession();

@@ -1,14 +1,16 @@
 "use client";
 
-import { useRef, useEffect, Fragment } from "react";
-import { Bot, User } from "lucide-react";
+import { useRef, useEffect, Fragment, useState } from "react";
+import { Bot, User, Copy, Check } from "lucide-react";
 import { Avatar, AvatarFallback } from '@kit/ui/avatar';
 import { ScrollArea } from "@kit/ui/scroll-area";
+import { Button } from "@kit/ui/button";
 import { cn } from "@kit/ui/utils";
 import { KipuToolRenderer } from './kipu/KipuToolRenderer';
 import { Markdown } from "./markdown";
 import { Message } from 'ai/react';
 import { Spinner } from '@kit/ui/spinner';
+import { PdfGenerationButton, type ContextItem } from '~/components/pdf';
 
 interface MessageListProps {
   messages: Message[];
@@ -125,6 +127,111 @@ const MessageContent = ({ message }: { message: Message }) => {
   );
 };
 
+// Helper function to extract text content from a message
+const extractMessageText = (message: Message): string => {
+  if (message.content) {
+    return message.content;
+  }
+
+  if (message.parts?.length) {
+    return message.parts
+      .map((part: MessagePart) => {
+        if (part.type === 'text' && part.text) return part.text;
+        if (part.type === 'reasoning' && part.reasoning) return `Reasoning: ${part.reasoning}`;
+        return '';
+      })
+      .filter(Boolean)
+      .join('\n\n');
+  }
+
+  return '';
+};
+
+// Convert message to PDF context item
+const messageToContextItem = (message: Message): ContextItem => {
+  const content = extractMessageText(message);
+  const timestamp = new Date().toLocaleString();
+  
+  return {
+    id: message.id,
+    title: `Chat Response - ${timestamp}`,
+    content,
+    type: 'chat-message',
+  };
+};
+
+const CopyButton = ({ message }: { message: Message }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    const text = extractMessageText(message);
+    if (!text.trim()) return;
+
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy message:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleCopy}
+      className="h-6 w-6 p-0 hover:bg-accent/50"
+      title="Copy message"
+    >
+      {copied ? (
+        <Check className="h-3 w-3 text-green-600" />
+      ) : (
+        <Copy className="h-3 w-3" />
+      )}
+    </Button>
+  );
+};
+
+const MessageFooter = ({ message }: { message: Message }) => {
+  const contextItem = messageToContextItem(message);
+  const hasContent = extractMessageText(message).trim().length > 0;
+
+  if (!hasContent) return null;
+
+  return (
+    <div className="flex items-center justify-end gap-1 mt-2 opacity-60 hover:opacity-100 transition-opacity">
+      <CopyButton message={message} />
+      <PdfGenerationButton
+        contextItems={[contextItem]}
+        variant="ghost"
+        size="sm"
+        className="h-6 w-6 p-0 hover:bg-accent/50"
+        showPreview={true}
+      >
+        <div title="Generate PDF">
+          <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14,2 14,8 20,8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10,9 9,9 8,9"/>
+          </svg>
+        </div>
+      </PdfGenerationButton>
+    </div>
+  );
+};
+
 export function MessageList({ messages, isLoading }: MessageListProps) {
   const textareaRef = useRef<HTMLDivElement>(null);
 
@@ -148,6 +255,7 @@ export function MessageList({ messages, isLoading }: MessageListProps) {
                 {message.role !== 'data' && <MessageAvatar role={message.role as MessageRole} />}
                 <div className="flex-1 space-y-2">
                   <MessageContent message={message} />
+                  {message.role === 'assistant' && <MessageFooter message={message} />}
                 </div>
               </div>
             ))}

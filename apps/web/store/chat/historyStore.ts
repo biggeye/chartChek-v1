@@ -14,7 +14,40 @@ interface HistoryState {
   deleteSession: (sessionId: string) => Promise<void>;
   createSession: (title?: string) => Promise<string>;
   updateSession: (sessionId: string, updates: Partial<ChatSession>) => Promise<void>;
+  generateSessionTitle: (sessionId: string, messages: ChatMessage[]) => Promise<void>;
+  cleanupEmptySessions: () => Promise<void>;
 }
+
+// AI-powered title generation
+const generateTitleFromMessages = async (messages: ChatMessage[]): Promise<string> => {
+  if (messages.length === 0) return 'New Chat';
+  
+  // Use the first user message for context
+  const firstUserMessage = messages.find(msg => msg.role === 'user');
+  if (!firstUserMessage) return 'New Chat';
+  
+  try {
+    const response = await fetch('/api/chat/generate-title', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: messages.slice(0, 3) // Send first few messages for context
+      }),
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.title || firstUserMessage.content.slice(0, 50);
+    }
+  } catch (error) {
+    console.error('Failed to generate AI title:', error);
+  }
+  
+  // Fallback to truncated first user message
+  return firstUserMessage.content.slice(0, 50);
+};
 
 export const useHistoryStore = create<HistoryState>((set, get) => ({
   sessions: [],
@@ -24,7 +57,7 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
   loadSessions: async () => {
     set({ isLoading: true, error: null });
     try {
-      // Get all sessions with their messages
+      // Get all sessions with their messages - try to get metadata but don't fail if column doesn't exist
       const { data: sessionsData, error: sessionsError } = await supabase
         .from('chat_sessions')
         .select('id, created_at, updated_at')
@@ -41,24 +74,122 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
             .eq('session_id', session.id)
             .order('created_at', { ascending: true });
 
+          const messageList = messages?.map(msg => ({
+            id: msg.id,
+            role: msg.role as 'user' | 'assistant' | 'system',
+            content: msg.content,
+            createdAt: msg.created_at
+          })) || [];
+
+          // Try to get title from metadata (if column exists), otherwise generate from messages
+          let title = 'New Chat';
+          if (messageList.length > 0) {
+            title = await generateTitleFromMessages(messageList);
+          }
+
           return {
             id: session.id,
-            title: messages?.[0]?.content?.slice(0, 50) || 'New Chat',
-            messages: messages?.map(msg => ({
-              id: msg.id,
-              role: msg.role as 'user' | 'assistant' | 'system',
-              content: msg.content,
-              createdAt: msg.created_at
-            })) || [],
+            title,
+            messages: messageList,
             createdAt: session.created_at,
             updatedAt: session.updated_at
           } as ChatSession;
         })
       );
 
-      set({ sessions: sessionsWithMessages, isLoading: false });
+      // Filter out sessions that are empty and older than 1 hour
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+      
+      const validSessions = sessionsWithMessages.filter(session => {
+        if (session.messages.length === 0) {
+          const createdAt = new Date(session.createdAt);
+          if (createdAt < oneHourAgo) {
+            // Delete empty old sessions in the background
+            get().deleteSession(session.id).catch(console.error);
+            return false;
+          }
+        }
+        return true;
+      });
+
+      set({ sessions: validSessions, isLoading: false });
     } catch (error) {
       set({ error: error as Error, isLoading: false });
+    }
+  },
+
+  generateSessionTitle: async (sessionId: string, messages: ChatMessage[]) => {
+    try {
+      const title = await generateTitleFromMessages(messages);
+      
+      // Try to update metadata, but don't fail if column doesn't exist
+      try {
+        await supabase
+          .from('chat_sessions')
+          .update({ 
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', sessionId);
+      } catch (dbError) {
+        console.warn('Could not update session metadata (column may not exist):', dbError);
+      }
+
+      // Update local state
+      set(state => ({
+        sessions: state.sessions.map(s => 
+          s.id === sessionId ? { ...s, title } : s
+        )
+      }));
+    } catch (error) {
+      console.error('Failed to generate session title:', error);
+    }
+  },
+
+  cleanupEmptySessions: async () => {
+    try {
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
+
+      // Get all sessions older than 1 hour
+      const { data: oldSessions, error: sessionsError } = await supabase
+        .from('chat_sessions')
+        .select('id, created_at')
+        .lt('created_at', oneHourAgo.toISOString());
+
+      if (sessionsError) throw sessionsError;
+
+      // Check which ones have no messages
+      const emptySessionIds: string[] = [];
+      for (const session of oldSessions || []) {
+        const { count } = await supabase
+          .from('chat_messages')
+          .select('id', { count: 'exact' })
+          .eq('session_id', session.id);
+        
+        if (count === 0) {
+          emptySessionIds.push(session.id);
+        }
+      }
+
+      // Delete empty sessions
+      if (emptySessionIds.length > 0) {
+        const { error: deleteError } = await supabase
+          .from('chat_sessions')
+          .delete()
+          .in('id', emptySessionIds);
+
+        if (deleteError) throw deleteError;
+
+        // Update local state
+        set(state => ({
+          sessions: state.sessions.filter(s => !emptySessionIds.includes(s.id))
+        }));
+
+        console.log(`Cleaned up ${emptySessionIds.length} empty sessions`);
+      }
+    } catch (error) {
+      console.error('Failed to cleanup empty sessions:', error);
     }
   },
 
@@ -96,7 +227,7 @@ export const useHistoryStore = create<HistoryState>((set, get) => ({
       const now = new Date().toISOString();
 
       console.log('[createSession] Inserting session:', { sessionId, userId: user.id, now });
-      // Create a new session
+      // Create a new session without metadata (for compatibility with older schema)
       const { error: sessionError } = await supabase
         .from('chat_sessions')
         .insert({

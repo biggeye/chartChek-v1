@@ -58,15 +58,27 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   },
   fetchKipuTemplate: async (evaluationId: number) => {
     set({ isLoadingKipuTemplates: true, error: null });
-    console.log('KIPU Template Store] template ID (evaluationId): ', evaluationId);
+    console.log('[KIPU Template Store] template ID (evaluationId): ', evaluationId);
     try {
       const response = await fetch(`/api/kipu/evaluations/${evaluationId}`);
-      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      
+      if (!response.ok) {
+        // Get the error details from the response
+        const errorText = await response.text();
+        console.error('[KIPU Template Store] API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorText
+        });
+        throw new Error(`HTTP error ${response.status}: ${errorText}`);
+      }
 
       const data = await response.json();
+      console.log('[KIPU Template Store] Response data:', data);
 
       if (data) {
-        set({ selectedKipuTemplate: data.evaluation });
+        // Fix: API returns evaluation data directly, not wrapped in data.evaluation
+        set({ selectedKipuTemplate: data });
       } else {
         throw new Error('Unexpected response format');
       }

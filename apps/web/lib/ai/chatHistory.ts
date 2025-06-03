@@ -4,7 +4,7 @@ import { CoreMessage } from 'ai';
 interface SaveChatMessagesParams {
   sessionId: string;
   userId: string;
-  messages: (CoreMessage & { promptId?: string })[];
+  messages: CoreMessage[];
 }
 
 export const saveChatMessages = async ({
@@ -35,8 +35,7 @@ export const saveChatMessages = async ({
     session_id: sessionId,
     account_id: userId,
     role: msg.role,
-    content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content),
-    prompt_id: msg.promptId
+    content: typeof msg.content === 'string' ? msg.content : JSON.stringify(msg.content)
   }));
 
   const { error } = await supabase.from('chat_messages').insert(formattedMessages);

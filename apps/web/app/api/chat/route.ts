@@ -11,7 +11,6 @@ interface ChatRequestBody {
   messages: CoreMessage[];
   systemPrompt?: string;
   context?: string | { content: string }[];
-  promptId?: string;
 }
 
 interface ContextItemResponse {

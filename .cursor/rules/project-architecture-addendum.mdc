@@ -1,7 +1,7 @@
 ---
 description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 # ChartChek Architecture Addendum
 
@@ -127,6 +127,55 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+```
+
+### API Route Pattern
+API routes should follow this consistent structure:
+```typescript
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  // 1. Parameter validation
+  if (!params.id) {
+    return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+  }
+
+  try {
+    // 2. Data fetching/processing
+    const data = await fetchData(params.id)
+    
+    // 3. Schema validation
+    const validatedData = schema.parse(data)
+    
+    // 4. Response
+    return NextResponse.json(validatedData)
+  } catch (error) {
+    // 5. Error handling
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Invalid data format' }, { status: 400 })
+    }
+    console.error('Unexpected error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+```
+
+### Error Response Pattern
+All API error responses should follow this structure:
+```typescript
+interface APIErrorResponse {
+  error: string;
+  code?: string;
+  details?: Record<string, unknown>;
+}
+
+// Usage
+return NextResponse.json({
+  error: 'Failed to fetch profile',
+  code: 'PROFILE_NOT_FOUND',
+  details: { userId: params.userId }
+}, { status: 404 })
 ```
 
 ## Pending Rules

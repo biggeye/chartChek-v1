@@ -58,22 +58,44 @@ export const useTemplateStore = create<TemplateState>((set, get) => ({
   },
   fetchKipuTemplate: async (evaluationId: number) => {
     set({ isLoadingKipuTemplates: true, error: null });
-    console.log('KIPU Template Store] template ID (evaluationId): ', evaluationId);
+    console.log('🔄 [KIPU Template Store] Fetching template with ID:', evaluationId);
     try {
       const response = await fetch(`/api/kipu/evaluations/${evaluationId}`);
       if (!response.ok) throw new Error(`HTTP error ${response.status}`);
 
       const data = await response.json();
+      console.log('📦 [KIPU Template Store] Raw API Response:', {
+        hasData: !!data,
+        dataKeys: data ? Object.keys(data) : [],
+        evaluationItems: data?.evaluationItems ? `Array(${data.evaluationItems.length})` : 'none',
+        items: data?.items ? `Array(${data.items.length})` : 'none',
+        fullData: data
+      });
 
-      if (data) {
-        set({ selectedKipuTemplate: data.evaluation });
+      if (data && data.evaluation) {
+        // The evaluation data is nested under the 'evaluation' key
+        const template = {
+          ...data.evaluation,
+          evaluationItems: data.evaluation.evaluationItems || []
+        };
+        set({ selectedKipuTemplate: template });
+        console.log('✅ [KIPU Template Store] Template set in store:', {
+          hasTemplate: !!template,
+          templateKeys: Object.keys(template),
+          evaluationItems: template.evaluationItems ? `Array(${template.evaluationItems.length})` : 'none',
+          firstItem: template.evaluationItems?.[0] ? {
+            id: template.evaluationItems[0].id,
+            fieldType: template.evaluationItems[0].fieldType,
+            label: template.evaluationItems[0].label
+          } : null
+        });
       } else {
         throw new Error('Unexpected response format');
       }
     } catch (error: unknown) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       set({ error: `Failed to fetch evaluation template: ${errorMessage}` });
-      console.error('Error fetching evaluation template:', error);
+      console.error('❌ [KIPU Template Store] Error fetching evaluation template:', error);
     } finally {
       set({ isLoadingKipuTemplates: false });
     }

@@ -156,3 +156,35 @@ async function calculateStatistics(
 - Enhanced monitoring capabilities
 
 - Automated testing improvements 
+
+### KIPU Data Transformation Patterns
+
+#### Case Conversion
+- All KIPU API responses must be converted from snake_case to camelCase
+- Use the `snakeToCamel` utility from `@/utils/case-converters.ts`
+- Apply conversion at the API route level before data crosses to client
+
+#### Terminology Mapping
+The following mappings must be consistently applied across the application:
+- KIPU "locations" → Our "facilities"
+- KIPU "evaluation" → Our "patient evaluation template"
+- KIPU "patient evaluation" → Our "instantiation of a patient evaluation template"
+
+#### Data Flow Rules
+1. Frontend components must never directly access services
+2. All data transformations should be handled in the service layer
+3. KIPU API interactions must go through `@/lib/kipu/service`
+4. Server-side utilities should be in `@/lib/server`
+
+### Service Layer Organization
+- **Client Services** (`/lib/services/*`)
+  - Handle internal API interactions
+  - Use camelCase naming
+  - Follow service->store->hook pattern
+  - Example: `usePatientService.ts`
+
+- **Server Services** (`/lib/kipu/service/*`)
+  - Handle KIPU EMR API interactions
+  - Use hyphen-case for endpoints
+  - Maintain clear separation from internal routes
+  - Example: `patientStatistics.ts` 

@@ -4,10 +4,11 @@ import { serverLoadKipuCredentialsFromSupabase } from '~/lib/kipu/auth/server';
 import { KipuApiResponse } from '~/types/kipu/kipuAdapter';
 import { kipuServerGet } from '~/lib/kipu/auth/server';
 import { createServer } from '~/utils/supabase/server';
-import { snakeToCamel } from '~/utils/case-converters'; // Import the utility
+import { snakeToCamel } from '~/utils/case-converters';
+import { transformKipuTemplate } from '~/lib/transformations/evaluation/template';
 
 /**
- * GET /api/kipu/evaluations/[evaluationId]
+ * GET /api/kipu/evaluations/[id]
  *
  * Retrieves a specific evaluation template from KIPU by ID
  * This endpoint returns the complete template definition including all fields,
@@ -15,12 +16,10 @@ import { snakeToCamel } from '~/utils/case-converters'; // Import the utility
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ evaluationId: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    // Await the params object before destructuring
-    const resolvedParams = await params;
-    const templateId: string = resolvedParams.evaluationId;
+    const templateId = params.id;
     const supabase = await createServer();
 
     // Get the user session to ensure they're authenticated
@@ -52,9 +51,12 @@ export async function GET(
         { status: 400 }
       );
     }
-    const camelCaseData = snakeToCamel(response.data);
 
-    return NextResponse.json(camelCaseData);
+    // Transform the response data to camelCase and then transform the template
+    const camelCaseData = snakeToCamel(response.data);
+    const transformedTemplate = transformKipuTemplate(camelCaseData);
+
+    return NextResponse.json(transformedTemplate);
   } catch (error: any) {
     console.error('Error fetching evaluation:', error);
     return NextResponse.json(

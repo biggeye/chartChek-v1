@@ -5,6 +5,8 @@ import { kipuServerGet, serverLoadKipuCredentialsFromSupabase, kipuServerPost } 
 import { KipuEvaluationResponse } from '~/types/kipu/kipuAdapter';
 import { snakeToCamel } from '~/utils/case-converters';
 import { kipuListPatientEvaluations } from '~/lib/kipu/service/patient-evaluation-service';
+import { parsePatientId } from '~/lib/kipu/auth/config';
+
 /**
  * GET handler for retrieving patient evaluations
  * 
@@ -103,107 +105,4 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-
-
-/**
- * POST /api/patient-evaluations
- *
- * Creates a new patient evaluation in the KIPU API with file attachments if provided
- */
-export async function POST(request: NextRequest) {
-  try {
-    // For multipart form data, we need to parse it differently
-    const formData = await request.formData()
-
-    // Extract the basic evaluation data
-    const evaluationId = formData.get("evaluationId") as string
-    const patientId = formData.get("patientId") as string
-    const notes = formData.get("notes") as string
-
-    // Validate required fields
-    if (!evaluationId) {
-      return NextResponse.json({ error: "Evaluation ID is required" }, { status: 400 })
-    }
-
-    if (!patientId) {
-      return NextResponse.json({ error: "Patient ID is required" }, { status: 400 })
-    }
-
-    // DEPRECATED: getKipuAuthHeaders/fetch. Use serverLoadKipuCredentialsFromSupabase + kipuServerPost
-    const credentials = await serverLoadKipuCredentialsFromSupabase();
-    if (!credentials) {
-      return NextResponse.json({ error: 'No KIPU credentials found for user/facility' }, { status: 500 });
-    }
-    // Parse items from formData if present
-    let items: any[] = [];
-    const itemsJson = formData.get('items');
-    if (typeof itemsJson === 'string') {
-      try {
-        items = JSON.parse(itemsJson);
-      } catch {
-        items = [];
-      }
-    }
-    // Prepare JSON payload (not multipart)
-    const payload = {
-      evaluationId,
-      patientId,
-      notes,
-      items,
-    };
-    const kipuRes = await kipuServerPost('/api/patient_evaluations', payload, credentials);
-    if (!kipuRes.success) {
-      console.error('KIPU API error:', kipuRes.error);
-      return NextResponse.json({ error: 'Failed to create patient evaluation in KIPU API', details: kipuRes.error }, { status: 502 });
-    }
-    // Explicitly type data as any
-    const data: any = kipuRes.data;
-    // Transform the response to match our application's format
-    const patientEvaluation = {
-      id: data?.patient_evaluation?.id?.toString(),
-      name: data?.patient_evaluation?.name,
-      status: data?.patient_evaluation?.status,
-      patientId: data?.patient_evaluation?.patient_id,
-      evaluationId: data?.patient_evaluation?.evaluation_id,
-      createdAt: data?.patient_evaluation?.created_at,
-      createdBy: data?.patient_evaluation?.created_by,
-      attachments: data?.patient_evaluation?.attachments || [],
-    };
-
-    return NextResponse.json(patientEvaluation);
-  } catch (error) {
-    console.error("Error creating patient evaluation:", error)
-    return NextResponse.json({ error: "Failed to create patient evaluation" }, { status: 500 })
-  }
-}
-
-// Helper function to convert FormData to string with proper boundary format
-async function formDataToString(formData: FormData, boundary: string): Promise<string> {
-  let result = ""
-
-  // Iterate through all entries in the FormData
-  for (const [key, value] of formData.entries()) {
-    result += `--${boundary}\r\n`
-
-    if (value instanceof File) {
-      result += `Content-Disposition: form-data; name="${key}"; filename="${value.name}"\r\n`
-      result += `Content-Type: ${value.type || "application/octet-stream"}\r\n\r\n`
-
-      // For files, we'd need to read the binary data
-      // This is a simplified version - in a real implementation, you'd need to handle binary data properly
-      result += "[FILE BINARY DATA PLACEHOLDER]"
-    } else {
-      result += `Content-Disposition: form-data; name="${key}"\r\n\r\n`
-      result += value
-    }
-
-    result += "\r\n"
-  }
-
-  // Add the final boundary
-  result += `--${boundary}--\r\n`
-
-  return result
 }

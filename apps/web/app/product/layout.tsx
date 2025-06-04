@@ -6,6 +6,8 @@ import { createClient } from '~/utils/supabase/client';
 import { useEffect, useState, useMemo } from 'react';
 import { AppLogo } from '~/components/app-logo';
 import { Loader2 } from 'lucide-react';
+import { Analytics } from "@vercel/analytics/next"
+
 
 interface UserData {
   id: string;
@@ -63,6 +65,7 @@ export default function ProductLayout({
 
 
   return (
+  
     <AppLayout
       account_id={userData.id}
       username={userData.username}
@@ -70,6 +73,8 @@ export default function ProductLayout({
     >
       {children}
       <DebugPanel />
+      <Analytics /> 
     </AppLayout>
-  );
+ 
+);
 }
